@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Drizzle Time Menu</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>Activate zone {{ zone }}</h1>
+  <h2>For how long?</h2>
+  {% for num in [ 5, 10, 15, 20, 30 ] -%}
+  <input type="button" value="{{ num }} minutes" onclick="window.location.href='/zone/{{ zone }}/{{ num }}/'" \>
+  {% endfor -%}
+  <input type="button" value="Cancel" class="cancel" onclick="window.location.href='/'" />
+</body>
+</html>
