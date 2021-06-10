@@ -39,8 +39,8 @@ def index():
     state = plate.relaySTATE(0)
     # Check each bit of state and comp a list of bools
     # which represents whether each zone is on or off
-    active = [ x for x in range(0,7) if (state >> x) % 2 ]
-    return render_template('zone.html', active=active)
+    active = [ x for x in range(0,NUM_ZONES) if (state >> x) % 2 ]
+    return render_template('zone.html', num_zones=NUM_ZONES, active=active)
 
 @app.route('/time/<int:id>/')
 def time(id):

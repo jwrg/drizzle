@@ -6,7 +6,7 @@
 </head>
 <body>
   <h1>Activate zone</h1>
-  {% for num in range(0,7) -%}
+  {% for num in range(0,num_zones) -%}
   <input type="button" value="Zone {{ num + 1 }}"
   {%- if num is in(active) %} class="active"
   {%- endif %} onclick="window.location.href='/time/{{ num + 1 }}/'" \>
