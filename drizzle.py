@@ -42,10 +42,25 @@ def index():
     active = [ x for x in range(0,NUM_ZONES) if (state >> x) % 2 ]
     return render_template('zone.html', num_zones=NUM_ZONES, active=active)
 
-@app.route('/time/<int:id>/')
-def time(id):
-    return render_template('time.html', zone=id)
+@app.route('/time/<int:zone>/')
+def time(zone):
+    return render_template('time.html', zone=zone)
 
-@app.route('/zone/<int:id>/<int:time>/')
-def zone(id, time):
-    return 'Turning on zone %d for %d minutes.' % (id, time)
+@app.route('/confirm/<int:zone>/<int:time>/<bool:enable>/')
+def confirm(zone, time):
+    return render_template('confirm.html', zone=zone, time=time)
+
+@app.route('/disable/<int:zone>/')
+def disable(zone):
+    # Turn off the requested zone
+    zoneOff(zone)
+    return redirect(url_for('.index'))
+
+@app.route('/enable/<int:zone>/<int:time>/')
+def enable(zone, time):
+    # Turn on the requested zone
+    zoneOn(zone)
+    # Create a timer object to turn off the zone
+    # after the specified number of minutes
+    zone_timers[zone] = Timer(60.0 * time, zoneOff(zone))
+    return redirect(url_for('.index'))

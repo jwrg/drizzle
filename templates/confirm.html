@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Drizzle Selection Confirmation</title>
+    <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <h1>Please confirm your selection:</h1>
+  {%- if time == 0 %}
+  <h2>De-activating zone {{ zone }}</h2>
+  <input type="button" value="Confirm" class="submit" onclick="window.location.href='/disable/{{ zone }}/'" />
+  {% else %}
+  <h2>Activating zone {{ zone }}</h2>
+  <h2>For {{ time }} minutes</h2>
+  <input type="button" value="Confirm" class="submit" onclick="window.location.href='/enable/{{ zone }}/{{ time }}/'" />
+  {% endif -%}
+  <input type="button" value="Cancel" class="cancel" onclick="window.location.href='/'" />
+</body>
+</html>

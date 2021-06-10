@@ -8,8 +8,9 @@
   <h1>Activate zone</h1>
   {% for num in range(0,num_zones) -%}
   <input type="button" value="Zone {{ num + 1 }}"
-  {%- if num is in(active) %} class="active"
-  {%- endif %} onclick="window.location.href='/time/{{ num + 1 }}/'" \>
+  {%- if num is in(active) %} class="active" onclick="window.location.href='/confirm/{{ num + 1 }}/0/'"
+  {%- else %} onclick="window.location.href='/time/{{ num + 1 }}/'"
+  {%- endif %} />
   {% endfor -%}
 </body>
 </html>
