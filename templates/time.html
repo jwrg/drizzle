@@ -5,8 +5,10 @@
     <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <h1>Activate zone {{ zone }}</h1>
-  <h2>For how long?</h2>
+  <h1>Drizzle</h1>
+  <h3>Make it rain.</h3>
+  <h2>Activate zone {{ zone }}</h2>
+  <p>For how long?</p>
   {% for num in [ 1, 5, 10, 15, 20, 30 ] -%}
   <input type="button" value="{{ num }} minutes" onclick="window.location.href='/confirm/{{ zone }}/{{ num }}/'" \>
   {% endfor -%}
