@@ -1,13 +1,14 @@
 body {
   width: 100%;
-  height: 4000px;
+  min-height: 100vh;
   font-family: Futura, ‘Century Gothic’, AppleGothic, sans-serif;
-  background-image: linear-gradient(white, blue);
+  background-image: linear-gradient(azure, cornflowerblue);
 }
 
 div.container {
   width: 80%;
   margin: 50px auto;
+}
 
 * {
   margin: 0;
@@ -28,14 +29,18 @@ h2 {
 }
 
 h3, p, input {
-  font-size: 32pt;
+  font-size: 36pt;
+}
+
+h2, h3 {
+  margin-bottom: 1em;
 }
 
 input[type="button"] {
   width: 300px;
   height: 300px;
-  margin: 25px;
-  background-image: linear-gradient(48deg, lightblue, white);
+  margin: 35px;
+  background-image: linear-gradient(48deg, honeydew, floralwhite);
   border-radius: 150px;
   border-width: 2px;
   -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
@@ -44,27 +49,27 @@ input[type="button"] {
 
 input.active {
   color: white;
-  border-color: blue;
-  background-image: linear-gradient(48deg, lightblue, blue);
+  border-color: cornflowerblue;
+  background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
 }
 
 input.cancel {
   color: white;
-  border-color: red;
-  background-image: linear-gradient(48deg, red, darkred);
+  border-color: indianred;
+  background-image: linear-gradient(48deg, crimson, darkred);
   font-size: 24pt;
 }
 
 input.submit {
   color: white;
-  border-color: green;
+  border-color: palegreen;
   background-image: linear-gradient(48deg, forestgreen, darkgreen);
   font-size: 24pt;
 }
 
 input:active {
-  color: #ffffff !important;
-  background: #f6b93b;
-  border-color: #f6b93b !important;
+  color: white !important;
+  background: rebeccapurple;
+  border-color: violet !important;
   transition: all 0.4s ease 0s;
 }
