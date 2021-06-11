@@ -61,3 +61,7 @@ def enable(zone, time):
     zone_timer = Timer(60.0 * time, zoneOff, [zone])
     zone_timer.start()
     return redirect(url_for('.index'))
+
+if __name__ == "__main__":
+    import bjoern
+    bjoern.run(app, "0.0.0.0", 8080)
