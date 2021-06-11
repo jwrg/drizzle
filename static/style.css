@@ -75,3 +75,17 @@ input:active {
   border-color: aliceblue !important;
   transition: all 0.6s ease 0s;
 }
+
+input.cancel:active {
+  color: white !important;
+  background: maroon;
+  border-color: firebrick !important;
+  transition: all 0.6s ease 0s;
+}
+
+input.submit:active {
+  color: white !important;
+  background: limegreen;
+  border-color: chartreuse !important;
+  transition: all 0.6s ease 0s;
+}
