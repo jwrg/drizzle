@@ -11,6 +11,7 @@
   <h2>Please confirm your selection:</h2>
   {%- if time == 0 %}
   <p>De-activating zone {{ zone }}</p>
+  <br />
   <input type="button" value="Confirm" class="submit" onclick="window.location.href='/disable/{{ zone }}/'" />
   {% else %}
   <p>Activating zone {{ zone }}</p>

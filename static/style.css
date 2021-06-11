@@ -2,7 +2,7 @@ body {
   width: 100%;
   min-height: 100vh;
   font-family: Futura, ‘Century Gothic’, AppleGothic, sans-serif;
-  background-image: linear-gradient(azure, cornflowerblue);
+  background-image: linear-gradient(azure, lightskyblue);
 }
 
 div.container {
@@ -20,15 +20,17 @@ h1, h2, h3, p {
 }
 
 h1 {
-  color: blue;
+  color: midnightblue;
   font-size: 64pt;
 }
 
 h2 {
+  color: black;
   font-size: 48pt;
 }
 
 h3, p, input {
+  color: navy;
   font-size: 36pt;
 }
 
@@ -39,10 +41,10 @@ h2, h3 {
 input[type="button"] {
   width: 300px;
   height: 300px;
-  margin: 35px;
+  margin: 40px;
   background-image: linear-gradient(48deg, honeydew, floralwhite);
   border-radius: 150px;
-  border-width: 2px;
+  border-width: 1px;
   -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
   -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
 }
@@ -69,7 +71,7 @@ input.submit {
 
 input:active {
   color: white !important;
-  background: rebeccapurple;
-  border-color: violet !important;
-  transition: all 0.4s ease 0s;
+  background: powderblue;
+  border-color: aliceblue !important;
+  transition: all 0.6s ease 0s;
 }
