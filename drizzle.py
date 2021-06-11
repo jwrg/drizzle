@@ -1,9 +1,10 @@
-import threading
 import time
 import logging
+from threading import Timer
 import piplates.RELAYplate as plate
 from flask import Flask
 from flask import render_template
+from flask import redirect
 app = Flask(__name__)
 
 # Configure logging format and verbosity
