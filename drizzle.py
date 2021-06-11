@@ -47,7 +47,7 @@ def index():
 def time(zone):
     return render_template('time.html', zone=zone)
 
-@app.route('/confirm/<int:zone>/<int:time>/<bool:enable>/')
+@app.route('/confirm/<int:zone>/<int:time>/')
 def confirm(zone, time):
     return render_template('confirm.html', zone=zone, time=time)
 
