@@ -5,6 +5,10 @@ body {
   background-image: linear-gradient(white, blue);
 }
 
+div.container {
+  width: 80%;
+  margin: 50px auto;
+
 * {
   margin: 0;
   padding: 0;
@@ -15,6 +19,7 @@ h1, h2, h3, p {
 }
 
 h1 {
+  color: blue;
   font-size: 64pt;
 }
 
@@ -22,18 +27,14 @@ h2 {
   font-size: 48pt;
 }
 
-h3, p {
+h3, p, input {
   font-size: 32pt;
-}
-
-input {
-  font-size: 72pt;
 }
 
 input[type="button"] {
   width: 300px;
-  margin: auto;
-  padding: 4ex 2ex;
+  height: 300px;
+  margin: 25px;
   background-image: linear-gradient(48deg, lightblue, white);
   border-radius: 150px;
   border-width: 2px;
@@ -51,6 +52,13 @@ input.cancel {
   color: white;
   border-color: red;
   background-image: linear-gradient(48deg, red, darkred);
+  font-size: 24pt;
+}
+
+input.submit {
+  color: white;
+  border-color: green;
+  background-image: linear-gradient(48deg, forestgreen, darkgreen);
   font-size: 24pt;
 }
 

@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
+  <div class="container">
   <h1>Drizzle</h1>
   <h3>Make it rain.</h3>
   <h2>Activate which zone?</h2>
@@ -14,5 +15,6 @@
   {%- else %} onclick="window.location.href='/time/{{ num + 1 }}/'"
   {%- endif %} />
   {% endfor -%}
+  </div>
 </body>
 </html>
