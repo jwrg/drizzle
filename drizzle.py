@@ -10,14 +10,10 @@ from flask import redirect
 from flask import url_for
 app = Flask(__name__)
 
-# Configure logging format and verbosity
-
 # Declare the number of sprinkler zones
 NUM_ZONES = 5
-# Declare the zone number for the master switch
-MASTER_ZONE = 7
-# A list to hold a timer object
-zone_timer = None
+# Declare the zone number for the pump switch
+PUMP_ZONE = 7
 
 # A function for turning a zone on
 def zoneOn(zone: int):
@@ -25,14 +21,14 @@ def zoneOn(zone: int):
     # Turn on the argument zone only if there isn't
     # already another zone turned on
     if state == 0:
-        # It should be safe to turn on the master switch
+        # It should be safe to turn on the pump switch
         # even when it is already switched on
-        relayON(0,MASTER_ZONE)
+        relayON(0,PUMP_ZONE)
         relayON(0,zone)
 
 # A function for turning a zone off (possibly early)
 def zoneOff(zone: int):
-    relayOFF(0,MASTER_ZONE)
+    relayOFF(0,PUMP_ZONE)
     relayOFF(0,zone)
 
 
@@ -54,15 +50,14 @@ def confirm(zone, time):
 
 @app.route('/disable/<int:zone>/')
 def disable(zone):
-    # Turn off the requested zone
     zoneOff(zone)
     return redirect(url_for('.index'))
 
 @app.route('/enable/<int:zone>/<int:time>/')
 def enable(zone, time):
-    # Turn on the requested zone
     zoneOn(zone)
     # Create a timer object to turn off the zone
     # after the specified number of minutes
-    zone_timer = Timer(60.0 * time, zoneOff(zone))
+    zone_timer = Timer(60.0 * time, zoneOff, [zone])
+    zone_timer.start()
     return redirect(url_for('.index'))
