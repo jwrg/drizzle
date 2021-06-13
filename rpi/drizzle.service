@@ -4,8 +4,12 @@ After=multi-user.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python /home/pi/drizzle/drizzle.py
-Restart=on-abort
+ExecStart=/usr/bin/python3 -u drizzle.py
+WorkingDirectory=/home/pi/drizzle
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=pi
 
 [Install]
 WantedBy=multi-user.target
