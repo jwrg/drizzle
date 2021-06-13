@@ -10,11 +10,11 @@
   <h3>Make it rain.</h3>
   <h2>Please confirm your selection:</h2>
   {%- if time == 0 %}
-  <p>De-activating {%- if zone == 0 %}pump{%- else %}zone {{ zone }}{% endif -%}</p>
+  <p>De-activating {% if zone == 0 %}pump{% else %}zone {{ zone }}{% endif -%}</p>
   <br />
   <input type="button" value="Confirm" class="submit" onclick="window.location.href='/disable/{{ zone }}/'" />
   {% else %}
-  <p>Activating {%- if zone == 0 %}pump{%- else %}zone {{ zone }}{% endif -%}</p>
+  <p>Activating {% if zone == 0 %}pump{% else %}zone {{ zone }}{% endif -%}</p>
   <p>For {{ time }} minutes</p>
   <input type="button" value="Confirm" class="submit" onclick="window.location.href='/enable/{{ zone }}/{{ time }}/'" />
   {% endif -%}

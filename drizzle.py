@@ -19,6 +19,10 @@ app = Flask(__name__)
 # requiring only one relay board and with an extra
 # relay used for powering a pump.
 
+# The app does assume that only one zone should be on
+# at once, and that the user might like to turn the
+# pump on by itself, and consider it its own zone.
+
 # Declare the number of sprinkler zones
 NUM_ZONES = 5
 # Declare the address (board, relay) for each zone
@@ -40,8 +44,9 @@ def getState():
     STATES = {x: relaySTATE(x) for x in BOARDS}
     # Check each state against all zones for that board
     active = [x for x in range(0, NUM_ZONES) if (STATES[ZONES[x][0]] >> (ZONES[x][1] - 1)) % 2]
-    # Check the pump state, if applicable
-    if PUMP_ZONE != None:
+    # Check the pump state, if applicable and only check
+    # when no other zones are active
+    if PUMP_ZONE != None and active == []:
         if (STATES[PUMP_ZONE[0]] >> (PUMP_ZONE[1] - 1)) % 2:
             active.append("Pump")
     return active
