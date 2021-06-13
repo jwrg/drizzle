@@ -8,7 +8,7 @@
   <div class="container">
   <h1>Drizzle</h1>
   <h3>Make it rain.</h3>
-  <h2>Activate zone {{ zone }}</h2>
+  <h2>Activate {%- if zone == 0 %}pump{%- else %}zone {{ zone }}{% endif -%}</h2>
   <p>For how many minutes?</p>
   {% for num in [ 1, 5, 10, 15, 20, 30, 45 ] -%}
   <input type="button" value="{{ num }}" onclick="window.location.href='/confirm/{{ zone }}/{{ num }}/'" \>

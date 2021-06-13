@@ -15,6 +15,11 @@
   {%- else %} onclick="window.location.href='/time/{{ num + 1 }}/'"
   {%- endif %} />
   {% endfor -%}
+  {%- if pump != None %}<input type="button" value="Pump" 
+  {%- if "Pump" is in(active) %} class="active" onclick="window.location.href='/confirm/0/0/'"
+  {%- else %} onclick="window.location.href='/time/0/'"
+  {%- endif %} />
+  {% endif -%}
   </div>
 </body>
 </html>

@@ -37,10 +37,13 @@ def getState():
     BOARDS = list({x[0] for x in ZONES})
     BOARDS.sort()
     # Get a state for each board
-    STATES = [relaySTATE(x) for x in BOARDS]
+    STATES = {x: relaySTATE(x) for x in BOARDS}
     # Check each state against all zones for that board
     active = [x for x in range(0, NUM_ZONES) if (STATES[ZONES[x][0]] >> (ZONES[x][1] - 1)) % 2]
-    # Concatenate and return sequential zone list of bools
+    # Check the pump state, if applicable
+    if PUMP_ZONE != None:
+        if (STATES[PUMP_ZONE[0]] >> (PUMP_ZONE[1] - 1)) % 2:
+            active.append("Pump")
     return active
 
 # Functions for turning on/off the pump, when applicable
@@ -80,16 +83,22 @@ def confirm(zone, time):
 
 @app.route('/disable/<int:zone>/')
 def disable(zone):
-    zoneOff(zone)
+    if zone == 0:
+        pumpOff()
+    else:
+        zoneOff(zone)
     return redirect(url_for('.index'))
 
 @app.route('/enable/<int:zone>/<int:time>/')
 def enable(zone, time):
-    zoneOn(zone)
-    # Create a timer object to turn off the zone
-    # after the specified number of minutes
-    zone_timer = Timer(60.0 * time, zoneOff, [zone])
-    zone_timer.start()
+    if zone == 0:
+        pumpOn()
+        pump_timer = Timer(60.0 * time, pumpOff)
+        pump_timer.start()
+    else:
+        zoneOn(zone)
+        zone_timer = Timer(60.0 * time, zoneOff, [zone])
+        zone_timer.start()
     return redirect(url_for('.index'))
 
 if __name__ == "__main__":
