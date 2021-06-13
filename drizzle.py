@@ -10,35 +10,65 @@ from flask import redirect
 from flask import url_for
 app = Flask(__name__)
 
+# NB That this app makes no assumptions regarding
+# the specific relays the user whiches to utilize
+# for each zone.  To this extent, the user is expected
+# to provide not only the number of zones, but also
+# the board and relay id number for each zone, given
+# in order.  The default example is for five zones,
+# requiring only one relay board and with an extra
+# relay used for powering a pump.
+
 # Declare the number of sprinkler zones
 NUM_ZONES = 5
-# Declare the zone number for the pump switch
-PUMP_ZONE = 7
+# Declare the address (board, relay) for each zone
+# NB that the interface starts counting zones at one
+# but this tuple is zero-indexed
+ZONES = (0, 1), (0, 2), (0, 3), (0, 4), (0, 5)
+# Declare the zone number for the pump switch (to
+# denote that no pump is used, give the value as None)
+PUMP_ZONE = (0, 7)
 
-# A function for turning a zone on
+# A function for determining which of the zone
+# relays are on, if any.  Returns a list that can
+# be passed to the index page
+def getState():
+    # Get a list of board addresses found in ZONES
+    BOARDS = list({x[0] for x in ZONES})
+    BOARDS.sort()
+    # Get a state for each board
+    STATES = [relaySTATE(x) for x in BOARDS]
+    # Check each state against all zones for that board
+    active = [x for x in range(0, NUM_ZONES) if (STATES[ZONES[x][0]] >> (ZONES[x][1] - 1)) % 2]
+    # Concatenate and return sequential zone list of bools
+    return active
+
+# Functions for turning on/off the pump, when applicable
+def pumpOn():
+    if PUMP_ZONE != None:
+        relayON(PUMP_ZONE[0], PUMP_ZONE[1])
+def pumpOff():
+    if PUMP_ZONE != None:
+        relayOFF(PUMP_ZONE[0], PUMP_ZONE[1])
+
+# A function for turning a zone on (argument not zero-indexed)
 def zoneOn(zone: int):
-    state = relaySTATE(0)
+    state = getState()
     # Turn on the argument zone only if there isn't
     # already another zone turned on
-    if state == 0:
-        # It should be safe to turn on the pump switch
-        # even when it is already switched on
-        relayON(0,PUMP_ZONE)
-        relayON(0,zone)
+    if state == []:
+        pumpOn()
+        relayON(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
-# A function for turning a zone off (possibly early)
+# A function for turning a zone off (argument not zero-indexed)
 def zoneOff(zone: int):
-    relayOFF(0,PUMP_ZONE)
-    relayOFF(0,zone)
+    pumpOff()
+    relayOFF(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
 
 @app.route('/')
 def index():
-    state = relaySTATE(0)
-    # Check each bit of state and comp a list of bools
-    # which represents whether each zone is on or off
-    active = [ x for x in range(0,NUM_ZONES) if (state >> x) % 2 ]
-    return render_template('zone.html', num_zones=NUM_ZONES, active=active)
+    return render_template('zone.html', num_zones=NUM_ZONES, pump=PUMP_ZONE, active=getState())
 
 @app.route('/time/<int:zone>/')
 def time(zone):
