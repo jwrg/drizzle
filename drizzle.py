@@ -1,13 +1,6 @@
-import time
-import logging
 from threading import Timer
-from piplates.RELAYplate import relaySTATE
-from piplates.RELAYplate import relayON
-from piplates.RELAYplate import relayOFF
-from flask import Flask
-from flask import render_template
-from flask import redirect
-from flask import url_for
+from piplates.RELAYplate import relaySTATE, relayON, relayOFF
+from flask import Flask, render_template, redirect, url_for
 app = Flask(__name__)
 
 # NB That this app makes no assumptions regarding
@@ -20,10 +13,10 @@ app = Flask(__name__)
 # relay used for powering a pump.
 
 # The user can declare how many zones should be on
-# at once, and that the user might like to turn the
-# pump on by itself, and consider it its own zone.
+# at once, and can also turn the pump on by itself; 
+# the app counts and displays this as another zone.
 
-# Declare the number of sprinkler zones
+# Declare the number of sprinkler zones (not including pump)
 NUM_ZONES = 5
 # Declare the number of concurrently active zones allowed
 MAX_ZONES = 1
