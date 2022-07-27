@@ -4,7 +4,7 @@ from flask import Flask, render_template, redirect, url_for
 app = Flask(__name__)
 
 # NB That this app makes no assumptions regarding
-# the specific relays the user whiches to utilize
+# the specific relays the user wishes to utilize
 # for each zone.  To this extent, the user is expected
 # to provide not only the number of zones, but also
 # the board and relay id number for each zone, given
@@ -32,6 +32,14 @@ ZONES = (0, 1), (0, 2), (0, 3), (0, 4), (0, 5)
 # denote that no pump is used, give the value as None)
 PUMP_ZONE = (0, 7)
 
+# A list of references to Timer objects; this is
+# initialized as a list of None values
+# NB that zone 0 is reserved for the pump
+TIMERS = [ None for x in range(0, NUM_ZONES + 1) ]
+
+# The application port on which the app listens
+APP_PORT = 8080
+
 # A function for determining which of the zone
 # relays are on, if any.  Returns a list that can
 # be passed to the index page
@@ -45,31 +53,32 @@ def getState():
     active = [x for x in range(0, NUM_ZONES) if (STATES[ZONES[x][0]] >> (ZONES[x][1] - 1)) % 2]
     # Check the pump state, if applicable and only check
     # when no other zones are active
-    if PUMP_ZONE != None and active == []:
+    if PUMP_ZONE is not None and active == []:
         if (STATES[PUMP_ZONE[0]] >> (PUMP_ZONE[1] - 1)) % 2:
             active.append("Pump")
     return active
 
 # Functions for turning on/off the pump, when applicable
 def pumpOn():
-    if PUMP_ZONE != None and len(state) < MAX_ZONES:
+    if PUMP_ZONE is not None and len(getState()) < MAX_ZONES:
         relayON(PUMP_ZONE[0], PUMP_ZONE[1])
 def pumpOff():
-    if PUMP_ZONE != None:
+    if PUMP_ZONE is not None:
         relayOFF(PUMP_ZONE[0], PUMP_ZONE[1])
 
 # A function for turning a zone on (argument not zero-indexed)
 def zoneOn(zone: int):
-    state = getState()
     # Turn on the argument zone only if there isn't
     # already another zone turned on
-    if len(state) < MAX_ZONES:
+    if len(getState()) < MAX_ZONES:
         pumpOn()
         relayON(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
 # A function for turning a zone off (argument not zero-indexed)
 def zoneOff(zone: int):
-    pumpOff()
+    # Turn off pump only when there is no active pump timer
+    if len(getState()) == 1 and TIMERS[0] is not None:
+        pumpOff()
     relayOFF(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
 
@@ -89,8 +98,14 @@ def confirm(zone, time):
 def disable(zone):
     if zone == 0:
         pumpOff()
+        if TIMERS[0]:
+            TIMERS[0].cancel()
+            TIMERS[0] = None;
     else:
         zoneOff(zone)
+        if TIMERS[zone]:
+            TIMERS[zone].cancel()
+            TIMERS[zone] = None;
     return redirect(url_for('.index'))
 
 @app.route('/enable/<int:zone>/<int:time>/')
@@ -98,14 +113,14 @@ def enable(zone, time):
     if time <= MAX_TIME:
         if zone == 0:
             pumpOn()
-            pump_timer = Timer(60.0 * time, pumpOff)
-            pump_timer.start()
+            TIMERS[0] = Timer(60.0 * time, pumpOff)
+            TIMERS[0].start()
         else:
             zoneOn(zone)
-            zone_timer = Timer(60.0 * time, zoneOff, [zone])
-            zone_timer.start()
+            TIMERS[zone] = Timer(60.0 * time, zoneOff, [zone])
+            TIMERS[zone].start()
     return redirect(url_for('.index'))
 
 if __name__ == "__main__":
     import bjoern
-    bjoern.run(app, "0.0.0.0", 8080)
+    bjoern.run(app, "0.0.0.0", APP_PORT)
