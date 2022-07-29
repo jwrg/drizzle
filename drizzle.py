@@ -77,7 +77,7 @@ def zoneOn(zone: int):
 # A function for turning a zone off (argument not zero-indexed)
 def zoneOff(zone: int):
     # Turn off pump only when there is no active pump timer
-    if len(getState()) == 1 and TIMERS[0] is not None:
+    if len(getState()) == 1 and TIMERS[0] is None:
         pumpOff()
     relayOFF(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
