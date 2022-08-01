@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Drizzle Sequences Menu</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Drizzle</h1>
+      <h3>Make it rain.</h3>
+      <h2>Sequences list</h2>
+      <ul class="entries">
+        {% for id,obj in sequences.items() -%}
+        <li>
+          <ul id="entry-{{ id }}" class="entry gradient">
+            <li class="inactive id">Id: {{ id }}</li>
+            <li class="name"><strong>{{ obj.name }}</strong></li>
+            <hr />
+            <li class="description">Description: {{ obj.description }}</li>
+            <li class="inactive datetime">Created: {{ obj.created }}</li>
+            <li class="inactive datetime">Modified: {{ obj.modified }}</li>
+            <br />
+            <table>
+              <tr>
+                <th>Zone #</th>
+                <th>Duration (minutes)</th>
+              </tr>
+              {% for tuple in obj.sequence -%}
+              <tr>
+                <td>Zone {{ tuple[0] }}</td>
+                <td>{{ tuple[1] }} minute{% if tuple[1] != 1 %}s{% endif %}</td>
+              </tr>
+              {% endfor -%}
+            </table>
+            <br />
+            <a class="success" href="run/{{ id }}">Run</a>&nbsp;|
+            <a class="caution" href="edit/{{ id }}">Edit</a>&nbsp;|
+            <a class="warning" href="delete/{{ id }}">Delete</a>
+          </ul>
+        </li>
+        {% endfor -%}
+      </ul>
+    </div>
+  </body>
+</html>

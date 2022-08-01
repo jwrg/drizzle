@@ -1,5 +1,6 @@
 from threading import Timer
-from piplates.RELAYplate import relaySTATE, relayON, relayOFF
+from json import dump, load
+#from piplates.RELAYplate import relaySTATE, relayON, relayOFF
 from flask import Flask, render_template, redirect, url_for
 app = Flask(__name__)
 
@@ -81,11 +82,18 @@ def zoneOff(zone: int):
         pumpOff()
     relayOFF(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
+# A function for reading the local sequences json file.
+# Returns a dict, since the top-level type is object
+def getSequences():
+    with open("sequences.json", "r") as file:
+        return load(file)
 
+# Routes for the homepage
 @app.route('/')
 def index():
     return render_template('zone.html', num_zones=NUM_ZONES, pump=PUMP_ZONE, active=getState())
 
+# Routes for the zones page
 @app.route('/time/<int:zone>/')
 def time(zone):
     return render_template('time.html', zone=zone)
@@ -120,6 +128,14 @@ def enable(zone, time):
             TIMERS[zone] = Timer(60.0 * time, zoneOff, [zone])
             TIMERS[zone].start()
     return redirect(url_for('.index'))
+
+# Routes for the sequences page
+@app.route('/sequences/')
+def sequences():
+    return render_template('sequence.html', sequences=getSequences())
+
+#@app.route('/sequences/edit/<int:id>')
+#def editSequence():
 
 if __name__ == "__main__":
     import bjoern
