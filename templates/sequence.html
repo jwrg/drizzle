@@ -10,17 +10,18 @@
       <h3>Make it rain.</h3>
       <h2>Sequences list</h2>
       <ul class="entries">
-        {% for id,obj in sequences.items() -%}
+        {% for id, obj in sequences.items() -%}
         <li>
-          <ul id="entry-{{ id }}" class="entry gradient">
+          <div class="box gradient">
+          <ul id="entry-{{ id }}" class="entry">
             <li class="inactive id">Id: {{ id }}</li>
             <li class="name"><strong>{{ obj.name }}</strong></li>
             <hr />
-            <li class="description">Description: {{ obj.description }}</li>
+            <li class="description">{{ obj.description }}</li>
             <li class="inactive datetime">Created: {{ obj.created }}</li>
             <li class="inactive datetime">Modified: {{ obj.modified }}</li>
             <br />
-            <table>
+            <table class="sequence">
               <tr>
                 <th>Zone #</th>
                 <th>Duration (minutes)</th>
@@ -33,10 +34,11 @@
               {% endfor -%}
             </table>
             <br />
-            <a class="success" href="run/{{ id }}">Run</a>&nbsp;|
-            <a class="caution" href="edit/{{ id }}">Edit</a>&nbsp;|
-            <a class="warning" href="delete/{{ id }}">Delete</a>
+            <a class="success" href="run/{{ id }}/">Run</a>&nbsp;|
+            <a class="caution" href="edit/{{ id }}/">Edit</a>&nbsp;|
+            <a class="warning" href="delete/{{ id }}/">Delete</a>
           </ul>
+          </div>
         </li>
         {% endfor -%}
       </ul>

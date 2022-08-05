@@ -134,8 +134,9 @@ def enable(zone, time):
 def sequences():
     return render_template('sequence.html', sequences=getSequences())
 
-#@app.route('/sequences/edit/<int:id>')
-#def editSequence():
+@app.route('/sequences/edit/<int:id>/')
+def editSequence(id):
+    return render_template('edit_sequence.html', sequences=getSequences(), id=str(id), num_zones=NUM_ZONES)
 
 if __name__ == "__main__":
     import bjoern
