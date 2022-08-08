@@ -1,7 +1,9 @@
 from threading import Timer
 from json import dump, load
+from re import match
+from time import strftime
 #from piplates.RELAYplate import relaySTATE, relayON, relayOFF
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, request, url_for
 app = Flask(__name__)
 
 # NB That this app makes no assumptions regarding
@@ -88,6 +90,11 @@ def getSequences():
     with open("sequences.json", "r") as file:
         return load(file)
 
+def putSequences(data):
+    with open("sequences.json", "w") as file:
+        return dump(data, file, sort_keys=True)
+
+
 # Routes for the homepage
 @app.route('/')
 def index():
@@ -134,8 +141,28 @@ def enable(zone, time):
 def sequences():
     return render_template('sequence.html', sequences=getSequences())
 
-@app.route('/sequences/edit/<int:id>/')
+@app.route('/sequences/edit/<int:id>/', methods=('GET', 'POST'))
 def editSequence(id):
+    if request.method == 'POST':
+        fields = ['name', 'description', 'created']
+        resultant = {}
+        for field in fields:
+            resultant[field] = request.form[field]
+        resultant['modified'] = strftime('%Y-%m-%dT%H:%M:%S.999Z')
+        resultant['sequence'] = [list(x) for x in zip(\
+                [int(request.form.get(y)) for y in \
+                [z for z in [*request.form.keys()] \
+                if match('select-*', z)]],\
+                [int(request.form.get(y)) for y in \
+                [z for z in [*request.form.keys()] \
+                if match('time-*', z)]]\
+                )]
+        # save the file
+        sequences = getSequences()
+        oldvalue = sequences.pop(str(id))
+        sequences.update({str(id): resultant})
+        putSequences(sequences)
+        return redirect(url_for('sequences'))
     return render_template('edit_sequence.html', sequences=getSequences(), id=str(id), num_zones=NUM_ZONES)
 
 if __name__ == "__main__":
