@@ -51,10 +51,6 @@ li.name, h3, p {
 
 a {
   text-decoration: none;
-  cursor: grabbing;
-}
-
-a:active {
   cursor: pointer;
 }
 
@@ -73,6 +69,10 @@ table {
 td, th {
   border: 1px solid #ccc;
   padding: 8px;
+}
+
+tr:nth-child(odd) {
+  background-color: #ddd
 }
 
 tr:nth-child(even) {
@@ -106,6 +106,13 @@ ul.entry {
   border-width: 1px;
   -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
   -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+}
+
+.active {
+  color: white;
+  border-width: 2px;
+  border-color: cornflowerblue;
+  background-image: linear-gradient(48deg, floralwhite, skyblue);
 }
 
 .warning, .red {

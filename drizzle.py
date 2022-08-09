@@ -2,7 +2,7 @@ from threading import Timer
 from json import dump, load
 from re import match
 from time import strftime
-#from piplates.RELAYplate import relaySTATE, relayON, relayOFF
+from piplates.RELAYplate import relaySTATE, relayON, relayOFF
 from flask import Flask, render_template, redirect, request, url_for
 app = Flask(__name__)
 
@@ -40,6 +40,17 @@ PUMP_ZONE = (0, 7)
 # NB that zone 0 is reserved for the pump
 TIMERS = [ None for x in range(0, NUM_ZONES + 1) ]
 
+# A variable for holding the id of the currently running
+# sequence.  None denotes no sequence is currently active
+# NB this obviously implies that only one sequence may 
+# be active at a time
+SEQUENCE = None
+
+# A list of references to Timer objects; this is
+# initialized as an empty list, which denotes that
+# there is no sequence currently active
+SEQUENCE_TIMERS = []
+
 # The application port on which the app listens
 APP_PORT = 8080
 
@@ -72,8 +83,8 @@ def pumpOff():
 # A function for turning a zone on (argument not zero-indexed)
 def zoneOn(zone: int):
     # Turn on the argument zone only if there isn't
-    # already another zone turned on
-    if len(getState()) < MAX_ZONES:
+    # already another zone or sequence turned on
+    if len(getState()) < MAX_ZONES and SEQUENCE == None:
         pumpOn()
         relayON(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
@@ -84,8 +95,8 @@ def zoneOff(zone: int):
         pumpOff()
     relayOFF(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
-# A function for reading the local sequences json file.
-# Returns a dict, since the top-level type is object
+# Functions for reading/updating the local sequences json
+# file.  Returns a dict, since the top-level type is object
 def getSequences():
     with open("sequences.json", "r") as file:
         return load(file)
@@ -94,6 +105,36 @@ def putSequences(data):
     with open("sequences.json", "w") as file:
         return dump(data, file, sort_keys=True)
 
+# Returns string of currently active sequence id,
+# otherwise returns a blank string (not None)
+def getSequenceState():
+    return '' if SEQUENCE == None else str(SEQUENCE)
+
+# Sets up and activates the sequence with specified
+# id number
+def initSequence(id):
+    if SEQUENCE == None:
+        SEQUENCE = int(id)
+        SEQUENCE_TIMERS.add(Timer(0, pumpOn()))
+        sum = 0
+        for [zone, time] in getSequences()[id]['sequence']:
+            SEQUENCE_TIMERS.add(Timer(60.0 * sum, zoneOn(zone)))
+            SEQUENCE_TIMERS.add(Timer(60.0 * (sum + time), zoneOff(zone)))
+            sum += time
+        SEQUENCE_TIMERS.add(Timer(sum, cancelSequence()))
+        for timer in SEQUENCE_TIMERS:
+            timer.start()
+
+# Cancels any currently active sequence
+def cancelSequence():
+    if SEQUENCE_TIMERS != []:
+        for timer in SEQUENCE_TIMERS:
+            timer.cancel()
+        SEQUENCE_TIMERS = []
+    for zone in ZONES:
+        relayOff(zone[0], zone[1])
+    pumpOff()
+    SEQUENCE = None
 
 # Routes for the homepage
 @app.route('/')
@@ -121,7 +162,7 @@ def disable(zone):
         if TIMERS[zone]:
             TIMERS[zone].cancel()
             TIMERS[zone] = None;
-    return redirect(url_for('.index'))
+    return redirect(url_for('index'))
 
 @app.route('/enable/<int:zone>/<int:time>/')
 def enable(zone, time):
@@ -134,12 +175,24 @@ def enable(zone, time):
             zoneOn(zone)
             TIMERS[zone] = Timer(60.0 * time, zoneOff, [zone])
             TIMERS[zone].start()
-    return redirect(url_for('.index'))
+    return redirect(url_for('index'))
 
 # Routes for the sequences page
 @app.route('/sequences/')
 def sequences():
-    return render_template('sequence.html', sequences=getSequences())
+    return render_template('sequence.html',\
+            sequences=getSequences(),\
+            active=getSequenceState())
+
+@app.route('/sequences/run/<int:id>/')
+def runSequence(id):
+    initSequence(id)
+    return redirect(url_for('sequences'))
+
+@app.route('/sequences/stop/')
+def stopSequence():
+    cancelSequence()
+    return redirect(url_for('sequences'))
 
 @app.route('/sequences/new/')
 def newSequence():
@@ -175,7 +228,9 @@ def editSequence(id):
         sequences.update({str(id): resultant})
         putSequences(sequences)
         return redirect(url_for('sequences'))
-    return render_template('edit_sequence.html', sequences=getSequences(), id=str(id), num_zones=NUM_ZONES)
+    return render_template('edit_sequence.html',\
+            sequences=getSequences(),\
+            id=str(id), num_zones=NUM_ZONES)
 
 @app.route('/sequences/delete/<int:id>/')
 def deleteSequence(id):

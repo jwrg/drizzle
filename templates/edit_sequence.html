@@ -33,7 +33,7 @@
                   <tr>
                     <th>Zone #</th>
                     <th>Duration (minutes)</th>
-                    <th><a href="#" onClick="append_row()">+</a></th>
+                    <th><a class="append success" id="append_row" onClick="append_row()">+</a></th>
                   </tr>
                   {% for tuple in obj.sequence -%}
                   <tr>
@@ -43,13 +43,13 @@
                         {% endfor %}</select>
                     </td>
                     <td><input type="number" id="time-{{ loop.index0 }}" name="time-{{ loop.index0 }}" min="1" max="120" value="{{ tuple[1] }}"/> minute{% if tuple[1] != 1 %}s{% endif %}</td>
-                    <td><a href="#" onClick="delete_row(this)">x</a></td>
+                    <td><a class="delete warning" id="delete_row-{{ loop.index0 }}" onClick="delete_row(this)">x</a></td>
                   </tr>
                   {% endfor -%}
                 </table>
                 <br />
                 <input type="submit" id="save" name="save" value="Save" />
-                <input type="button" id="cancel" name="cancel" value="Cancel" />
+                <input type="button" id="cancel" name="cancel" onClick="window.open('/sequences/','_parent')" value="Cancel" />
               </form>
             </ul>
           </div>

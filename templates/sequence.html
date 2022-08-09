@@ -12,10 +12,10 @@
       <ul class="entries">
         {% for id, obj in sequences.items() -%}
         <li>
-          <div class="box gradient">
+          <div class="box gradient {%- if id == active %} active {%- endif %}">
           <ul id="entry-{{ id }}" class="entry">
             <li class="inactive id">Id: {{ id }}</li>
-            <li class="name"><strong>{{ obj.name }}</strong></li>
+            <li class="name"><strong>{{ obj.name }}{%- if id == active %} (active) {%- endif %}</strong></li>
             <hr class="navy" />
             <li class="description">{{ obj.description }}</li>
             <li class="inactive datetime">Created: {{ obj.created }}</li>
@@ -34,9 +34,11 @@
               {% endfor -%}
             </table>
             <br />
-            <a class="success" href="run/{{ id }}/">Run</a>&nbsp;|
+            {% if id == active %}<a class="warning" onClick="if(window.confirm('Really stop sequence {{ obj.name }}?')){window.open('stop/','_parent')}">Stop</a>{% else %}
+            {% if active == '' %}<a class="success" href="run/{{ id }}/">Run</a>&nbsp;|{% endif %}
             <a class="caution" href="edit/{{ id }}/">Edit</a>&nbsp;|
-            <a class="warning" onclick="if(window.confirm('Really delete {{ obj.name }}?')){window.open('delete/{{ id }}/','_parent')}">Delete</a>
+            <a class="warning" onClick="if(window.confirm('Really delete {{ obj.name }}?')){window.open('delete/{{ id }}/','_parent')}">Delete</a>
+            {% endif -%}
           </ul>
           </div>
         </li>
