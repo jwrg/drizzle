@@ -16,7 +16,7 @@
           <ul id="entry-{{ id }}" class="entry">
             <li class="inactive id">Id: {{ id }}</li>
             <li class="name"><strong>{{ obj.name }}</strong></li>
-            <hr />
+            <hr class="navy" />
             <li class="description">{{ obj.description }}</li>
             <li class="inactive datetime">Created: {{ obj.created }}</li>
             <li class="inactive datetime">Modified: {{ obj.modified }}</li>
@@ -41,6 +41,12 @@
           </div>
         </li>
         {% endfor -%}
+        <li>
+          <div class="box gradient">
+          <ul id="new-entry" class="entry">
+            <li class="name"><p><a class="success" href="new/">Create a new sequence</a></p></li>
+          </ul>
+          </div>
       </ul>
     </div>
   </body>

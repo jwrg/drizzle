@@ -141,13 +141,27 @@ def enable(zone, time):
 def sequences():
     return render_template('sequence.html', sequences=getSequences())
 
+@app.route('/sequences/new/')
+def newSequence():
+    return render_template('edit_sequence.html',\
+            sequences={str(max([int(x) for x in getSequences().keys()]) + 1):\
+            {'name': '', 'description': '',\
+            'created': strftime('%Y-%m-%dT%H:%M:%S.999Z'),\
+            'modified': '',\
+            'sequence': [[1,1]]}},\
+            id=str(max([int(x) for x in getSequences().keys()]) + 1),\
+            num_zones=NUM_ZONES)
+
 @app.route('/sequences/edit/<int:id>/', methods=('GET', 'POST'))
 def editSequence(id):
     if request.method == 'POST':
         fields = ['name', 'description', 'created']
         resultant = {}
         for field in fields:
-            resultant[field] = request.form[field]
+            if request.form[field] == '':
+                resultant[field] = field
+            else:
+                resultant[field] = request.form[field]
         resultant['modified'] = strftime('%Y-%m-%dT%H:%M:%S.999Z')
         resultant['sequence'] = [list(x) for x in zip(\
                 [int(request.form.get(y)) for y in \
@@ -157,9 +171,7 @@ def editSequence(id):
                 [z for z in [*request.form.keys()] \
                 if match('time-*', z)]]\
                 )]
-        # save the file
         sequences = getSequences()
-        oldvalue = sequences.pop(str(id))
         sequences.update({str(id): resultant})
         putSequences(sequences)
         return redirect(url_for('sequences'))
