@@ -36,7 +36,7 @@
             <br />
             <a class="success" href="run/{{ id }}/">Run</a>&nbsp;|
             <a class="caution" href="edit/{{ id }}/">Edit</a>&nbsp;|
-            <a class="warning" href="delete/{{ id }}/">Delete</a>
+            <a class="warning" onclick="if(window.confirm('Really delete {{ obj.name }}?')){window.open('delete/{{ id }}/','_parent')}">Delete</a>
           </ul>
           </div>
         </li>

@@ -177,6 +177,13 @@ def editSequence(id):
         return redirect(url_for('sequences'))
     return render_template('edit_sequence.html', sequences=getSequences(), id=str(id), num_zones=NUM_ZONES)
 
+@app.route('/sequences/delete/<int:id>/')
+def deleteSequence(id):
+    sequences = getSequences()
+    sequences.pop(str(id))
+    putSequences(sequences)
+    return redirect(url_for('sequences'))
+
 if __name__ == "__main__":
     import bjoern
     bjoern.run(app, "0.0.0.0", APP_PORT)

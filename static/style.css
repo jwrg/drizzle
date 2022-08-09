@@ -49,6 +49,15 @@ li.name, h3, p {
   font-size: 36pt;
 }
 
+a {
+  text-decoration: none;
+  cursor: grabbing;
+}
+
+a:active {
+  cursor: pointer;
+}
+
 /* Orientation and Colour */
 
 h2, h3 {
