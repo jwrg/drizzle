@@ -84,7 +84,7 @@ def pumpOff():
 def zoneOn(zone: int):
     # Turn on the argument zone only if there isn't
     # already another zone or sequence turned on
-    if len(getState()) < MAX_ZONES and SEQUENCE == None:
+    if len(getState()) < MAX_ZONES:
         pumpOn()
         relayON(ZONES[zone - 1][0], ZONES[zone - 1][1])
 
@@ -113,27 +113,27 @@ def getSequenceState():
 # Sets up and activates the sequence with specified
 # id number
 def initSequence(id):
-    global SEQUENCE
+    global SEQUENCE, SEQUENCE_TIMERS
     if SEQUENCE == None:
         SEQUENCE = int(id)
-        SEQUENCE_TIMERS.append(Timer(0, pumpOn()))
         sum = 0
-        for [zone, time] in getSequences()[id]['sequence']:
-            SEQUENCE_TIMERS.append(Timer(60.0 * sum, zoneOn(zone)))
-            SEQUENCE_TIMERS.append(Timer(60.0 * (sum + time), zoneOff(zone)))
+        for [zone, time] in getSequences()[str(id)]['sequence']:
+            SEQUENCE_TIMERS.append(Timer(60.0 * sum, zoneOn, [zone]))
+            SEQUENCE_TIMERS.append(Timer(60.0 * (sum + time), zoneOff, [zone]))
             sum += time
-        SEQUENCE_TIMERS.append(Timer(sum, cancelSequence()))
+        SEQUENCE_TIMERS.append(Timer(60.0 * sum, cancelSequence))
         for timer in SEQUENCE_TIMERS:
             timer.start()
 
 # Cancels any currently active sequence
 def cancelSequence():
+    global SEQUENCE, SEQUENCE_TIMERS
     if SEQUENCE_TIMERS != []:
         for timer in SEQUENCE_TIMERS:
             timer.cancel()
         SEQUENCE_TIMERS = []
     for zone in ZONES:
-        relayOff(zone[0], zone[1])
+        relayOFF(zone[0], zone[1])
     pumpOff()
     SEQUENCE = None
 
