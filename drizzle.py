@@ -113,15 +113,16 @@ def getSequenceState():
 # Sets up and activates the sequence with specified
 # id number
 def initSequence(id):
+    global SEQUENCE
     if SEQUENCE == None:
         SEQUENCE = int(id)
-        SEQUENCE_TIMERS.add(Timer(0, pumpOn()))
+        SEQUENCE_TIMERS.append(Timer(0, pumpOn()))
         sum = 0
         for [zone, time] in getSequences()[id]['sequence']:
-            SEQUENCE_TIMERS.add(Timer(60.0 * sum, zoneOn(zone)))
-            SEQUENCE_TIMERS.add(Timer(60.0 * (sum + time), zoneOff(zone)))
+            SEQUENCE_TIMERS.append(Timer(60.0 * sum, zoneOn(zone)))
+            SEQUENCE_TIMERS.append(Timer(60.0 * (sum + time), zoneOff(zone)))
             sum += time
-        SEQUENCE_TIMERS.add(Timer(sum, cancelSequence()))
+        SEQUENCE_TIMERS.append(Timer(sum, cancelSequence()))
         for timer in SEQUENCE_TIMERS:
             timer.start()
 
