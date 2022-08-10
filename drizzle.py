@@ -40,16 +40,15 @@ PUMP_ZONE = (0, 7)
 # NB that zone 0 is reserved for the pump
 TIMERS = [ None for x in range(0, NUM_ZONES + 1) ]
 
-# A variable for holding the id of the currently running
+# An integer for holding the id of the currently running
 # sequence.  None denotes no sequence is currently active
 # NB this obviously implies that only one sequence may 
 # be active at a time
 SEQUENCE = None
 
-# A list of references to Timer objects; this is
-# initialized as an empty list, which denotes that
-# there is no sequence currently active
-SEQUENCE_TIMERS = []
+# A reference to a Timer object; this is initialized as
+# None, which denotes that there is no active sequence
+SEQUENCE_TIMER = None
 
 # The application port on which the app listens
 APP_PORT = 8080
@@ -110,28 +109,35 @@ def putSequences(data):
 def getSequenceState():
     return '' if SEQUENCE == None else str(SEQUENCE)
 
+# Functional means for executing a sequence
+def executeSequence(index: int, sequence):
+    global SEQUENCE, SEQUENCE_TIMER
+    if index > 0:
+        zoneOff(sequence[index - 1][0])
+    if index < len(sequence):
+        zoneOn(sequence[index][0])
+        SEQUENCE_TIMER = Timer(60.0 * sequence[index][1], executeSequence, [index + 1, sequence])
+        SEQUENCE_TIMER.start()
+    else:
+        pumpOff()
+        SEQUENCE = None
+        SEQUENCE_TIMER = None
+
 # Sets up and activates the sequence with specified
 # id number
 def initSequence(id):
     global SEQUENCE, SEQUENCE_TIMERS
     if SEQUENCE == None:
         SEQUENCE = int(id)
-        sum = 0
-        for [zone, time] in getSequences()[str(id)]['sequence']:
-            SEQUENCE_TIMERS.append(Timer(60.0 * sum, zoneOn, [zone]))
-            SEQUENCE_TIMERS.append(Timer(60.0 * (sum + time), zoneOff, [zone]))
-            sum += time
-        SEQUENCE_TIMERS.append(Timer(60.0 * sum, cancelSequence))
-        for timer in SEQUENCE_TIMERS:
-            timer.start()
+        executeSequence(0, getSequences()[str(id)]['sequence'])
 
-# Cancels any currently active sequence
+# Cancels any currently active sequence (and heavy-handedly
+# turns off all zones for good measure)
 def cancelSequence():
-    global SEQUENCE, SEQUENCE_TIMERS
-    if SEQUENCE_TIMERS != []:
-        for timer in SEQUENCE_TIMERS:
-            timer.cancel()
-        SEQUENCE_TIMERS = []
+    global SEQUENCE, SEQUENCE_TIMER
+    if SEQUENCE_TIMER != None:
+        SEQUENCE_TIMER.cancel()
+        SEQUENCE_TIMER = None
     for zone in ZONES:
         relayOFF(zone[0], zone[1])
     pumpOff()
