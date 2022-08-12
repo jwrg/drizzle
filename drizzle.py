@@ -5,6 +5,7 @@ from time import strftime
 from piplates.RELAYplate import relaySTATE, relayON, relayOFF
 from flask import Flask, render_template, redirect, request, url_for
 app = Flask(__name__)
+app.config.from_json('config.json')
 
 # NB That this app makes no assumptions regarding
 # the specific relays the user wishes to utilize
@@ -68,7 +69,7 @@ def getState():
     # when no other zones are active
     if PUMP_ZONE is not None and active == []:
         if (STATES[PUMP_ZONE[0]] >> (PUMP_ZONE[1] - 1)) % 2:
-            active.append("Pump")
+            active.append('Pump')
     return active
 
 # Functions for turning on/off the pump, when applicable
@@ -97,11 +98,11 @@ def zoneOff(zone: int):
 # Functions for reading/updating the local sequences json
 # file.  Returns a dict, since the top-level type is object
 def getSequences():
-    with open("sequences.json", "r") as file:
+    with open('sequences.json', 'r') as file:
         return load(file)
 
 def putSequences(data):
-    with open("sequences.json", "w") as file:
+    with open('sequences.json', 'w') as file:
         return dump(data, file, sort_keys=True)
 
 # Returns string of currently active sequence id,
@@ -143,20 +144,45 @@ def cancelSequence():
     pumpOff()
     SEQUENCE = None
 
-# Routes for the homepage
+# Routes for the dashboard
+#@app.route('/')
+#def index():
+
+# Routes for enabling and disabling single zones
+#@app.route('/zone/')
 @app.route('/')
 def index():
-    return render_template('zone.html', num_zones=NUM_ZONES, pump=PUMP_ZONE, active=getState())
+    actions=[ ( str(x), 'disable' if x in getState() else 'time',\
+            {'zone': x}, str(x) in getState())\
+            for x in range(1, app.config['NUM_ZONES'] + 1)]
+    if app.config['PUMP_ZONE'] is not None:
+        actions.append(('Pump',\
+                'disable' if 'Pump' in getState() else 'time',\
+                {'zone': 0}, 'Pump' in getState()))
+    return render_template('keypad.html',\
+            confirm = False,\
+            subject = 'Zone',\
+            prompt = 'Activate which zone?',\
+            actions = actions\
+            )
 
-# Routes for the zones page
 @app.route('/time/<int:zone>/')
 def time(zone):
-    return render_template('time.html', zone=zone)
+    actions = [ (str(x), 'enable',\
+              {'zone': zone, 'time': x}, False)\
+              for x in app.config['TIMES']]
+    actions.append(('Cancel', 'index', {}, False))
+    prompt = 'Activate '
+    prompt += 'zone ' + str(zone) if zone != 0 else 'pump'
+    prompt += ' for how many minutes?'
+    return render_template('keypad.html',\
+            confirm = True,\
+            subject = 'Time',\
+            prompt = prompt,\
+            actions = actions\
+            )
 
-@app.route('/confirm/<int:zone>/<int:time>/')
-def confirm(zone, time):
-    return render_template('confirm.html', zone=zone, time=time)
-
+# Web API for turning zones on and off
 @app.route('/disable/<int:zone>/')
 def disable(zone):
     if zone == 0:
@@ -246,6 +272,6 @@ def deleteSequence(id):
     putSequences(sequences)
     return redirect(url_for('sequences'))
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import bjoern
-    bjoern.run(app, "0.0.0.0", APP_PORT)
+    bjoern.run(app, '0.0.0.0', app.config['APP_PORT'])

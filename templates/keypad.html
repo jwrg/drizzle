@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+  {% block title %}{{ subject }} Menu{% endblock %}
+  {% block content %}
+      <h2>{{ prompt }}</h2>
+    {%- for label, url, arguments, active in actions %}
+      <input type="button" value="{{ label }}" class="gradient keypad zone
+    {%- if active == True %} active" onclick="{%- else %}" onclick="{%- endif -%}
+    {%- if confirm == True %}if (window.confirm('You sure?')){ {% endif %}window.open('{{ url_for(url, **arguments) }}', '_parent'){%- if confirm == True %} }{%- endif %}" />
+    {%- endfor -%}
+  {% endblock %}

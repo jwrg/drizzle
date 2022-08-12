@@ -8,7 +8,7 @@ body {
   background-image: linear-gradient(azure, lightskyblue);
 }
 
-div.container {
+main {
   width: 80%;
   margin: 50px auto;
 }
@@ -115,7 +115,12 @@ ul.entry {
   background-image: linear-gradient(48deg, floralwhite, skyblue);
 }
 
-.warning, .red {
+.append, .delete {
+  font-size: 24pt;
+  text-align: center;
+}
+
+.error, .warning, .red {
   color: red;
 }
 
@@ -129,6 +134,10 @@ ul.entry {
 
 .success, .green {
   color: green;
+}
+
+.white {
+  color: white;
 }
 
 .inactive {
@@ -150,7 +159,7 @@ textarea.name {
 input.zone[type="button"] {
   width: 300px;
   height: 300px;
-  margin: 40px;
+  margin: 30px;
   color: navy;
   font-size: 36pt;
   border-radius: 150px;
