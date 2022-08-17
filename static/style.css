@@ -49,6 +49,20 @@ li.name, h3, p {
   font-size: 36pt;
 }
 
+li.name::after {
+  content: "";
+  height: 2px;
+  background: navy;
+  display: block;
+  margin-bottom: 0.25ex;
+}
+
+div.active ul.entry li.name::before {
+  display: inline-block;
+  margin-right: 0.5ex;
+  content: "(Active) ";
+}
+
 a {
   text-decoration: none;
   cursor: pointer;
@@ -64,6 +78,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14pt;
+  margin: 0.5em 0;
 }
 
 td, th {
@@ -86,6 +101,23 @@ tr:hover {
 th {
   background-color:navy;
   color: #eee;
+}
+
+nav {
+  width: 100%;
+}
+
+nav a {
+  margin-right: 1.5ex;
+}
+
+nav a:not(:last-child)::after {
+  content:"|";
+  color: navy;
+  position: relative;
+  right:-1ex;
+  top:0;
+  height:100%;
 }
 
 ul {
@@ -115,16 +147,16 @@ ul.entry {
   background-image: linear-gradient(48deg, floralwhite, skyblue);
 }
 
-.append, .delete {
+.append {
   font-size: 24pt;
   text-align: center;
 }
 
-.error, .warning, .red {
+.stop, .delete, .error, .warning, .red {
   color: red;
 }
 
-.caution, .orange {
+.edit, .caution, .orange {
   color: darkOrange;
 }
 
@@ -132,7 +164,7 @@ ul.entry {
   color: navy;
 }
 
-.success, .green {
+.run, .success, .green {
   color: green;
 }
 

@@ -3,7 +3,7 @@ from json import dump, load
 from re import match
 from time import strftime
 from piplates.RELAYplate import relaySTATE, relayON, relayOFF
-from flask import Flask, render_template, redirect, request, url_for
+from flask import Flask, flash, render_template, redirect, request, url_for
 app = Flask(__name__)
 app.config.from_json('config.json')
 
@@ -117,7 +117,8 @@ def executeSequence(index: int, sequence):
         zoneOff(sequence[index - 1][0])
     if index < len(sequence):
         zoneOn(sequence[index][0])
-        SEQUENCE_TIMER = Timer(60.0 * sequence[index][1], executeSequence, [index + 1, sequence])
+        SEQUENCE_TIMER = Timer(60.0 * sequence[index][1],\
+                executeSequence, [index + 1, sequence])
         SEQUENCE_TIMER.start()
     else:
         pumpOff()
@@ -170,7 +171,7 @@ def index():
 def time(zone):
     actions = [ (str(x), 'enable',\
               {'zone': zone, 'time': x}, False)\
-              for x in app.config['TIMES']]
+              for x in app.config['TIMES'] ]
     actions.append(('Cancel', 'index', {}, False))
     prompt = 'Activate '
     prompt += 'zone ' + str(zone) if zone != 0 else 'pump'
@@ -190,41 +191,64 @@ def disable(zone):
         if TIMERS[0]:
             TIMERS[0].cancel()
             TIMERS[0] = None;
+        flash('Pump was turned off.', 'success')
     else:
         zoneOff(zone)
         if TIMERS[zone]:
             TIMERS[zone].cancel()
             TIMERS[zone] = None;
+        flash('Zone ' + str(zone) + ' was turned off.', 'success')
     return redirect(url_for('index'))
 
 @app.route('/enable/<int:zone>/<int:time>/')
 def enable(zone, time):
+    minutes = ' minute.' if time == 1 else ' minutes.'
     if time <= MAX_TIME:
         if zone == 0:
             pumpOn()
             TIMERS[0] = Timer(60.0 * time, pumpOff)
             TIMERS[0].start()
+            flash('Pump was turned on for ' + str(time) + minutes, 'success')
         else:
             zoneOn(zone)
             TIMERS[zone] = Timer(60.0 * time, zoneOff, [zone])
             TIMERS[zone].start()
+            flash('Zone ' + str(zone) + ' was turned on for ' + str(time) + minutes, 'success')
     return redirect(url_for('index'))
 
 # Routes for the sequences page
 @app.route('/sequences/')
 def sequences():
-    return render_template('sequence.html',\
-            sequences=getSequences(),\
-            active=getSequenceState())
+    actions = { 'run': 'runSequence',
+            'edit': 'editSequence',
+            'delete': 'deleteSequence' }
+    active = { 'stop': 'stopSequence' }
+    fields = [ 'name', 'description', 'sequence' ]
+    items = []
+    for id, entry in getSequences().items():
+        new_item = [id]
+        new_item.append({ field: entry[field] for field in fields })
+        if id == str(SEQUENCE):
+            new_item.append([ (key.capitalize(), value, {}, True) for key, value in active.items() ])
+            new_item.append(True)
+        else:
+            new_item.append([ (key.capitalize(), value, {'id': id}, True) for key, value in actions.items() ])
+            new_item.append(False)
+        items.append(new_item)
+    return render_template('list.html', allow_create = True,\
+            data_headings = ['zone', 'minutes'],\
+            subject = 'Sequence', items = items)
 
 @app.route('/sequences/run/<int:id>/')
 def runSequence(id):
     initSequence(id)
+    flash('Started sequence ' + getSequences()[str(id)]['name'] + '.', 'success')
     return redirect(url_for('sequences'))
 
 @app.route('/sequences/stop/')
 def stopSequence():
     cancelSequence()
+    flash('Sequence cancelled.', 'caution')
     return redirect(url_for('sequences'))
 
 @app.route('/sequences/new/')

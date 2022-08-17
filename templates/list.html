@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+  {% block title %}{{ subject }} List{% endblock %}
+  {% block content %}
+      <h2>{{ subject }} list</h2>
+      <ul class="entries">
+    {%- for id, fields, actions, active in items %}
+        <li><div class="box gradient {%- if active %} active {%- endif %}">
+          <ul id="entry-{{ loop.index0 }}" class="entry">
+      {%- for fieldName, fieldData in fields.items() %}
+        {%- if fieldName == subject.lower() %}
+            <table>
+          {%- if data_headings != {} %}
+              <tr>
+            {%- for heading in data_headings %}
+                <th>{{ heading|capitalize }}</th>
+            {%- endfor %}
+              </tr>
+          {%- endif %}
+          {%- for row in fieldData %}
+              <tr>
+            {%- for cell in row %}
+                <td>{{ cell }}</td>
+            {%- endfor %}
+              </tr>
+          {%- endfor %}
+            </table>
+        {%- else %}
+            <li class="{{ fieldName }}">{{ fieldData }}</li>
+        {%- endif %}
+      {%- endfor %}
+            <nav>
+      {%- for action, endpoint, args, confirm in actions %}
+              <a class="{{ action|lower }}" onClick="
+        {%- if confirm %}if(window.confirm('Really {{ action }} {{ fields['name'] }}?')){ {%- endif -%}
+        window.open('{{ url_for(endpoint, **args) }}','_parent')
+        {%- if confirm -%} } {%- endif -%}
+        ">{{ action }}</a>
+      {%- endfor %}
+            </nav>
+          </ul>
+        </div></li>
+    {%- endfor %}
+    {%- if allow_create %}
+        <li><div class="box gradient">
+          <ul id="new-entry" class="entry">
+            <li><p><a class="success" href="new/">Create a new {{ subject|lower }}</a></p></li>
+          </ul>
+        </div></li>
+    {%- endif %}
+      </ul>
+  {%- endblock %}
