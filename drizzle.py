@@ -103,7 +103,7 @@ def getSequences():
 
 def putSequences(data):
     with open('sequences.json', 'w') as file:
-        return dump(data, file, sort_keys=True)
+        return dump(data, file, sort_keys=False)
 
 # Returns string of currently active sequence id,
 # otherwise returns a blank string (not None)
@@ -114,10 +114,10 @@ def getSequenceState():
 def executeSequence(index: int, sequence):
     global SEQUENCE, SEQUENCE_TIMER
     if index > 0:
-        zoneOff(sequence[index - 1][0])
-    if index < len(sequence):
-        zoneOn(sequence[index][0])
-        SEQUENCE_TIMER = Timer(60.0 * sequence[index][1],\
+        zoneOff(sequence[str(index - 1)]['zone'])
+    if index < len(sequence) - 1:
+        zoneOn(sequence[str(index)]['zone'])
+        SEQUENCE_TIMER = Timer(60.0 * sequence[str(index)]['minutes'],\
                 executeSequence, [index + 1, sequence])
         SEQUENCE_TIMER.start()
     else:
@@ -153,6 +153,10 @@ def cancelSequence():
 #@app.route('/zone/')
 @app.route('/')
 def index():
+    return redirect(url_for('zone'))
+
+@app.route('/zone/')
+def zone():
     actions=[ ( str(x), 'disable' if x in getState() else 'time',\
             {'zone': x}, str(x) in getState())\
             for x in range(1, app.config['NUM_ZONES'] + 1)]
@@ -167,7 +171,7 @@ def index():
             actions = actions\
             )
 
-@app.route('/time/<int:zone>/')
+@app.route('/zone/time/<int:zone>/')
 def time(zone):
     actions = [ (str(x), 'enable',\
               {'zone': zone, 'time': x}, False)\
@@ -184,7 +188,7 @@ def time(zone):
             )
 
 # Web API for turning zones on and off
-@app.route('/disable/<int:zone>/')
+@app.route('/zone/disable/<int:zone>/')
 def disable(zone):
     if zone == 0:
         pumpOff()
@@ -200,7 +204,7 @@ def disable(zone):
         flash('Zone ' + str(zone) + ' was turned off.', 'success')
     return redirect(url_for('index'))
 
-@app.route('/enable/<int:zone>/<int:time>/')
+@app.route('/zone/enable/<int:zone>/<int:time>/')
 def enable(zone, time):
     minutes = ' minute.' if time == 1 else ' minutes.'
     if time <= MAX_TIME:
@@ -217,8 +221,8 @@ def enable(zone, time):
     return redirect(url_for('index'))
 
 # Routes for the sequences page
-@app.route('/sequences/')
-def sequences():
+@app.route('/sequence/')
+def sequence():
     actions = { 'run': 'runSequence',
             'edit': 'editSequence',
             'delete': 'deleteSequence' }
@@ -239,62 +243,73 @@ def sequences():
             data_headings = ['zone', 'minutes'],\
             subject = 'Sequence', items = items)
 
-@app.route('/sequences/run/<int:id>/')
+@app.route('/sequence/run/<int:id>/')
 def runSequence(id):
     initSequence(id)
     flash('Started sequence ' + getSequences()[str(id)]['name'] + '.', 'success')
-    return redirect(url_for('sequences'))
+    return redirect(url_for('sequence'))
 
-@app.route('/sequences/stop/')
+@app.route('/sequence/stop/')
 def stopSequence():
     cancelSequence()
     flash('Sequence cancelled.', 'caution')
-    return redirect(url_for('sequences'))
+    return redirect(url_for('sequence'))
 
-@app.route('/sequences/new/')
+@app.route('/sequence/new/')
 def newSequence():
-    return render_template('edit_sequence.html',\
-            sequences={str(max([int(x) for x in getSequences().keys()]) + 1):\
-            {'name': '', 'description': '',\
-            'created': strftime('%Y-%m-%dT%H:%M:%S.999Z'),\
-            'modified': '',\
-            'sequence': [[1,1]]}},\
+    return render_template('edit.html',\
             id=str(max([int(x) for x in getSequences().keys()]) + 1),\
+            subject = 'sequence',\
+            item = {'name': '', 'description': '',\
+            'sequence': {'0': {'zone': 1, 'minutes':1}, 'columns': ['zone','minutes']}},\
+            fields = ['name', 'description', 'sequence'],\
+            constrain = {'minutes': 120,\
+                'zone':[ x for x in range(1, NUM_ZONES + 1)]},\
             num_zones=NUM_ZONES)
 
-@app.route('/sequences/edit/<int:id>/', methods=('GET', 'POST'))
+@app.route('/sequence/edit/<int:id>/', methods=('GET', 'POST'))
 def editSequence(id):
     if request.method == 'POST':
-        fields = ['name', 'description', 'created']
+        sequences = getSequences()
+        fields = ['description', 'name']
         resultant = {}
+        resultant['created'] = strftime('%Y-%m-%dT%H:%M:%S.999Z') if str(id) not in sequences else sequences[str(id)]['created']
         for field in fields:
             if request.form[field] == '':
                 resultant[field] = field
             else:
                 resultant[field] = request.form[field]
         resultant['modified'] = strftime('%Y-%m-%dT%H:%M:%S.999Z')
-        resultant['sequence'] = [list(x) for x in zip(\
+        resultant['sequence'] = [x for x in zip(\
                 [int(request.form.get(y)) for y in \
                 [z for z in [*request.form.keys()] \
-                if match('select-*', z)]],\
+                if match('zone-*', z)]],\
                 [int(request.form.get(y)) for y in \
                 [z for z in [*request.form.keys()] \
-                if match('time-*', z)]]\
+                if match('minutes-*', z)]]\
                 )]
-        sequences = getSequences()
+        resultant['sequence'] = {str(x): {'zone': y, 'minutes': z} for x, (y,z) in enumerate(resultant['sequence'])}
+        resultant['sequence']['columns'] = ['zone', 'minutes']
         sequences.update({str(id): resultant})
         putSequences(sequences)
-        return redirect(url_for('sequences'))
-    return render_template('edit_sequence.html',\
-            sequences=getSequences(),\
-            id=str(id), num_zones=NUM_ZONES)
+        flash('Sequence ' + resultant['name'] + ' updated.', 'success')
+        return redirect(url_for('sequence'))
+    return render_template('edit.html',\
+            id = str(id),\
+            subject = 'sequence',\
+            item = getSequences()[str(id)],\
+            fields = ['name', 'description', 'sequence'],\
+            constrain = {'minutes': 120,\
+                'zone':[ x for x in range(1, NUM_ZONES + 1)]},\
+            num_zones = NUM_ZONES)
 
-@app.route('/sequences/delete/<int:id>/')
+@app.route('/sequence/delete/<int:id>/')
 def deleteSequence(id):
     sequences = getSequences()
-    sequences.pop(str(id))
+    removed = sequences.pop(str(id))
     putSequences(sequences)
-    return redirect(url_for('sequences'))
+    flash('Sequence ' + removed['name'] + ' deleted.', 'caution')
+    return redirect(url_for('sequence'))
 
 if __name__ == '__main__':
     import bjoern

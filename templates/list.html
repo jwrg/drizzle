@@ -3,23 +3,23 @@
   {% block content %}
       <h2>{{ subject }} list</h2>
       <ul class="entries">
-    {%- for id, fields, actions, active in items %}
+    {%- for id, fields, actions, active in items|reverse %}
         <li><div class="box gradient {%- if active %} active {%- endif %}">
           <ul id="entry-{{ loop.index0 }}" class="entry">
       {%- for fieldName, fieldData in fields.items() %}
-        {%- if fieldName == subject.lower() %}
+        {%- if fieldName == subject|lower %}
             <table>
-          {%- if data_headings != {} %}
+          {%- if fieldData['columns'] != [] %}
               <tr>
-            {%- for heading in data_headings %}
+            {%- for heading in fieldData['columns'] %}
                 <th>{{ heading|capitalize }}</th>
             {%- endfor %}
               </tr>
           {%- endif %}
-          {%- for row in fieldData %}
+          {%- for key, value in fieldData.items() if key != 'columns' %}
               <tr>
-            {%- for cell in row %}
-                <td>{{ cell }}</td>
+            {%- for columnName in fieldData['columns'] %}
+                <td>{{ columnName|capitalize }}:&nbsp;{{ value[columnName] }}</td>
             {%- endfor %}
               </tr>
           {%- endfor %}

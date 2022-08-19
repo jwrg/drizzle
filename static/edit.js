@@ -6,15 +6,19 @@ function increment_id_number(string) {
 }
 
 function append_row() {
-  const table = document.getElementById("sequence-table");
+  const table = document.querySelector('form table');
   const old_row = table.lastElementChild.lastElementChild;
   let new_row = old_row.cloneNode(true);
-  let new_select = new_row.firstElementChild.firstElementChild;
+  let new_select = new_row.firstElementChild.lastElementChild;
+  let new_select_label = new_row.firstElementChild.firstElementChild;
   new_select.id = increment_id_number(new_select.id);
   new_select.name = increment_id_number(new_select.name);
-  let new_number = new_row.firstElementChild.nextElementSibling.firstElementChild;
+  new_select_label.htmlFor = increment_id_number(new_select_label.htmlFor)
+  let new_number = new_row.firstElementChild.nextElementSibling.lastElementChild;
+  let new_number_label = new_row.firstElementChild.nextElementSibling.firstElementChild;
   new_number.id = increment_id_number(new_number.id);
   new_number.name = increment_id_number(new_number.name);
+  new_number_label.htmlFor = increment_id_number(new_number_label.htmlFor);
   table.lastElementChild.appendChild(new_row);
 }
 
