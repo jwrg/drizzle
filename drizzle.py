@@ -166,7 +166,7 @@ def zone():
                 {'zone': 0}, 'Pump' in getState()))
     return render_template('keypad.html',\
             confirm = False,\
-            subject = 'Zone',\
+            subject = 'zone',\
             prompt = 'Activate which zone?',\
             actions = actions\
             )
@@ -182,7 +182,7 @@ def time(zone):
     prompt += ' for how many minutes?'
     return render_template('keypad.html',\
             confirm = True,\
-            subject = 'Time',\
+            subject = 'time',\
             prompt = prompt,\
             actions = actions\
             )
@@ -241,7 +241,7 @@ def sequence():
         items.append(new_item)
     return render_template('list.html', allow_create = True,\
             data_headings = ['zone', 'minutes'],\
-            subject = 'Sequence', items = items)
+            subject = 'sequence', items = items)
 
 @app.route('/sequence/run/<int:id>/')
 def runSequence(id):

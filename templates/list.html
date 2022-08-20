@@ -1,7 +1,6 @@
 {% extends "base.html" %}
-  {% block title %}{{ subject }} List{% endblock %}
+  {% block title %}{{ subject|capitalize }} List{% endblock %}
   {% block content %}
-      <h2>{{ subject }} list</h2>
       <ul class="entries">
     {%- for id, fields, actions, active in items|reverse %}
         <li><div class="box gradient {%- if active %} active {%- endif %}">

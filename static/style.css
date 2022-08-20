@@ -3,14 +3,14 @@
 body {
   width: 100%;
   min-height: 100vh;
-  font-family: Futura, ‘Century Gothic’, AppleGothic, sans-serif;
+  font-family: Geneva, Verdana, sans-serif;
   text-align: left;
   background-image: linear-gradient(azure, lightskyblue);
 }
 
 main {
-  width: 80%;
-  margin: 50px auto;
+  width: 90%;
+  margin: 40px auto;
 }
 
 div.box {
@@ -36,7 +36,7 @@ h1 {
 
 h2 {
   color: black;
-  font-size: 48pt;
+  font-size: 36pt;
 }
 
 td, li, input, label, textarea {
@@ -71,7 +71,11 @@ a {
 /* Orientation and Colour */
 
 h2, h3 {
-  margin-bottom: 1em;
+  margin-bottom: 1ex;
+}
+
+ul#messages li {
+  text-align: center;
 }
 
 table {
@@ -107,11 +111,70 @@ nav {
   width: 100%;
 }
 
-nav a {
+header {
+  border-top: 3px solid black;
+  border-bottom: 3px solid #eee;
+}
+
+header nav {
+  height: 40px;
+  font-size: 0;
+  background-color: #24a;
+  border-top: 4px solid #115;
+  border-bottom: 4px solid lightgrey;
+}
+
+header nav ul {
+  display: flex;
+}
+
+header nav ul li {
+  text-align: left;
+  font-size: 18pt;
+  font-family: Trebuchet, Tahoma, Arial, sans-serif;
+  height: 40px;
+  padding: 0 2.5ex;
+  border-left: 2px solid #015;
+  border-right: 2px solid #99f;
+}
+
+header nav ul li a {
+  color: white;
+  vertical-align: sub;
+}
+
+header nav ul li.corner a, header nav ul li.filler a {
+  color: transparent;
+}
+
+header nav ul li.filler {
+  flex-grow: 1;
+}
+
+header nav ul li.drizzle {
+  background-color: #115;
+}
+
+header nav ul li.current {
+  background-image: linear-gradient(0deg, #222, #115);
+  border-bottom: 4px solid #aaf;
+  font-weight: bold;
+}
+
+header nav li a.icon svg {
+  display: inline-block;
+  text-align: right;
+  width: auto;
+  fill: white;
+  stroke: black;
+  stroke-width: 0px;
+}
+
+ul nav a {
   margin-right: 1.5ex;
 }
 
-nav a:not(:last-child)::after {
+ul nav a:not(:last-child)::after {
   content:"|";
   color: navy;
   position: relative;
@@ -189,12 +252,12 @@ textarea.name {
 }
 
 input.zone[type="button"] {
-  width: 300px;
-  height: 300px;
-  margin: 30px;
+  width: 40vw;
+  height: 40vw;
+  margin: 2.0vw;
   color: navy;
   font-size: 36pt;
-  border-radius: 150px;
+  border-radius: 20vw;
   border-width: 1px;
 }
 
