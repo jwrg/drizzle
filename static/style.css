@@ -10,7 +10,11 @@ body {
 
 main {
   width: 90%;
-  margin: 40px auto;
+  margin: 1em auto 0 auto;
+}
+
+main#messages {
+  padding: 1em 0;
 }
 
 div.box {
@@ -117,23 +121,24 @@ header {
 }
 
 header nav {
-  height: 40px;
-  font-size: 0;
+  height: 3ex;
+  font-size: 24pt;
   background-color: #24a;
   border-top: 4px solid #115;
   border-bottom: 4px solid lightgrey;
 }
 
 header nav ul {
+  font-size: 0;
   display: flex;
 }
 
 header nav ul li {
   text-align: left;
-  font-size: 18pt;
+  font-size: 24pt;
   font-family: Trebuchet, Tahoma, Arial, sans-serif;
-  height: 40px;
-  padding: 0 2.5ex;
+  height: 3ex;
+  padding: 0 1.5ex;
   border-left: 2px solid #015;
   border-right: 2px solid #99f;
 }
@@ -164,7 +169,7 @@ header nav ul li.current {
 header nav li a.icon svg {
   display: inline-block;
   text-align: right;
-  width: auto;
+  vertical-align: middle;
   fill: white;
   stroke: black;
   stroke-width: 0px;

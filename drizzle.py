@@ -1,3 +1,4 @@
+from logging import basicConfig
 from threading import Timer
 from json import dump, load
 from re import match
@@ -6,6 +7,7 @@ from piplates.RELAYplate import relaySTATE, relayON, relayOFF
 from flask import Flask, flash, render_template, redirect, request, url_for
 app = Flask(__name__)
 app.config.from_json('config.json')
+basicConfig(filename='drizzle.log', level=app.config['LOG_LEVEL'])
 
 # NB That this app makes no assumptions regarding
 # the specific relays the user wishes to utilize
