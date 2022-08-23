@@ -282,15 +282,24 @@ def editSequence(id):
             else:
                 resultant[field] = request.form[field]
         resultant['modified'] = strftime('%Y-%m-%dT%H:%M:%S.999Z')
-        resultant['sequence'] = [x for x in zip(\
-                [int(request.form.get(y)) for y in \
-                [z for z in [*request.form.keys()] \
-                if match('zone-*', z)]],\
-                [int(request.form.get(y)) for y in \
-                [z for z in [*request.form.keys()] \
-                if match('minutes-*', z)]]\
-                )]
-        resultant['sequence'] = {str(x): {'zone': y, 'minutes': z} for x, (y,z) in enumerate(resultant['sequence'])}
+        resultant['sequence'] = {\
+            str(x): {'zone': y, 'minutes': z}\
+            for x, (y,z)\
+            in enumerate([\
+                x for x\
+                in zip([\
+                    int(request.form.get(y)) for y in [\
+                        z for z in list(request.form.keys())\
+                        if match('zone-*', z)\
+                    ]\
+                ],[\
+                    int(request.form.get(y)) for y in [\
+                        z for z in list(request.form.keys())\
+                        if match('minutes-*', z)\
+                    ]\
+                ])\
+            ])\
+        }
         resultant['sequence']['columns'] = ['zone', 'minutes']
         sequences.update({str(id): resultant})
         putSequences(sequences)
