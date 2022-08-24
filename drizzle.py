@@ -160,7 +160,7 @@ def index():
 @app.route('/zone/')
 def zone():
     actions=[ ( str(x), 'disable' if x in getState() else 'time',\
-            {'zone': x}, str(x) in getState())\
+            {'zone': x}, x in getState())\
             for x in range(1, app.config['NUM_ZONES'] + 1)]
     if app.config['PUMP_ZONE'] is not None:
         actions.append(('Pump',\
@@ -179,9 +179,11 @@ def time(zone):
               {'zone': zone, 'time': x}, False)\
               for x in app.config['TIMES'] ]
     actions.append(('Cancel', 'index', {}, False))
-    prompt = 'Activate '
-    prompt += 'zone ' + str(zone) if zone != 0 else 'pump'
-    prompt += ' for how many minutes?'
+    prompt = ' '.join([
+        'Activate zone',
+        str(zone) if zone != 0 else 'pump',
+        'for how many minutes?'
+    ])
     return render_template('keypad.html',\
             confirm = True,\
             subject = 'time',\
@@ -203,23 +205,34 @@ def disable(zone):
         if TIMERS[zone]:
             TIMERS[zone].cancel()
             TIMERS[zone] = None;
-        flash('Zone ' + str(zone) + ' was turned off.', 'success')
+        flash(' '.join([
+            'Zone', str(zone), 'was turned off.'
+            ]), 'success')
     return redirect(url_for('index'))
 
 @app.route('/zone/enable/<int:zone>/<int:time>/')
 def enable(zone, time):
-    minutes = ' minute.' if time == 1 else ' minutes.'
     if time <= MAX_TIME:
         if zone == 0:
             pumpOn()
             TIMERS[0] = Timer(60.0 * time, pumpOff)
             TIMERS[0].start()
-            flash('Pump was turned on for ' + str(time) + minutes, 'success')
+            flash(' '.join([
+                'Pump was turned on for',
+                str(time),
+                'minute.' if time == 1 else 'minutes.'
+                ]), 'success')
         else:
             zoneOn(zone)
             TIMERS[zone] = Timer(60.0 * time, zoneOff, [zone])
             TIMERS[zone].start()
-            flash('Zone ' + str(zone) + ' was turned on for ' + str(time) + minutes, 'success')
+            flash(' '.join([
+                'Zone',
+                str(zone),
+                'was turned on for',
+                str(time),
+                'minute.' if time == 1 else 'minutes.'
+                ]), 'success')
     return redirect(url_for('index'))
 
 # Routes for the sequences page
@@ -248,7 +261,11 @@ def sequence():
 @app.route('/sequence/run/<int:id>/')
 def runSequence(id):
     initSequence(id)
-    flash('Started sequence ' + getSequences()[str(id)]['name'] + '.', 'success')
+    flash(' '.join([
+        'Started sequence',
+        getSequences()[str(id)]['name'],
+        '.'
+        ]), 'success')
     return redirect(url_for('sequence'))
 
 @app.route('/sequence/stop/')
@@ -303,7 +320,11 @@ def editSequence(id):
         resultant['sequence']['columns'] = ['zone', 'minutes']
         sequences.update({str(id): resultant})
         putSequences(sequences)
-        flash('Sequence ' + resultant['name'] + ' updated.', 'success')
+        flash(' '.join([
+            'Sequence',
+            resultant['name'],
+            'updated.'
+            ]), 'success')
         return redirect(url_for('sequence'))
     return render_template('edit.html',\
             id = str(id),\
@@ -319,7 +340,11 @@ def deleteSequence(id):
     sequences = getSequences()
     removed = sequences.pop(str(id))
     putSequences(sequences)
-    flash('Sequence ' + removed['name'] + ' deleted.', 'caution')
+    flash(' '.join([
+        'Sequence',
+        removed['name'],
+        'deleted.'
+        ]), 'caution')
     return redirect(url_for('sequence'))
 
 if __name__ == '__main__':
