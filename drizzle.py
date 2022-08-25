@@ -33,52 +33,55 @@ basicConfig(filename='drizzle.log', level=app.config['LOG_LEVEL'])
 # Declare the zone number for the pump switch (to
 # denote that no pump is used, give the value as None)
 
-# A list of references to Timer objects; this is
-# initialized as a list of None values
-# NB that zone 0 is reserved for the pump
-TIMERS = [ None for x in range(0, app.config['NUM_ZONES'] + 1) ]
+# Controller helper class for Pi-Plates RelayPlate
+class Platelet:
+    # A list of references to Timer objects; this is
+    # initialized as a list of None values
+    # NB that zone 0 is reserved for the pump
+    timers = [ None for x in range(0, app.config['NUM_ZONES'] + 1) ]
 
-# A function for determining which of the zone
-# relays are on, if any.  Returns a list that can
-# be passed to the index page
-def getState():
-    # Get a list of board addresses found in app.config['ZONES']
-    BOARDS = list({x[0] for x in app.config['ZONES']})
-    BOARDS.sort()
-    # Get a state for each board
-    STATES = {x: relaySTATE(x) for x in BOARDS}
-    # Check each state against all zones for that board
-    active = [x for x in range(0, app.config['NUM_ZONES']) if (STATES[app.config['ZONES'][x][0]] >> (app.config['ZONES'][x][1] - 1)) % 2]
-    # Check the pump state, if applicable and only check
-    # when no other zones are active
-    if app.config['PUMP_ZONE'] is not None and active == []:
-        if (STATES[app.config['PUMP_ZONE'][0]] >> (app.config['PUMP_ZONE'][1] - 1)) % 2:
-            active.append('Pump')
-    return active
+    # A function for determining which of the zone
+    # relays are on, if any.  Returns a list that can
+    # be passed to the index page
+    def getState():
+        # Get a list of board addresses found in app.config['ZONES']
+        boards = list({x[0] for x in app.config['ZONES']})
+        boards.sort()
+        # Get a state for each board
+        states = {x: relaySTATE(x) for x in boards}
+        # Check each state against all zones for that board
+        active = [x for x in range(0, app.config['NUM_ZONES']) if (states[app.config['ZONES'][x][0]] >> (app.config['ZONES'][x][1] - 1)) % 2]
+        # Check the pump state, if applicable and only check
+        # when no other zones are active
+        if app.config['PUMP_ZONE'] is not None and active == []:
+            if (states[app.config['PUMP_ZONE'][0]] >> (app.config['PUMP_ZONE'][1] - 1)) % 2:
+                active.append('Pump')
+        return active
 
-# Functions for turning on/off the pump, when applicable
-def pumpOn():
-    if app.config['PUMP_ZONE'] is not None and len(getState()) < app.config['MAX_ZONES']:
-        relayON(app.config['PUMP_ZONE'][0], app.config['PUMP_ZONE'][1])
-def pumpOff():
-    if app.config['PUMP_ZONE'] is not None:
-        relayOFF(app.config['PUMP_ZONE'][0], app.config['PUMP_ZONE'][1])
+    # Functions for turning on/off the pump, when applicable
+    def pumpOn():
+        if app.config['PUMP_ZONE'] is not None and len(Platelet.getState()) < app.config['MAX_ZONES']:
+            relayON(app.config['PUMP_ZONE'][0], app.config['PUMP_ZONE'][1])
+    def pumpOff():
+        if app.config['PUMP_ZONE'] is not None:
+            relayOFF(app.config['PUMP_ZONE'][0], app.config['PUMP_ZONE'][1])
 
-# A function for turning a zone on (argument not zero-indexed)
-def zoneOn(zone: int):
-    # Turn on the argument zone only if there isn't
-    # already another zone or sequence turned on
-    if len(getState()) < app.config['MAX_ZONES']:
-        pumpOn()
-        relayON(app.config['ZONES'][zone - 1][0], app.config['ZONES'][zone - 1][1])
+    # A function for turning a zone on (argument not zero-indexed)
+    def zoneOn(zone: int):
+        # Turn on the argument zone only if there isn't
+        # already another zone or sequence turned on
+        if len(Platelet.getState()) < app.config['MAX_ZONES']:
+            Platelet.pumpOn()
+            relayON(app.config['ZONES'][zone - 1][0], app.config['ZONES'][zone - 1][1])
 
-# A function for turning a zone off (argument not zero-indexed)
-def zoneOff(zone: int):
-    # Turn off pump only when there is no active pump timer
-    if len(getState()) == 1 and TIMERS[0] is None:
-        pumpOff()
-    relayOFF(app.config['ZONES'][zone - 1][0], app.config['ZONES'][zone - 1][1])
+    # A function for turning a zone off (argument not zero-indexed)
+    def zoneOff(zone: int):
+        # Turn off pump only when there is no active pump timer
+        if len(Platelet.getState()) == 1 and Platelet.timers[0] is None:
+            Platelet.pumpOff()
+        relayOFF(app.config['ZONES'][zone - 1][0], app.config['ZONES'][zone - 1][1])
 
+# Class for running and handling sequences
 class Sequencer:
     # An integer for holding the id of the currently running
     # sequence.  None denotes no sequence is currently active
@@ -108,14 +111,14 @@ class Sequencer:
     # Functional means for executing a sequence
     def executeSequence(index: int, sequence):
         if index > 0:
-            zoneOff(sequence[str(index - 1)]['zone'])
+            Platelet.zoneOff(sequence[str(index - 1)]['zone'])
         if index < len(sequence) - 1:
-            zoneOn(sequence[str(index)]['zone'])
+            Platelet.zoneOn(sequence[str(index)]['zone'])
             Sequencer.sequence_timer = Timer(60.0 * sequence[str(index)]['minutes'],\
                     Sequencer.executeSequence, [index + 1, sequence])
             Sequencer.sequence_timer.start()
         else:
-            pumpOff()
+            Platelet.pumpOff()
             Sequencer.sequence = None
             Sequencer.sequence_timer = None
 
@@ -134,7 +137,7 @@ class Sequencer:
             Sequencer.sequence_timer = None
         for zone in app.config['ZONES']:
             relayOFF(zone[0], zone[1])
-        pumpOff()
+        Platelet.pumpOff()
         Sequencer.sequence = None
 
 # Routes for the dashboard
@@ -149,13 +152,13 @@ def index():
 
 @app.route('/zone/')
 def zone():
-    actions=[ ( str(x), 'disable' if x in getState() else 'time',\
-            {'zone': x}, x in getState())\
+    actions=[ ( str(x), 'disable' if x in Platelet.getState() else 'time',\
+            {'zone': x}, x in Platelet.getState())\
             for x in range(1, app.config['NUM_ZONES'] + 1)]
     if app.config['PUMP_ZONE'] is not None:
         actions.append(('Pump',\
-                'disable' if 'Pump' in getState() else 'time',\
-                {'zone': 0}, 'Pump' in getState()))
+                'disable' if 'Pump' in Platelet.getState() else 'time',\
+                {'zone': 0}, 'Pump' in Platelet.getState()))
     return render_template('keypad.html',\
             confirm = False,\
             subject = 'zone',\
@@ -185,16 +188,16 @@ def time(zone):
 @app.route('/zone/disable/<int:zone>/')
 def disable(zone):
     if zone == 0:
-        pumpOff()
-        if TIMERS[0]:
-            TIMERS[0].cancel()
-            TIMERS[0] = None;
+        Platelet.pumpOff()
+        if Platelet.timers[0]:
+            Platelet.timers[0].cancel()
+            Platelet.timers[0] = None;
         flash('Pump was turned off.', 'success')
     else:
-        zoneOff(zone)
-        if TIMERS[zone]:
-            TIMERS[zone].cancel()
-            TIMERS[zone] = None;
+        Platelet.zoneOff(zone)
+        if Platelet.timers[zone]:
+            Platelet.timers[zone].cancel()
+            Platelet.timers[zone] = None;
         flash(' '.join([
             'Zone', str(zone), 'was turned off.'
             ]), 'success')
@@ -204,18 +207,18 @@ def disable(zone):
 def enable(zone, time):
     if time <= app.config['MAX_TIME']:
         if zone == 0:
-            pumpOn()
-            TIMERS[0] = Timer(60.0 * time, pumpOff)
-            TIMERS[0].start()
+            Platelet.pumpOn()
+            Platelet.timers[0] = Timer(60.0 * time, Platelet.pumpOff)
+            Platelet.timers[0].start()
             flash(' '.join([
                 'Pump was turned on for',
                 str(time),
                 'minute.' if time == 1 else 'minutes.'
                 ]), 'success')
         else:
-            zoneOn(zone)
-            TIMERS[zone] = Timer(60.0 * time, zoneOff, [zone])
-            TIMERS[zone].start()
+            Platelet.zoneOn(zone)
+            Platelet.timers[zone] = Timer(60.0 * time, Platelet.zoneOff, [zone])
+            Platelet.timers[zone].start()
             flash(' '.join([
                 'Zone',
                 str(zone),
