@@ -19,7 +19,7 @@ basicConfig(filename='drizzle.log', level=app.config['LOG_LEVEL'])
 # relay used for powering a pump.
 
 # The user can declare how many zones should be on
-# at once, and can also turn the pump on by itself; 
+# at once, and can also turn the pump on by itself;
 # the app counts and displays this as another zone.
 
 # Declare the number of sprinkler zones (not including pump)
@@ -37,16 +37,6 @@ basicConfig(filename='drizzle.log', level=app.config['LOG_LEVEL'])
 # initialized as a list of None values
 # NB that zone 0 is reserved for the pump
 TIMERS = [ None for x in range(0, app.config['NUM_ZONES'] + 1) ]
-
-# An integer for holding the id of the currently running
-# sequence.  None denotes no sequence is currently active
-# NB this obviously implies that only one sequence may 
-# be active at a time
-SEQUENCE = None
-
-# A reference to a Timer object; this is initialized as
-# None, which denotes that there is no active sequence
-SEQUENCE_TIMER = None
 
 # A function for determining which of the zone
 # relays are on, if any.  Returns a list that can
@@ -89,55 +79,63 @@ def zoneOff(zone: int):
         pumpOff()
     relayOFF(app.config['ZONES'][zone - 1][0], app.config['ZONES'][zone - 1][1])
 
-# Functions for reading/updating the local sequences json
-# file.  Returns a dict, since the top-level type is object
-def getSequences():
-    with open('sequences.json', 'r') as file:
-        return load(file)
+class Sequencer:
+    # An integer for holding the id of the currently running
+    # sequence.  None denotes no sequence is currently active
+    # NB this obviously implies that only one sequence may
+    # be active at a time
+    sequence = None
 
-def putSequences(data):
-    with open('sequences.json', 'w') as file:
-        return dump(data, file, sort_keys=False)
+    # A reference to a Timer object; this is initialized as
+    # None, which denotes that there is no active sequence
+    sequence_timer = None
 
-# Returns string of currently active sequence id,
-# otherwise returns a blank string (not None)
-def getSequenceState():
-    return '' if SEQUENCE == None else str(SEQUENCE)
+    # Functions for reading/updating the local sequences json
+    # file.  Returns a dict, since the top-level type is object
+    def getSequences():
+        with open('sequences.json', 'r') as file:
+            return load(file)
 
-# Functional means for executing a sequence
-def executeSequence(index: int, sequence):
-    global SEQUENCE, SEQUENCE_TIMER
-    if index > 0:
-        zoneOff(sequence[str(index - 1)]['zone'])
-    if index < len(sequence) - 1:
-        zoneOn(sequence[str(index)]['zone'])
-        SEQUENCE_TIMER = Timer(60.0 * sequence[str(index)]['minutes'],\
-                executeSequence, [index + 1, sequence])
-        SEQUENCE_TIMER.start()
-    else:
+    def putSequences(data):
+        with open('sequences.json', 'w') as file:
+            return dump(data, file, sort_keys=False)
+
+    # Returns string of currently active sequence id,
+    # otherwise returns a blank string (not None)
+    def getSequenceState():
+        return '' if Sequencer.sequence == None else str(Sequencer.sequence)
+
+    # Functional means for executing a sequence
+    def executeSequence(index: int, sequence):
+        if index > 0:
+            zoneOff(sequence[str(index - 1)]['zone'])
+        if index < len(sequence) - 1:
+            zoneOn(sequence[str(index)]['zone'])
+            Sequencer.sequence_timer = Timer(60.0 * sequence[str(index)]['minutes'],\
+                    Sequencer.executeSequence, [index + 1, sequence])
+            Sequencer.sequence_timer.start()
+        else:
+            pumpOff()
+            Sequencer.sequence = None
+            Sequencer.sequence_timer = None
+
+    # Sets up and activates the sequence with specified
+    # id number
+    def initSequence(id):
+        if Sequencer.sequence == None:
+            Sequencer.sequence = int(id)
+            Sequencer.executeSequence(0, Sequencer.getSequences()[str(id)]['sequence'])
+
+    # Cancels any currently active sequence (and heavy-handedly
+    # turns off all zones for good measure)
+    def cancelSequence():
+        if Sequencer.sequence_timer != None:
+            Sequencer.sequence_timer.cancel()
+            Sequencer.sequence_timer = None
+        for zone in app.config['ZONES']:
+            relayOFF(zone[0], zone[1])
         pumpOff()
-        SEQUENCE = None
-        SEQUENCE_TIMER = None
-
-# Sets up and activates the sequence with specified
-# id number
-def initSequence(id):
-    global SEQUENCE, SEQUENCE_TIMERS
-    if SEQUENCE == None:
-        SEQUENCE = int(id)
-        executeSequence(0, getSequences()[str(id)]['sequence'])
-
-# Cancels any currently active sequence (and heavy-handedly
-# turns off all zones for good measure)
-def cancelSequence():
-    global SEQUENCE, SEQUENCE_TIMER
-    if SEQUENCE_TIMER != None:
-        SEQUENCE_TIMER.cancel()
-        SEQUENCE_TIMER = None
-    for zone in app.config['ZONES']:
-        relayOFF(zone[0], zone[1])
-    pumpOff()
-    SEQUENCE = None
+        Sequencer.sequence = None
 
 # Routes for the dashboard
 #@app.route('/')
@@ -236,10 +234,10 @@ def sequence():
     active = { 'stop': 'stopSequence' }
     fields = [ 'name', 'description', 'sequence' ]
     items = []
-    for id, entry in getSequences().items():
+    for id, entry in Sequencer.getSequences().items():
         new_item = [id]
         new_item.append({ field: entry[field] for field in fields })
-        if id == str(SEQUENCE):
+        if id == str(Sequencer.sequence):
             new_item.append([ (key.capitalize(), value, {}, True) for key, value in active.items() ])
             new_item.append(True)
         else:
@@ -252,24 +250,24 @@ def sequence():
 
 @app.route('/sequence/run/<int:id>/')
 def runSequence(id):
-    initSequence(id)
+    Sequencer.initSequence(id)
     flash(' '.join([
         'Started sequence',
-        getSequences()[str(id)]['name'],
+        Sequencer.getSequences()[str(id)]['name'],
         '.'
         ]), 'success')
     return redirect(url_for('sequence'))
 
 @app.route('/sequence/stop/')
 def stopSequence():
-    cancelSequence()
+    Sequencer.cancelSequence()
     flash('Sequence cancelled.', 'caution')
     return redirect(url_for('sequence'))
 
 @app.route('/sequence/new/')
 def newSequence():
     return render_template('edit.html',\
-            id=str(max([int(x) for x in getSequences().keys()]) + 1),\
+            id=str(max([int(x) for x in Sequencer.getSequences().keys()]) + 1),\
             subject = 'sequence',\
             item = {'name': '', 'description': '',\
             'sequence': {'0': {'zone': 1, 'minutes':1}, 'columns': ['zone','minutes']}},\
@@ -281,7 +279,7 @@ def newSequence():
 @app.route('/sequence/edit/<int:id>/', methods=('GET', 'POST'))
 def editSequence(id):
     if request.method == 'POST':
-        sequences = getSequences()
+        sequences = Sequencer.getSequences()
         fields = ['description', 'name']
         resultant = {}
         resultant['created'] = strftime('%Y-%m-%dT%H:%M:%S.999Z') if str(id) not in sequences else sequences[str(id)]['created']
@@ -311,7 +309,7 @@ def editSequence(id):
         }
         resultant['sequence']['columns'] = ['zone', 'minutes']
         sequences.update({str(id): resultant})
-        putSequences(sequences)
+        Sequencer.putSequences(sequences)
         flash(' '.join([
             'Sequence',
             resultant['name'],
@@ -321,7 +319,7 @@ def editSequence(id):
     return render_template('edit.html',\
             id = str(id),\
             subject = 'sequence',\
-            item = getSequences()[str(id)],\
+            item = Sequencer.getSequences()[str(id)],\
             fields = ['name', 'description', 'sequence'],\
             constrain = {'minutes': app.config['MAX_TIME'],\
                 'zone':[ x for x in range(1, app.config['NUM_ZONES'] + 1)]},\
@@ -329,9 +327,9 @@ def editSequence(id):
 
 @app.route('/sequence/delete/<int:id>/')
 def deleteSequence(id):
-    sequences = getSequences()
+    sequences = Sequencer.getSequences()
     removed = sequences.pop(str(id))
-    putSequences(sequences)
+    Sequencer.putSequences(sequences)
     flash(' '.join([
         'Sequence',
         removed['name'],
