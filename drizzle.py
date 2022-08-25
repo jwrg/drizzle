@@ -4,6 +4,7 @@ from json import dump, load
 from re import match
 from time import strftime
 from piplates.RELAYplate import relaySTATE, relayON, relayOFF
+#from test.plates import relaySTATE, relayON, relayOFF
 from flask import Flask, flash, render_template, redirect, request, url_for
 app = Flask(__name__)
 app.config.from_json('config.json')
