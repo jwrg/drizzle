@@ -6,7 +6,7 @@
         <li>
           <div class="box gradient">
             <ul class="entry">
-              <form action="/sequence/edit/{{ id }}/" method="post">
+              <form method="post">
     {%- for fieldName in fields %}
       {%- if item[fieldName] is mapping %}
                 <table class="{{ subject }}">
