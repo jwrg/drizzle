@@ -50,7 +50,7 @@ class Platelet:
         # Get a state for each board
         states = {x: relaySTATE(x) for x in boards}
         # Check each state against all zones for that board
-        active = [x for x in range(0, app.config['NUM_ZONES']) if (states[app.config['ZONES'][x][0]] >> (app.config['ZONES'][x][1] - 1)) % 2]
+        active = [x for x in range(1, app.config['NUM_ZONES'] + 1) if (states[app.config['ZONES'][x - 1][0]] >> (app.config['ZONES'][x - 1][1] - 1)) % 2]
         # Check the pump state, if applicable and only check
         # when no other zones are active
         if app.config['PUMP_ZONE'] is not None and active == []:
