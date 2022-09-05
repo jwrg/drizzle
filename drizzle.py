@@ -274,10 +274,13 @@ def stopSequence():
     flash('Sequence cancelled.', 'caution')
     return redirect(url_for('sequence'))
 
-@app.route('/sequence/new/')
+@app.route('/sequence/new/', methods=('GET', 'POST'))
 def newSequence():
+    id = str(max([int(x) for x in Sequencer.getSequences().keys()]) + 1)
+    if request.method == 'POST':
+        return redirect(url_for('editSequence', id = id), code = 307)
     return render_template('edit.html',\
-            id=str(max([int(x) for x in Sequencer.getSequences().keys()]) + 1),\
+            id = id,\
             subject = 'sequence',\
             item = {'name': '', 'description': '',\
             'sequence': {'0': {'zone': 1, 'minutes':1}, 'columns': ['zone','minutes']}},\
