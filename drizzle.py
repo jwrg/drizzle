@@ -1,4 +1,3 @@
-from logging import basicConfig
 from threading import Timer
 from json import dump, load
 from re import match
@@ -8,7 +7,7 @@ from piplates.RELAYplate import relaySTATE, relayON, relayOFF
 from flask import Flask, flash, render_template, redirect, request, url_for
 app = Flask(__name__)
 app.config.from_json('config.json')
-basicConfig(filename='drizzle.log', level=app.config['LOG_LEVEL'])
+app.logger.setLevel(app.config['LOG_LEVEL'])
 
 # NB That this app makes no assumptions regarding
 # the specific relays the user wishes to utilize
@@ -57,15 +56,20 @@ class Platelet:
         if app.config['PUMP_ZONE'] is not None and active == []:
             if (states[app.config['PUMP_ZONE'][0]] >> (app.config['PUMP_ZONE'][1] - 1)) % 2:
                 active.append('Pump')
+        app.logger.debug(' '.join(['Returned getState() with active zones'] + [str(x) for x in active]))
         return active
 
     # Functions for turning on/off the pump, when applicable
     def pumpOn():
         if app.config['PUMP_ZONE'] is not None and len(Platelet.getState()) < app.config['MAX_ZONES']:
             relayON(app.config['PUMP_ZONE'][0], app.config['PUMP_ZONE'][1])
+            app.logger.info('Pump was turned on')
+        else:
+            app.logger.debug('Call to pumpOn() but pump NOT turned on')
     def pumpOff():
         if app.config['PUMP_ZONE'] is not None:
             relayOFF(app.config['PUMP_ZONE'][0], app.config['PUMP_ZONE'][1])
+            app.logger.info('Pump was turned off')
 
     # A function for turning a zone on (argument not zero-indexed)
     def zoneOn(zone: int):
@@ -74,6 +78,7 @@ class Platelet:
         if len(Platelet.getState()) < app.config['MAX_ZONES']:
             Platelet.pumpOn()
             relayON(app.config['ZONES'][zone - 1][0], app.config['ZONES'][zone - 1][1])
+            app.logger.info(' '.join(['Zone', str(zone), 'was turned on']))
 
     # A function for turning a zone off (argument not zero-indexed)
     def zoneOff(zone: int):
@@ -81,6 +86,7 @@ class Platelet:
         if len(Platelet.getState()) == 1 and Platelet.timers[0] is None:
             Platelet.pumpOff()
         relayOFF(app.config['ZONES'][zone - 1][0], app.config['ZONES'][zone - 1][1])
+        app.logger.info(' '.join(['Zone', str(zone), 'was turned off']))
 
 # Class for running and handling sequences
 class Sequencer:
@@ -343,4 +349,5 @@ def deleteSequence(id):
 
 if __name__ == '__main__':
     import bjoern
+    app.logger.info('Drizzle has started.')
     bjoern.run(app, '0.0.0.0', app.config['APP_PORT'])
