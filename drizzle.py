@@ -159,13 +159,14 @@ def index():
 
 @app.route('/zone/')
 def zone():
-    actions=[ ( str(x), 'disable' if x in Platelet.getState() else 'time',\
-            {'zone': x}, x in Platelet.getState())\
+    state = Platelet.getState()
+    actions=[ ( str(x), 'disable' if x in state else 'time',\
+            {'zone': x}, x in state )\
             for x in range(1, app.config['NUM_ZONES'] + 1)]
     if app.config['PUMP_ZONE'] is not None:
         actions.append(('Pump',\
-                'disable' if 'Pump' in Platelet.getState() else 'time',\
-                {'zone': 0}, 'Pump' in Platelet.getState()))
+                'disable' if 'Pump' in state else 'time',\
+                {'zone': 0}, 'Pump' in state ))
     return render_template('keypad.html',\
             confirm = False,\
             subject = 'zone',\
