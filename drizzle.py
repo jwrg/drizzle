@@ -147,6 +147,16 @@ class Sequencer:
         Platelet.pumpOff()
         Sequencer.sequence = None
 
+# Request debug logging
+@app.before_request
+def log_request():
+    app.logger.debug(' '.join([ str(x) for x in [
+        request.remote_addr,
+        request.method,
+        request.path,
+        request.scheme
+        ]]))
+
 # Routes for the dashboard
 #@app.route('/')
 #def index():
