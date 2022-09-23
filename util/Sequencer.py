@@ -1,8 +1,6 @@
 from threading import Timer
 from json import dump, load
 from util.Platelet import Platelet
-from piplates.RELAYplate import relaySTATE, relayON, relayOFF
-#from test.plates import relaySTATE, relayON, relayOFF
 
 from flask import current_app
 
@@ -60,7 +58,5 @@ class Sequencer:
         if Sequencer.sequence_timer != None:
             Sequencer.sequence_timer.cancel()
             Sequencer.sequence_timer = None
-        for zone in current_app.config['ZONES']:
-            relayOFF(zone[0], zone[1])
-        Platelet.pumpOff()
+        Platelet.allOff()
         Sequencer.sequence = None

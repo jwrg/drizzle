@@ -71,3 +71,9 @@ class Platelet:
             Platelet.pumpOff()
         relayOFF(Platelet.zones[zone - 1][0], Platelet.zones[zone - 1][1])
         Platelet.logger.info(' '.join(['Zone', str(zone), 'was turned off']))
+
+    # A function to turn everything off
+    def allOff():
+        for zone in Platelet.zones:
+            relayOFF(zone[0], zone[1])
+        Platelet.pumpOff()
