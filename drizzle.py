@@ -1,4 +1,3 @@
-from threading import Timer
 from json import dump, load
 from re import match
 from time import strftime
@@ -91,15 +90,9 @@ def time(zone):
 def disable(zone):
     if zone == 0:
         Platelet.pumpOff()
-        if Platelet.timers[0]:
-            Platelet.timers[0].cancel()
-            Platelet.timers[0] = None;
         flash('Pump was turned off.', 'success')
     else:
         Platelet.zoneOff(zone)
-        if Platelet.timers[zone]:
-            Platelet.timers[zone].cancel()
-            Platelet.timers[zone] = None;
         flash(' '.join([
             'Zone', str(zone), 'was turned off.'
             ]), 'success')
@@ -109,18 +102,14 @@ def disable(zone):
 def enable(zone, time):
     if time <= app.config['MAX_TIME']:
         if zone == 0:
-            Platelet.pumpOn()
-            Platelet.timers[0] = Timer(60.0 * time, Platelet.pumpOff)
-            Platelet.timers[0].start()
+            Platelet.pumpOn(time)
             flash(' '.join([
                 'Pump was turned on for',
                 str(time),
                 'minute.' if time == 1 else 'minutes.'
                 ]), 'success')
         else:
-            Platelet.zoneOn(zone)
-            Platelet.timers[zone] = Timer(60.0 * time, Platelet.zoneOff, [zone])
-            Platelet.timers[zone].start()
+            Platelet.zoneOn(zone, time)
             flash(' '.join([
                 'Zone',
                 str(zone),

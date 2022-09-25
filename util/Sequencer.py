@@ -1,4 +1,3 @@
-from threading import Timer
 from json import dump, load
 from util.Platelet import Platelet
 
@@ -11,10 +10,8 @@ class Sequencer:
     # NB this obviously implies that only one sequence may
     # be active at a time
     sequence = None
-
-    # A reference to a Timer object; this is initialized as
-    # None, which denotes that there is no active sequence
-    sequence_timer = None
+    # Persist the logger object
+    logger = current_app.logger
 
     # Functions for reading/updating the local sequences json
     # file.  Returns a dict, since the top-level type is object
@@ -29,34 +26,39 @@ class Sequencer:
     # Returns string of currently active sequence id,
     # otherwise returns a blank string (not None)
     def getSequenceState():
+        Sequencer.logger.debug(' '.join(['Returned getSequenceState() with', str(Sequencer.sequence)]))
         return '' if Sequencer.sequence == None else str(Sequencer.sequence)
 
     # Functional means for executing a sequence
     def executeSequence(index: int, sequence):
         if index > 0:
-            Platelet.zoneOff(sequence[str(index - 1)]['zone'])
+            Platelet.zones[sequence[str(index - 1)]['zone'] - 1].off()
         if index < len(sequence) - 1:
-            Platelet.zoneOn(sequence[str(index)]['zone'])
-            Sequencer.sequence_timer = Timer(60.0 * sequence[str(index)]['minutes'],\
-                    Sequencer.executeSequence, [index + 1, sequence])
-            Sequencer.sequence_timer.start()
+            Platelet.pump_zone.on(sequence[str(index)]['minutes'])
+            Platelet.zones[sequence[str(index)]['zone'] - 1].on(sequence[str(index)]['minutes'], Sequencer.executeSequence, [index + 1, sequence])
         else:
-            Platelet.pumpOff()
+            Sequencer.logger.info(' '.join(['Sequence', str(Sequencer.sequence), 'completed.']))
             Sequencer.sequence = None
-            Sequencer.sequence_timer = None
 
     # Sets up and activates the sequence with specified
     # id number
     def initSequence(id):
         if Sequencer.sequence == None:
+            Sequencer.logger.info(' '.join(['Sequence', str(id), 'started.']))
             Sequencer.sequence = int(id)
             Sequencer.executeSequence(0, Sequencer.getSequences()[str(id)]['sequence'])
+        else:
+            Sequencer.logger.debug(' '.join([
+                'Sequence', 
+                str(id), 
+                'NOT started. Sequence', 
+                str(Sequencer.sequence), 
+                'currently running.'
+                ]))
 
     # Cancels any currently active sequence (and heavy-handedly
     # turns off all zones for good measure)
     def cancelSequence():
-        if Sequencer.sequence_timer != None:
-            Sequencer.sequence_timer.cancel()
-            Sequencer.sequence_timer = None
         Platelet.allOff()
+        Sequencer.logger.debug(' '.join(['Sequence', str(Sequencer.sequence), 'cancelled.']))
         Sequencer.sequence = None
