@@ -17,7 +17,7 @@ SRV_PORT=80
 APP_PORT=8080
 
 # Install spidev, RPi.GPIO and bjoern
-sudo apt-get install libev-dev python2-dev python3-pip python3-flask
+sudo apt-get install libev-dev python2-dev python3-pip python3-flask iptables
 sudo pip3 install pi-plates
 pip3 install spidev RPi.GPIO bjoern
 
