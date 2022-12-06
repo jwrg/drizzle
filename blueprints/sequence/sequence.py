@@ -1,35 +1,41 @@
-from time import strftime
-from json import dump, load
+"""
+Routes for sequencing relays
+"""
 from re import match
+from time import strftime
+
 from flask import (
     Blueprint,
     current_app,
     flash,
-    render_template,
     redirect,
+    render_template,
     request,
     url_for,
 )
 
 with current_app.app_context():
-    from util.Sequencer import Sequencer
+    from util.sequencer import Sequencer
 sequence = Blueprint("sequence", __name__, url_prefix="/sequence")
 
 
 @sequence.route("/")
-def list():
+def list_sequences():
+    """
+    View that lists all available sequences
+    """
     actions = {
-        "run": "sequence.runSequence",
-        "edit": "sequence.editSequence",
-        "delete": "sequence.deleteSequence",
+        "run": "sequence.run_sequence",
+        "edit": "sequence.edit_sequence",
+        "delete": "sequence.delete_sequence",
     }
-    active = {"stop": "sequence.stopSequence"}
+    active = {"stop": "sequence.stop_sequence"}
     fields = ["name", "description", "sequence"]
     items = []
-    for id, entry in Sequencer.getSequences().items():
-        new_item = [id]
+    for sequence_id, entry in Sequencer.get_sequences().items():
+        new_item = [sequence_id]
         new_item.append({field: entry[field] for field in fields})
-        if id == str(Sequencer.sequence):
+        if sequence_id == str(Sequencer.sequence):
             new_item.append(
                 [(key.capitalize(), value, {}, True) for key, value in active.items()]
             )
@@ -37,7 +43,7 @@ def list():
         else:
             new_item.append(
                 [
-                    (key.capitalize(), value, {"id": id}, True)
+                    (key.capitalize(), value, {"sequence_id": sequence_id}, True)
                     for key, value in actions.items()
                 ]
             )
@@ -52,31 +58,46 @@ def list():
     )
 
 
-@sequence.route("/run/<int:id>/")
-def runSequence(id):
-    Sequencer.initSequence(id)
+@sequence.route("/run/<int:sequence_id>/")
+def run_sequence(sequence_id):
+    """
+    API command that executes a sequence, given its id number
+    """
+    Sequencer.init_sequence(sequence_id)
     flash(
-        " ".join(["Sequence", Sequencer.getSequences()[str(id)]["name"], "started."]),
+        " ".join(
+            [
+                "Sequence",
+                Sequencer.get_sequences()[str(sequence_id)]["name"],
+                "started.",
+            ]
+        ),
         "success",
     )
-    return redirect(url_for(".list"))
+    return redirect(url_for(".list_sequences"))
 
 
 @sequence.route("/stop/")
-def stopSequence():
-    Sequencer.cancelSequence()
+def stop_sequence():
+    """
+    API command that stops any currently active sequence
+    """
+    Sequencer.cancel_sequence()
     flash("Sequence cancelled.", "caution")
-    return redirect(url_for(".list"))
+    return redirect(url_for(".list_sequences"))
 
 
 @sequence.route("/new/", methods=("GET", "POST"))
-def newSequence():
-    id = str(max([int(x) for x in Sequencer.getSequences().keys()]) + 1)
+def new_sequence():
+    """
+    View that creates a new sequence
+    """
+    sequence_id = str(max(int(x) for x in Sequencer.get_sequences().keys()) + 1)
     if request.method == "POST":
-        return redirect(url_for(".editSequence", id=id), code=307)
+        return redirect(url_for(".edit_sequence", sequence_id=sequence_id), code=307)
     return render_template(
         "edit.html",
-        id=id,
+        id=sequence_id,
         subject="sequence",
         item={
             "name": "",
@@ -89,22 +110,25 @@ def newSequence():
         fields=["name", "description", "sequence"],
         constrain={
             "minutes": 120,
-            "zone": [x for x in range(1, current_app.config["NUM_ZONES"] + 1)],
+            "zone": list(range(1, current_app.config["NUM_ZONES"] + 1)),
         },
         num_zones=current_app.config["NUM_ZONES"],
     )
 
 
-@sequence.route("/edit/<int:id>/", methods=("GET", "POST"))
-def editSequence(id):
+@sequence.route("/edit/<int:sequence_id>/", methods=("GET", "POST"))
+def edit_sequence(sequence_id):
+    """
+    View that edits a sequence, given its id number
+    """
     if request.method == "POST":
-        sequences = Sequencer.getSequences()
+        sequences = Sequencer.get_sequences()
         fields = ["description", "name"]
         resultant = {}
         resultant["created"] = (
             strftime("%Y-%m-%dT%H:%M:%S.999Z")
-            if str(id) not in sequences
-            else sequences[str(id)]["created"]
+            if str(sequence_id) not in sequences
+            else sequences[str(sequence_id)]["created"]
         )
         for field in fields:
             if request.form[field] == "":
@@ -115,9 +139,8 @@ def editSequence(id):
         resultant["sequence"] = {
             str(x): {"zone": y, "minutes": z}
             for x, (y, z) in enumerate(
-                [
-                    x
-                    for x in zip(
+                list(
+                    zip(
                         [
                             int(request.form.get(y))
                             for y in [
@@ -131,32 +154,35 @@ def editSequence(id):
                             ]
                         ],
                     )
-                ]
+                )
             )
         }
         resultant["sequence"]["columns"] = ["zone", "minutes"]
-        sequences.update({str(id): resultant})
-        Sequencer.putSequences(sequences)
+        sequences.update({str(sequence_id): resultant})
+        Sequencer.put_sequences(sequences)
         flash(" ".join(["Sequence", resultant["name"], "updated."]), "success")
-        return redirect(url_for(".list"))
+        return redirect(url_for(".list_sequences"))
     return render_template(
         "edit.html",
-        id=str(id),
+        id=str(sequence_id),
         subject="sequence",
-        item=Sequencer.getSequences()[str(id)],
+        item=Sequencer.get_sequences()[str(sequence_id)],
         fields=["name", "description", "sequence"],
         constrain={
             "minutes": current_app.config["MAX_TIME"],
-            "zone": [x for x in range(1, current_app.config["NUM_ZONES"] + 1)],
+            "zone": list(range(1, current_app.config["NUM_ZONES"] + 1)),
         },
         num_zones=current_app.config["NUM_ZONES"],
     )
 
 
-@sequence.route("/delete/<int:id>/")
-def deleteSequence(id):
-    sequences = Sequencer.getSequences()
-    removed = sequences.pop(str(id))
-    Sequencer.putSequences(sequences)
+@sequence.route("/delete/<int:sequence_id>/")
+def delete_sequence(sequence_id):
+    """
+    API command that deletes a sequence, given its id number
+    """
+    sequences = Sequencer.get_sequences()
+    removed = sequences.pop(str(sequence_id))
+    Sequencer.put_sequences(sequences)
     flash(" ".join(["Sequence", removed["name"], "deleted."]), "caution")
-    return redirect(url_for(".list"))
+    return redirect(url_for(".list_sequences"))
