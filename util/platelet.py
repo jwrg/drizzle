@@ -3,8 +3,7 @@ Controller helper classes for Pi-Plates RelayPlate
 """
 # from piplates.RELAYplate import relaySTATE, relayON, relayOFF
 from test.plates import relayOFF, relayON, relaySTATE
-from threading import Timer
-from time import time as now
+from util.timmy import Timmy
 
 from flask import current_app
 
@@ -20,12 +19,12 @@ class Zone:
         self.name = name
         self.board = board
         self.relay = relay
-        self.timer = self.Timer(self.name)
+        self.timer = Timmy(self.name)
         Zone.logger.debug(" ".join(["Zone", str(self.name), "initialized"]))
 
     def on(self, interval, callback=None, args=None):
         """
-        Method that turns on the zone
+        Turns on the zone
         """
         relayON(self.board, self.relay)
         self.timer.set(interval, self.off if callback is None else callback, args)
@@ -33,84 +32,11 @@ class Zone:
 
     def off(self):
         """
-        Method that turns off the zone
+        Turns off the zone
         """
         relayOFF(self.board, self.relay)
         self.timer.clear()
         Zone.logger.debug(" ".join(["Zone", str(self.name), "off"]))
-
-    class Timer:
-        """
-        Helper class that wraps a threading timer using minutes as its unit of
-        time
-        """
-
-        def __init__(self, name):
-            self.name = name
-            self.timer = None
-            # Start time in seconds from the epoch
-            self.start = 0
-            # Interval time in minutes
-            self.interval = 0
-
-        def remaining(self):
-            """
-            Method that returns remaining timer interval in minutes
-            """
-            if self.timer is not None:
-                return ((self.start + (self.interval * 60)) - now()) / 60
-            return 0
-
-        # Functions for setting and clearing timers
-        def set(self, interval, callback, args):
-            """
-            Method that sets the timer given a time interval, a method to call
-            once the interval has elapsed, and arguments for said callback
-            method
-            """
-            if interval > self.remaining():
-                if self.timer is not None:
-                    self.timer.cancel()
-                    self.timer = None
-                    Zone.logger.debug(" ".join(["Timer", str(self.name), "extended."]))
-                self.interval = interval
-                self.start = now()
-                self.timer = Timer(60.0 * interval, callback, args)
-                self.timer.start()
-                Zone.logger.debug(
-                    " ".join(
-                        [
-                            "Timer",
-                            str(self.name),
-                            "set for",
-                            str(interval),
-                            "minute." if interval == 1 else "minutes.",
-                        ]
-                    )
-                )
-            else:
-                Zone.logger.debug(
-                    " ".join(
-                        [
-                            "Timer",
-                            str(self.name),
-                            "not set! Arg",
-                            str(interval),
-                            "ends before currently set timer",
-                        ]
-                    )
-                )
-
-        def clear(self):
-            """
-            Method that clears the timer
-            """
-            if self.timer is not None:
-                self.interval = 0
-                self.start = 0
-                self.timer.cancel()
-                self.timer = None
-                Zone.logger.debug(" ".join(["Timer", str(self.name), "cleared."]))
 
 
 class Platelet:
