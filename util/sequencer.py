@@ -1,11 +1,10 @@
 """
 Helper class for recursively sequencing relays on and off
 """
-from json import dump, load
-
 from flask import current_app
 
 from util.platelet import Platelet
+from util.jsonny import Jsonny
 
 
 # Class for running and handling sequences
@@ -23,28 +22,10 @@ class Sequencer:
     # Persist the logger object
     logger = current_app.logger
 
-    # Functions for reading/updating the local sequences json
-    # file.  Returns a dict, since the top-level type is object
-    @staticmethod
-    def get_sequences():
-        """
-        Method that returns a dict of all stored sequences
-        """
-        with open("sequences.json", "r", encoding="utf8") as file:
-            return load(file)
-
-    @staticmethod
-    def put_sequences(data):
-        """
-        Method that persists to disk all sequence data in JSON format
-        """
-        with open("sequences.json", "w", encoding="utf8") as file:
-            return dump(data, file, sort_keys=False)
-
     @staticmethod
     def get_sequence_state():
         """
-        Method that returns the currently active sequence id, otherwise returns a blank
+        Returns the currently active sequence id, otherwise returns a blank
         string (sc., it does not return None)
         """
         Sequencer.logger.debug(
@@ -75,13 +56,13 @@ class Sequencer:
     @staticmethod
     def init_sequence(sequence_id):
         """
-        Method that initializes and activates the sequence with specified id number
+        Initializes and activates the sequence with specified id number
         """
         if Sequencer.sequence is None:
             Sequencer.logger.info(" ".join(["Sequence", str(sequence_id), "started."]))
             Sequencer.sequence = int(sequence_id)
             Sequencer.execute_sequence(
-                0, Sequencer.get_sequences()[str(sequence_id)]["sequence"]
+                    0, Jsonny.get("sequences")[str(sequence_id)]["sequence"]
             )
         else:
             Sequencer.logger.debug(
@@ -99,7 +80,7 @@ class Sequencer:
     @staticmethod
     def cancel_sequence():
         """
-        Method that cancels any currently active sequence (and heavy-handedly turns off
+        Cancels any currently active sequence (and heavy-handedly turns off
         all zones for good measure)
         """
         Platelet.all_off()

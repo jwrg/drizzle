@@ -16,6 +16,7 @@ from flask import (
 
 with current_app.app_context():
     from util.sequencer import Sequencer
+    from util.jsonny import Jsonny
 sequence = Blueprint("sequence", __name__, url_prefix="/sequence")
 
 
@@ -32,7 +33,7 @@ def list_sequences():
     active = {"stop": "sequence.stop_sequence"}
     fields = ["name", "description", "sequence"]
     items = []
-    for sequence_id, entry in Sequencer.get_sequences().items():
+    for sequence_id, entry in Jsonny.get("sequences").items():
         new_item = [sequence_id]
         new_item.append({field: entry[field] for field in fields})
         if sequence_id == str(Sequencer.sequence):
@@ -68,7 +69,7 @@ def run_sequence(sequence_id):
         " ".join(
             [
                 "Sequence",
-                Sequencer.get_sequences()[str(sequence_id)]["name"],
+                Jsonny.get("sequences")[str(sequence_id)]["name"],
                 "started.",
             ]
         ),
@@ -92,7 +93,7 @@ def new_sequence():
     """
     View that creates a new sequence
     """
-    sequence_id = str(max(int(x) for x in Sequencer.get_sequences().keys()) + 1)
+    sequence_id = str(max(int(x) for x in Jsonny.get("sequences").keys()) + 1)
     if request.method == "POST":
         return redirect(url_for(".edit_sequence", sequence_id=sequence_id), code=307)
     return render_template(
@@ -122,7 +123,7 @@ def edit_sequence(sequence_id):
     View that edits a sequence, given its id number
     """
     if request.method == "POST":
-        sequences = Sequencer.get_sequences()
+        sequences = Jsonny.get("sequences")
         fields = ["description", "name"]
         resultant = {}
         resultant["created"] = (
@@ -159,14 +160,14 @@ def edit_sequence(sequence_id):
         }
         resultant["sequence"]["columns"] = ["zone", "minutes"]
         sequences.update({str(sequence_id): resultant})
-        Sequencer.put_sequences(sequences)
+        Jsonny.put("sequences", sequences)
         flash(" ".join(["Sequence", resultant["name"], "updated."]), "success")
         return redirect(url_for(".list_sequences"))
     return render_template(
         "edit.html",
         id=str(sequence_id),
         subject="sequence",
-        item=Sequencer.get_sequences()[str(sequence_id)],
+        item=Jsonny.get("sequences")[str(sequence_id)],
         fields=["name", "description", "sequence"],
         constrain={
             "minutes": current_app.config["MAX_TIME"],
@@ -181,8 +182,8 @@ def delete_sequence(sequence_id):
     """
     API command that deletes a sequence, given its id number
     """
-    sequences = Sequencer.get_sequences()
+    sequences = Jsonny.get("sequences")
     removed = sequences.pop(str(sequence_id))
-    Sequencer.put_sequences(sequences)
+    Jsonny.put("sequences", sequences)
     flash(" ".join(["Sequence", removed["name"], "deleted."]), "caution")
     return redirect(url_for(".list_sequences"))
