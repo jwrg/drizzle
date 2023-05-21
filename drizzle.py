@@ -31,11 +31,13 @@ def log_request():
 
 
 with app.app_context():
+    from blueprints.schedule import schedule
     from blueprints.sequence import sequence
     from blueprints.zone import zone
 
 app.register_blueprint(zone.zone)
 app.register_blueprint(sequence.sequence)
+app.register_blueprint(schedule.schedule)
 
 
 @app.route("/")

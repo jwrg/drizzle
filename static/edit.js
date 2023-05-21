@@ -9,16 +9,13 @@ function append_row() {
   const table = document.querySelector('form table');
   const old_row = table.lastElementChild.lastElementChild;
   let new_row = old_row.cloneNode(true);
-  let new_select = new_row.firstElementChild.lastElementChild;
-  let new_select_label = new_row.firstElementChild.firstElementChild;
-  new_select.id = increment_id_number(new_select.id);
-  new_select.name = increment_id_number(new_select.name);
-  new_select_label.htmlFor = increment_id_number(new_select_label.htmlFor)
-  let new_number = new_row.firstElementChild.nextElementSibling.lastElementChild;
-  let new_number_label = new_row.firstElementChild.nextElementSibling.firstElementChild;
-  new_number.id = increment_id_number(new_number.id);
-  new_number.name = increment_id_number(new_number.name);
-  new_number_label.htmlFor = increment_id_number(new_number_label.htmlFor);
+  for (let el of new_row.children) {
+    if (el.firstElementChild.tagName != "A") {
+      el.firstElementChild.htmlFor = increment_id_number(el.firstElementChild.htmlFor);
+      el.lastElementChild.id = increment_id_number(el.lastElementChild.id);
+      el.lastElementChild.name = increment_id_number(el.lastElementChild.name);
+    }
+  }
   table.lastElementChild.appendChild(new_row);
 }
 

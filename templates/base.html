@@ -20,8 +20,8 @@
           <li{% if subject == 'sequence' %} class="current"{% endif %}>
             <a href="{{ url_for('sequence.list_sequences') }}">Sequences</a>
           </li>
-          <li>
-            <a>Schedule</a>
+          <li{% if subject == 'schedule' %} class="current"{% endif %}>
+            <a href="{{ url_for('schedule.list_schedules') }}">Schedules</a>
           </li>
           <li class="filler"><a>_</a></li>
           <li>

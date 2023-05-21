@@ -15,8 +15,8 @@ from flask import (
 )
 
 with current_app.app_context():
-    from util.sequencer import Sequencer
     from util.jsonny import Jsonny
+    from util.sequencer import Sequencer
 sequence = Blueprint("sequence", __name__, url_prefix="/sequence")
 
 
@@ -54,6 +54,7 @@ def list_sequences():
         "list.html",
         allow_create=True,
         data_headings=["zone", "minutes"],
+        data_name="sequence",
         subject="sequence",
         items=items,
     )
@@ -109,9 +110,13 @@ def new_sequence():
             },
         },
         fields=["name", "description", "sequence"],
+        data_headings=["zone", "minutes"],
         constrain={
             "minutes": 120,
-            "zone": list(range(1, current_app.config["NUM_ZONES"] + 1)),
+            "zone": {
+                str(x): "Zone " + str(x)
+                for x in list(range(1, current_app.config["NUM_ZONES"] + 1))
+            },
         },
         num_zones=current_app.config["NUM_ZONES"],
     )
@@ -138,8 +143,8 @@ def edit_sequence(sequence_id):
                 resultant[field] = request.form[field]
         resultant["modified"] = strftime("%Y-%m-%dT%H:%M:%S.999Z")
         resultant["sequence"] = {
-            str(x): {"zone": y, "minutes": z}
-            for x, (y, z) in enumerate(
+            str(p): {"zone": q, "minutes": r}
+            for p, (q, r) in enumerate(
                 list(
                     zip(
                         [
@@ -169,9 +174,13 @@ def edit_sequence(sequence_id):
         subject="sequence",
         item=Jsonny.get("sequences")[str(sequence_id)],
         fields=["name", "description", "sequence"],
+        data_headings=["zone", "minutes"],
         constrain={
             "minutes": current_app.config["MAX_TIME"],
-            "zone": list(range(1, current_app.config["NUM_ZONES"] + 1)),
+            "zone": {
+                str(x): "Zone " + str(x)
+                for x in list(range(1, current_app.config["NUM_ZONES"] + 1))
+            },
         },
         num_zones=current_app.config["NUM_ZONES"],
     )

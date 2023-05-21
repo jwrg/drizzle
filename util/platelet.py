@@ -3,9 +3,10 @@ Controller helper classes for Pi-Plates RelayPlate
 """
 # from piplates.RELAYplate import relaySTATE, relayON, relayOFF
 from test.plates import relayOFF, relayON, relaySTATE
-from util.timmy import Timmy
 
 from flask import current_app
+
+from util.timmy import Timmy
 
 
 class Zone:

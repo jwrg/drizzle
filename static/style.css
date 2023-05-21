@@ -228,11 +228,11 @@ ul.entry {
   color: darkOrange;
 }
 
-.navy {
+.deactivate, .navy {
   color: navy;
 }
 
-.run, .success, .green {
+.activate .run, .success, .green {
   color: green;
 }
 

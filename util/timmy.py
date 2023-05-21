@@ -1,3 +1,6 @@
+"""
+Helper class for multithreaded timing
+"""
 from threading import Timer
 from time import time as now
 
@@ -31,7 +34,7 @@ class Timmy:
     # Methods for setting and clearing timers
     def set(self, interval, callback, args):
         """
-        Sets the timer 
+        Sets the timer
 
         :param interval: specify when to call callback
         :param callback: a method to call once the interval has elapsed
@@ -78,5 +81,6 @@ class Timmy:
             self.interval = 0
             self.start = 0
             self.timer.cancel()
+            del self.timer
             self.timer = None
             Timmy.logger.debug(" ".join(["Timer", str(self.name), "cleared."]))

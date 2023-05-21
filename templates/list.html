@@ -6,19 +6,19 @@
         <li><div class="box gradient {%- if active %} active {%- endif %}">
           <ul id="entry-{{ loop.index0 }}" class="entry">
       {%- for fieldName, fieldData in fields.items() %}
-        {%- if fieldName == subject|lower %}
+        {%- if fieldName == data_name %}
             <table>
-          {%- if fieldData['columns'] != [] %}
+          {%- if data_headings != [] %}
               <tr>
-            {%- for heading in fieldData['columns'] %}
+            {%- for heading in data_headings %}
                 <th>{{ heading|capitalize }}</th>
             {%- endfor %}
               </tr>
           {%- endif %}
           {%- for key, value in fieldData.items() if key != 'columns' %}
               <tr>
-            {%- for columnName in fieldData['columns'] %}
-                <td>{{ columnName|capitalize }}:&nbsp;{{ value[columnName] }}</td>
+            {%- for columnName in data_headings %}
+            <td><!--{{ columnName|capitalize }}:&nbsp;-->{{ value[columnName] }}</td>
             {%- endfor %}
               </tr>
           {%- endfor %}

@@ -10,9 +10,9 @@
     {%- for fieldName in fields %}
       {%- if item[fieldName] is mapping %}
                 <table class="{{ subject }}">
-        {%- if item[fieldName]['columns'] != [] %}
+        {%- if data_headings != [] %}
                   <tr>
-          {%- for heading in item[fieldName]['columns'] %}
+          {%- for heading in data_headings %}
                     <th>{{ heading|capitalize }}</th>
           {%- endfor %}
                     <th><a class="append white" id="append_row" onClick="append_row()">+</a></th>
@@ -20,18 +20,20 @@
         {%-  endif %}
         {%- for key, tuple in item[fieldName].items() if not key == 'columns' %}
                   <tr>
-          {%- for columnName in item[fieldName]['columns'] %}
+          {%- for columnName in data_headings %}
                     <td>
                       <label for="{{ columnName }}-{{ key }}" >{{ columnName|capitalize }}:</label>&nbsp;
             {%- if constrain[columnName] is integer %}
-                      <input type="number" id="{{ columnName }}-{{ key }}" name="{{ columnName }}-{{ key }}" min="1" max="{{ constrain[columnName] }}" value="{{ item[fieldName][key][columnName] }}"/>
-          {%- else %}
-                      <select id="{{ columnName }}-{{ key }}" name="{{ item[fieldName]['columns'][loop.index0]}}-{{ key }}">
-            {%- for constraint in constrain[columnName] %}
-                        <option value="{{ constraint }}" {% if constraint == item[fieldName][key][columnName] %}selected{% endif %}>{{ constraint }}</option>
-            {%- endfor %}
+                      <input type="number" id="{{ columnName }}-{{ key }}" name="{{ columnName }}-{{ key }}" min="1" max="{{ constrain[columnName] }}" value="{{ tuple[columnName] }}"/>
+            {%- elif constrain[columnName] is string %}
+                      <input type="{{ constrain[columnName] }}" id="{{ columnName }}-{{ key }}" name="{{ columnName }}-{{ key }}" value="{{ tuple[columnName] }}"/>
+            {%- elif constrain[columnName] is mapping %}
+                      <select id="{{ columnName }}-{{ key }}" name="{{ data_headings[loop.index0]}}-{{ key }}">
+              {%- for constraint_key, constraint in constrain[columnName].items() %}
+                        <option value="{{ constraint_key }}" {% if constraint_key == tuple[columnName] %}selected{% endif %}>{{ constraint }}</option>
+              {%- endfor %}
                       </select>
-          {%- endif %}
+            {%- endif %}
                     </td>
           {%- endfor %}
                     <td><a class="delete warning" id="delete_row-{{ loop.index0 }}" onClick="delete_row(this)">x</a></td>

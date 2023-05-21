@@ -3,8 +3,8 @@ Helper class for recursively sequencing relays on and off
 """
 from flask import current_app
 
-from util.platelet import Platelet
 from util.jsonny import Jsonny
+from util.platelet import Platelet
 
 
 # Class for running and handling sequences
