@@ -1,6 +1,8 @@
 """
 Helper class for recursively sequencing relays on and off
 """
+from datetime import timedelta
+
 from flask import current_app
 
 from util.jsonny import Jsonny
@@ -41,9 +43,9 @@ class Sequencer:
         if index > 0:
             Platelet.zones[sequence[str(index - 1)]["zone"] - 1].off()
         if index < len(sequence) - 1:
-            Platelet.pump_zone.on(sequence[str(index)]["minutes"])
+            Platelet.pump_zone.on(timedelta(minutes=sequence[str(index)]["minutes"]))
             Platelet.zones[sequence[str(index)]["zone"] - 1].on(
-                sequence[str(index)]["minutes"],
+                timedelta(minutes=sequence[str(index)]["minutes"]),
                 Sequencer.execute_sequence,
                 [index + 1, sequence],
             )

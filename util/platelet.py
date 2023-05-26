@@ -1,12 +1,15 @@
 """
 Controller helper classes for Pi-Plates RelayPlate
 """
-# from piplates.RELAYplate import relaySTATE, relayON, relayOFF
+from datetime import timedelta
 from test.plates import relayOFF, relayON, relaySTATE
+from typing import Any, Callable
 
 from flask import current_app
 
 from util.timmy import Timmy
+
+# from piplates.RELAYplate import relayOFF, relayON, relaySTATE
 
 
 class Zone:
@@ -16,28 +19,33 @@ class Zone:
 
     logger = current_app.logger
 
-    def __init__(self, name, board, relay):
+    def __init__(self, name: str, board: int, relay: int) -> None:
         self.name = name
         self.board = board
         self.relay = relay
         self.timer = Timmy(self.name)
         Zone.logger.debug(" ".join(["Zone", str(self.name), "initialized"]))
 
-    def on(self, interval, callback=None, args=None):
+    def on(
+        self,
+        interval: timedelta,
+        callback: Callable[[...], Any] = None,
+        args: list[str] = None,
+    ) -> None:
         """
         Turns on the zone
         """
         relayON(self.board, self.relay)
         self.timer.set(interval, self.off if callback is None else callback, args)
-        Zone.logger.debug(" ".join(["Zone", str(self.name), "on"]))
+        Zone.logger.info(" ".join(["Zone", str(self.name), "on"]))
 
-    def off(self):
+    def off(self) -> None:
         """
         Turns off the zone
         """
         relayOFF(self.board, self.relay)
         self.timer.clear()
-        Zone.logger.debug(" ".join(["Zone", str(self.name), "off"]))
+        Zone.logger.info(" ".join(["Zone", str(self.name), "off"]))
 
 
 class Platelet:
@@ -93,10 +101,9 @@ class Platelet:
         return active
 
     @staticmethod
-    def pump_on(interval: int):
+    def pump_on(interval: timedelta) -> None:
         """
-        Method that turns on the pump, if it is present, for a given time
-        interval in minutes
+        Turn on the pump, if it is present, for a given timedelta
         """
         if Platelet.pump_zone is not None:
             Platelet.pump_zone.on(interval)
@@ -105,7 +112,6 @@ class Platelet:
                     [
                         "Pump was turned on for",
                         str(interval),
-                        "minute." if interval == 1 else "minutes.",
                     ]
                 )
             )
@@ -115,19 +121,18 @@ class Platelet:
             )
 
     @staticmethod
-    def pump_off():
+    def pump_off() -> None:
         """
-        Method that turns off the pump, if present
+        Turn off the pump, if present
         """
         if Platelet.pump_zone is not None:
             Platelet.pump_zone.off()
             Platelet.logger.info("Pump was turned off")
 
     @staticmethod
-    def zone_on(zone_id: int, interval: int):
+    def zone_on(zone_id: int, interval: timedelta) -> None:
         """
-        Method that turns a zone specified by id on for a given time interval
-        in minutes
+        Turn a zone specified by id on for a given timedelta
         """
         # Turn on the argument zone only if there isn't
         # already another zone or sequence turned on
@@ -141,13 +146,12 @@ class Platelet:
                         str(zone_id),
                         "was turned on for",
                         str(interval),
-                        "minute." if interval == 1 else "minutes.",
                     ]
                 )
             )
 
     @staticmethod
-    def zone_off(zone_id: int):
+    def zone_off(zone_id: int) -> None:
         """
         Method that turns a zone off, given its id
         """
@@ -157,7 +161,7 @@ class Platelet:
         Platelet.logger.info(" ".join(["Zone", str(zone_id), "was turned off"]))
 
     @staticmethod
-    def all_off():
+    def all_off() -> None:
         """
         Method that turns everything off
         """

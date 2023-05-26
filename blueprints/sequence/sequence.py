@@ -178,7 +178,7 @@ def edit_sequence(sequence_id):
         constrain={
             "minutes": current_app.config["MAX_TIME"],
             "zone": {
-                str(x): "Zone " + str(x)
+                x: "Zone " + str(x)
                 for x in list(range(1, current_app.config["NUM_ZONES"] + 1))
             },
         },

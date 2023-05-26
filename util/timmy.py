@@ -1,38 +1,40 @@
 """
 Helper class for multithreaded timing
 """
+from datetime import datetime, timedelta
 from threading import Timer
-from time import time as now
+from typing import Any, Callable
 
 from flask import current_app
 
 
 class Timmy:
     """
-    Helper class that wraps a threading timer using minutes as its unit of
-    time
+    Helper class that wraps a threading timer using timedelta for intervals
     """
 
     logger = current_app.logger
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
         self.name = name
         self.timer = None
-        # Start time in seconds from the epoch
-        self.start = 0
-        # Interval time in minutes
-        self.interval = 0
+        self.start = None
+        self.interval = None
+        self.callback = None
+        self.args = None
 
-    def remaining(self):
+    def remaining(self) -> timedelta:
         """
-        Returns remaining timer interval in minutes
+        Returns remaining timer interval
         """
         if self.timer is not None:
-            return ((self.start + (self.interval * 60)) - now()) / 60
-        return 0
+            return (self.start + self.interval) - datetime.now()
+        return timedelta()
 
     # Methods for setting and clearing timers
-    def set(self, interval, callback, args):
+    def set(
+        self, interval: timedelta, callback: Callable[[...], Any], args: list[str]
+    ) -> None:
         """
         Sets the timer
 
@@ -42,21 +44,54 @@ class Timmy:
         """
         if interval > self.remaining():
             if self.timer is not None:
+                Timmy.logger.debug(
+                    " ".join(
+                        [
+                            "Timer",
+                            str(self.name),
+                            "thread",
+                            str(self.timer.native_id),
+                            "has been reset before finishing!",
+                        ]
+                    )
+                )
+                if callback != self.callback or args != self.args:
+                    Timmy.logger.debug(
+                        " ".join(
+                            [
+                                "Timer",
+                                str(self.name),
+                                "thread",
+                                str(self.timer.native_id),
+                                "used to have callback",
+                                str(self.callback),
+                                "with args",
+                                str(self.args),
+                                "but has been changed to callback",
+                                str(callback),
+                                "with args",
+                                str(args),
+                            ]
+                        )
+                    )
                 self.timer.cancel()
+                del self.timer
                 self.timer = None
-                Timmy.logger.debug(" ".join(["Timer", str(self.name), "extended."]))
             self.interval = interval
-            self.start = now()
-            self.timer = Timer(60.0 * interval, callback, args)
+            self.start = datetime.now()
+            self.callback = callback
+            self.args = args
+            self.timer = Timer(interval.total_seconds(), callback, args)
             self.timer.start()
-            Timmy.logger.debug(
+            Timmy.logger.info(
                 " ".join(
                     [
                         "Timer",
                         str(self.name),
+                        "thread",
+                        str(self.timer.native_id),
                         "set for",
                         str(interval),
-                        "minute." if interval == 1 else "minutes.",
                     ]
                 )
             )
@@ -66,6 +101,8 @@ class Timmy:
                     [
                         "Timer",
                         str(self.name),
+                        "thread",
+                        str(self.timer.native_id),
                         "not set! Arg",
                         str(interval),
                         "ends before currently set timer",
@@ -73,14 +110,24 @@ class Timmy:
                 )
             )
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Clears the timer
         """
         if self.timer is not None:
-            self.interval = 0
-            self.start = 0
+            self.interval = None
+            self.start = None
             self.timer.cancel()
+            Timmy.logger.info(
+                " ".join(
+                    [
+                        "Timer",
+                        str(self.name),
+                        "thread",
+                        str(self.timer.native_id),
+                        "cleared.",
+                    ]
+                )
+            )
             del self.timer
             self.timer = None
-            Timmy.logger.debug(" ".join(["Timer", str(self.name), "cleared."]))

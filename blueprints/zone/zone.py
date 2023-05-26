@@ -1,6 +1,8 @@
 """
 Routes for activating relay timers
 """
+from datetime import timedelta
+
 from flask import Blueprint, current_app, flash, redirect, render_template, url_for
 
 with current_app.app_context():
@@ -89,7 +91,7 @@ def enable(zone_id, interval):
     """
     if interval <= current_app.config["MAX_TIME"]:
         if zone_id == 0:
-            Platelet.pump_on(interval)
+            Platelet.pump_on(timedelta(minutes=interval))
             flash(
                 " ".join(
                     [
@@ -101,7 +103,7 @@ def enable(zone_id, interval):
                 "success",
             )
         else:
-            Platelet.zone_on(zone_id, interval)
+            Platelet.zone_on(zone_id, timedelta(minutes=interval))
             flash(
                 " ".join(
                     [

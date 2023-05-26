@@ -1,9 +1,10 @@
 """
 Helper class for manipulating scheduling data
 """
+from __future__ import annotations
+
 from collections import deque
 from datetime import date, datetime, time, timedelta
-from time import time as now
 
 from flask import current_app
 
@@ -19,7 +20,9 @@ class Schedule:
 
     logger = current_app.logger
 
-    def __init__(self, id_number, name, jobs):
+    def __init__(
+        self, id_number: int, name: str, jobs: dict[int, int, int, int]
+    ) -> None:
         self.id_number = id_number
         self.name = name
         self.jobs = deque(
@@ -31,7 +34,7 @@ class Schedule:
             )
         )
         self.timer = Timmy(name)
-        self.timer.set(self.jobs[0].remaining() / 60, self.next, [])
+        self.timer.set(self.jobs[0].remaining(), self.next, [])
         Schedule.logger.debug(
             " ".join(
                 [
@@ -43,14 +46,11 @@ class Schedule:
                     str(len(self.jobs)),
                     "jobs.  Next job runs in",
                     str(self.jobs[0].remaining()),
-                    "seconds.",
                 ]
             )
         )
 
-    def __del__(self):
-        self.timer.clear()
-        del self.timer
+    def __del__(self) -> None:
         Schedule.logger.debug(
             " ".join(
                 [
@@ -63,12 +63,33 @@ class Schedule:
             )
         )
 
-    def next(self):
+    def cleanup(self) -> None:
+        """
+        Destroy object contents in preparation for object deletion
+        """
+        self.timer.clear()
+        del self.timer
+        for job in self.jobs:
+            del job
+        self.jobs = []
+        Schedule.logger.debug(
+            " ".join(
+                [
+                    "Schedule",
+                    self.name,
+                    "with id number",
+                    self.id_number,
+                    "cleaned up",
+                ]
+            )
+        )
+
+    def next(self) -> None:
         """
         Run the next job
         """
         Sequencer.init_sequence(self.jobs[0].sequence)
-        Schedule.logger.debug(
+        Schedule.logger.info(
             " ".join(
                 [
                     "Schedule",
@@ -81,69 +102,66 @@ class Schedule:
             )
         )
         self.jobs.rotate(-1)
-        Schedule.logger.debug(
+        Schedule.logger.info(
             " ".join(
                 [
                     "Next job is for sequence",
                     str(self.jobs[0].sequence),
                     "and runs in",
                     str(self.jobs[0].remaining()),
-                    "seconds.",
                 ]
             )
         )
-        self.timer.set(self.jobs[0].remaining() / 60, self.next, [])
+        self.timer.set(self.jobs[0].remaining(), self.next, [])
 
     class Job:
         """
         Helper class that wraps weekly time info and compares on next run time
         """
 
-        def __init__(self, sequence, weekday, hour, minute):
-            self.sequence = int(sequence)
-            self.weekday = int(weekday)
-            self.hour = int(hour)
-            self.minute = int(minute)
+        def __init__(self, sequence: int, weekday: int, hour: int, minute: int) -> None:
+            self.sequence = sequence
+            self.weekday = weekday
+            self.hour = hour
+            self.minute = minute
 
-        def __eq__(self, obj):
+        def __eq__(self, obj: Job) -> bool:
             return self.upcoming() == obj.upcoming()
 
-        def __ne__(self, obj):
+        def __ne__(self, obj: Job) -> bool:
             return self.upcoming() != obj.upcoming()
 
-        def __lt__(self, obj):
+        def __lt__(self, obj: Job) -> bool:
             return self.upcoming() < obj.upcoming()
 
-        def __le__(self, obj):
+        def __le__(self, obj: Job) -> bool:
             return self.upcoming() <= obj.upcoming()
 
-        def __gt__(self, obj):
+        def __gt__(self, obj: Job) -> bool:
             return self.upcoming() > obj.upcoming()
 
-        def __ge__(self, obj):
+        def __ge__(self, obj: Job) -> bool:
             return self.upcoming() >= obj.upcoming()
 
-        def remaining(self):
+        def remaining(self) -> timedelta:
             """
-            Return the # of seconds between now and the next run of this job
+            Return timedelta between now and the next run of this job
             """
-            return self.upcoming() - now()
+            return self.upcoming() - datetime.now()
 
-        def upcoming(self):
+        def upcoming(self) -> datetime:
             """
-            Return the # of seconds from the epoch when the next time this
-            job will run
+            Return datetime when the next time this job will run
             """
             today = datetime.combine(date.today(), time())
-            thisweek = (
-                today
-                + timedelta(
-                    days=self.weekday - (today.isoweekday() % 7),
-                    hours=self.hour,
-                    minutes=self.minute,
-                )
-            ).timestamp()
-            return thisweek if thisweek > now() else thisweek + (7 * 24 * 3600)
+            thisweek = today + timedelta(
+                days=self.weekday - (today.isoweekday() % 7),
+                hours=self.hour,
+                minutes=self.minute,
+            )
+            return (
+                thisweek if thisweek > datetime.now() else thisweek + timedelta(days=7)
+            )
 
 
 class Scheduler:
@@ -153,41 +171,45 @@ class Scheduler:
 
     logger = current_app.logger
 
-    schedules = {
-        Schedule(schedule_id, entry["name"], entry["jobs"])
-        for schedule_id, entry in Jsonny.get("schedules").items()
-        if entry["active"] is True
-    }
+    def __init__(self) -> None:
+        self.json = Jsonny.get("schedules")
+        self.schedules = self.load(self.json.items())
 
-    json = Jsonny.get("schedules")
+    def load(
+        self, schedule_list: dict[bool, str, str, str, str, dict]
+    ) -> list[Schedule]:
+        """
+        Return a list of Schedule objects initialized using config data
+        """
+        return list(
+            Schedule(schedule_id, entry["name"], entry["jobs"])
+            for schedule_id, entry in schedule_list
+            if entry["active"] is True
+        )
 
-    @staticmethod
-    def reload():
+    def reload(self) -> None:
         """
         Re-initialize all schedules
         """
-        for schedule in Scheduler.schedules:
+        Scheduler.logger.info("Reloading all schedules")
+        for schedule in self.schedules:
+            schedule.cleanup()
             del schedule
-        Scheduler.json = Jsonny.get("schedules")
-        Scheduler.schedules = {
-            Schedule(schedule_id, entry["name"], entry["jobs"])
-            for schedule_id, entry in Scheduler.json.items()
-            if entry["active"] is True
-        }
+        self.json = Jsonny.get("schedules")
+        self.schedules = self.load(self.json.items())
 
-    @staticmethod
-    def activate(schedule_id):
+    def activate(self, schedule_id: int) -> None:
         """
         Sets a schedule to active and persists the change
         """
-        Scheduler.json[str(schedule_id)]["active"] = True
-        Jsonny.put("schedules", Scheduler.json)
-        Scheduler.reload()
-        Scheduler.logger.debug(
+        self.json[str(schedule_id)]["active"] = True
+        Jsonny.put("schedules", self.json)
+        self.reload()
+        Scheduler.logger.info(
             " ".join(
                 [
                     "Schedule",
-                    Scheduler.json[str(schedule_id)]["name"],
+                    self.json[str(schedule_id)]["name"],
                     "with id number",
                     str(schedule_id),
                     "set as active.",
@@ -195,19 +217,18 @@ class Scheduler:
             )
         )
 
-    @staticmethod
-    def deactivate(schedule_id):
+    def deactivate(self, schedule_id: int) -> None:
         """
         Sets a schedule to not active and persists the change
         """
-        Scheduler.json[str(schedule_id)]["active"] = False
-        Jsonny.put("schedules", Scheduler.json)
-        Scheduler.reload()
-        Scheduler.logger.debug(
+        self.json[str(schedule_id)]["active"] = False
+        Jsonny.put("schedules", self.json)
+        self.reload()
+        Scheduler.logger.info(
             " ".join(
                 [
                     "Schedule",
-                    Scheduler.json[str(schedule_id)]["name"],
+                    self.json[str(schedule_id)]["name"],
                     "with id number",
                     str(schedule_id),
                     "set as inactive.",

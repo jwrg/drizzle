@@ -19,6 +19,7 @@ with current_app.app_context():
     from util.schedule import Scheduler
 schedule = Blueprint("schedule", __name__, url_prefix="/schedule")
 
+scheduler = Scheduler()
 weekdays = {
     0: "Sunday",
     1: "Monday",
@@ -50,7 +51,14 @@ def list_schedules():
     items = []
     for schedule_id, entry in Jsonny.get("schedules").items():
         for _, job in entry["jobs"].items():
-            job["time"] = ":".join([str(job["hour"]), str(job["minute"])])
+            job["time"] = ":".join(
+                [
+                    str(job["hour"]) if job["hour"] > 9 else "0" + str(job["hour"]),
+                    str(job["minute"])
+                    if job["minute"] > 9
+                    else "0" + str(job["minute"]),
+                ]
+            )
             del job["hour"]
             del job["minute"]
             job["weekday"] = weekdays[job["weekday"]]
@@ -103,7 +111,7 @@ def activate_schedule(schedule_id):
     """
     API command that sets a schedule as active
     """
-    Scheduler.activate(schedule_id)
+    scheduler.activate(schedule_id)
     return redirect(url_for(".list_schedules"))
 
 
@@ -112,7 +120,7 @@ def deactivate_schedule(schedule_id):
     """
     API command that sets a schedule as inactive
     """
-    Scheduler.deactivate(schedule_id)
+    scheduler.deactivate(schedule_id)
     return redirect(url_for(".list_schedules"))
 
 
@@ -215,7 +223,7 @@ def edit_schedule(schedule_id):
         }
         schedules.update({str(schedule_id): resultant})
         Jsonny.put("schedules", schedules)
-        Scheduler.reload()
+        scheduler.reload()
         return redirect(url_for(".list_schedules"))
     for key, job in schedules[str(schedule_id)]["jobs"].items():
         job["time"] = ":".join(
