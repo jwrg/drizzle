@@ -65,17 +65,31 @@ def run_sequence(sequence_id):
     """
     API command that executes a sequence, given its id number
     """
-    Sequencer.init_sequence(sequence_id)
-    flash(
-        " ".join(
-            [
-                "Sequence",
-                Jsonny.get("sequences")[str(sequence_id)]["name"],
-                "started.",
-            ]
-        ),
-        "success",
-    )
+    sequences = Jsonny.get("sequences")
+    if Sequencer.sequence is None:
+        Sequencer.init_sequence(sequence_id)
+        flash(
+            " ".join(
+                [
+                    "Sequence",
+                    sequences[str(sequence_id)]["name"],
+                    "started.",
+                ]
+            ),
+            "success",
+        )
+    else:
+        flash(
+            " ".join(
+                [
+                    "Sequence",
+                    sequences[str(sequence_id)]["name"],
+                    "NOT started. Sequence",
+                    sequences[str(Sequencer.sequence)]["name"],
+                    "currently running.",
+                ]
+            )
+        )
     return redirect(url_for(".list_sequences"))
 
 
