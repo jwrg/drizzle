@@ -2,9 +2,17 @@
   {% block title %}{{ subject|capitalize }} Menu{% endblock %}
   {% block content %}
       <h2>{{ prompt }}</h2>
-    {%- for label, endpoint, arguments, active in actions %}
-      <input type="button" value="{{ label }}" class="gradient keypad zone
-    {%- if active == True %} active" onclick="{%- else %}" onclick="{%- endif -%}
-    {%- if confirm == True %}if (window.confirm('You sure?')){ {% endif %}window.open('{{ url_for(endpoint, **arguments) }}', '_parent'){%- if confirm == True %} }{%- endif %}" />
+      <form method="post">
+        <div class="range-wrapper" id="range-wrapper">
+          <input type="range" class="range" id="time" name="time" value=10 min=1 max=120 />
+          <output class="range-bubble" id="range-bubble"></output>
+        </div>
+    {%- for label, action, endpoint, arguments, confirm, active in actions %}
+        <input type="submit" value="{{ label }}" class="gradient keypad zone
+      {%- if active == True %} active" {%- else %}" {% endif -%} onclick="
+      {%- if confirm == True -%} return window.confirm('Really {{ action }} {{ subject }} {{ label }}?')
+      {%- endif %}" formaction="{{ url_for(endpoint, **arguments) }}" />
     {%- endfor -%}
+      </form>
+      <script src="{{ url_for('static', filename='keypad.js') }}"></script>
   {% endblock %}

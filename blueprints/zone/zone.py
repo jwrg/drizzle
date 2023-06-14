@@ -3,7 +3,7 @@ Routes for activating relay timers
 """
 from datetime import timedelta
 
-from flask import Blueprint, current_app, flash, redirect, render_template, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 
 with current_app.app_context():
     from util.platelet import Platelet
@@ -20,8 +20,10 @@ def zone_select():
     actions = [
         (
             str(x),
-            "zone.disable" if x in state else "zone.time_select",
+            "deactivate" if x in state else "activate",
+            "zone.disable" if x in state else "zone.enable",
             {"zone_id": x},
+            True,
             x in state,
         )
         for x in range(1, current_app.config["NUM_ZONES"] + 1)
@@ -30,47 +32,22 @@ def zone_select():
         actions.append(
             (
                 "Pump",
-                "zone.disable" if "Pump" in state else "zone.time_select",
+                "deactivate" if "Pump" in state else "activate",
+                "zone.disable" if "Pump" in state else "zone.enable",
                 {"zone_id": 0},
+                True,
                 "Pump" in state,
             )
         )
     return render_template(
         "keypad.html",
-        confirm=False,
         subject="zone",
         prompt="Activate which zone?",
         actions=actions,
     )
 
 
-@zone.route("/time/<int:zone_id>/")
-def time_select(zone_id):
-    """
-    View that selects the activation time interval, given the id number
-    """
-    actions = [
-        (str(x), "zone.enable", {"zone_id": zone_id, "interval": x}, False)
-        for x in current_app.config["TIMES"]
-    ]
-    actions.append(("Cancel", "index", {}, False))
-    prompt = " ".join(
-        [
-            "Activate zone",
-            str(zone_id) if zone_id != 0 else "pump",
-            "for how many minutes?",
-        ]
-    )
-    return render_template(
-        "keypad.html",
-        confirm=True,
-        subject="time",
-        prompt=prompt,
-        actions=actions,
-    )
-
-
-@zone.route("/zone/disable/<int:zone_id>/")
+@zone.route("/zone/disable/<int:zone_id>/", methods=(["POST"]))
 def disable(zone_id):
     """
     API command for turning off a zone, given its id number
@@ -84,11 +61,12 @@ def disable(zone_id):
     return redirect(url_for("index"))
 
 
-@zone.route("/zone/enable/<int:zone_id>/<int:interval>/")
-def enable(zone_id, interval):
+@zone.route("/zone/enable/<int:zone_id>/", methods=(["POST"]))
+def enable(zone_id):
     """
     API command that activates a zone specified by id number for a given number of minutes
     """
+    interval = int(request.form["time"])
     if interval <= current_app.config["MAX_TIME"]:
         if zone_id == 0:
             Platelet.pump_on(timedelta(minutes=interval))
