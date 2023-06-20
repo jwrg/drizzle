@@ -129,10 +129,10 @@ def new_sequence():
             "minutes": 120,
             "zone": {
                 str(x): "Zone " + str(x)
-                for x in list(range(1, current_app.config["NUM_ZONES"] + 1))
+                for x in list(range(1, Platelet.num_zones + 1))
             },
         },
-        num_zones=current_app.config["NUM_ZONES"],
+        num_zones=Platelet.num_zones,
     )
 
 
@@ -190,13 +190,13 @@ def edit_sequence(sequence_id):
         fields=["name", "description", "sequence"],
         data_headings=["zone", "minutes"],
         constrain={
-            "minutes": current_app.config["MAX_TIME"],
+            "minutes": Platelet.max_minutes,
             "zone": {
                 x: "Zone " + str(x)
-                for x in list(range(1, current_app.config["NUM_ZONES"] + 1))
+                for x in list(range(1, Platelet.num_zones + 1))
             },
         },
-        num_zones=current_app.config["NUM_ZONES"],
+        num_zones=Platelet.num_zones,
     )
 
 

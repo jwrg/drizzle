@@ -53,13 +53,11 @@ class Platelet:
     Static controller class for manipulating Zone objects
     """
 
-    # A list of zone objects, each having a timer object
     zones = [Zone(x + 1, y, z) for x, (y, z) in enumerate(current_app.config["ZONES"])]
-    # Persist a list of board addresses
     boards = {x[0] for x in current_app.config["ZONES"]}
-    # Persist the number of zones
     num_zones = current_app.config["NUM_ZONES"]
-    # Persist the pump zone
+    max_zones = current_app.config["MAX_ZONES"]
+    max_minutes = current_app.config["MAX_TIME"]
     pump_zone = (
         None
         if current_app.config["PUMP_ZONE"] is None
@@ -69,9 +67,7 @@ class Platelet:
             current_app.config["PUMP_ZONE"][1],
         )
     )
-    # Persist the max number of concurrent zones
-    max_zones = current_app.config["MAX_ZONES"]
-    # Persist the logger object
+
     logger = current_app.logger
 
     @staticmethod
@@ -132,10 +128,9 @@ class Platelet:
     @staticmethod
     def zone_on(zone_id: int, interval: timedelta) -> None:
         """
-        Turn a zone specified by id on for a given timedelta
+        Turn a relay specified by id on for a given timedelta, but only if the number
+        of active relays is fewer than what is specified in the configuration
         """
-        # Turn on the argument zone only if there isn't
-        # already another zone or sequence turned on
         if len(Platelet.get_state()) < Platelet.max_zones:
             Platelet.pump_on(interval)
             Platelet.zones[int(zone_id) - 1].on(interval)

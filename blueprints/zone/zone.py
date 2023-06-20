@@ -26,9 +26,9 @@ def zone_select():
             True,
             x in state,
         )
-        for x in range(1, current_app.config["NUM_ZONES"] + 1)
+        for x in range(1, Platelet.num_zones + 1)
     ]
-    if current_app.config["PUMP_ZONE"] is not None:
+    if Platelet.pump_zone is not None:
         actions.append(
             (
                 "Pump",
@@ -67,7 +67,7 @@ def enable(zone_id):
     API command that activates a zone specified by id number for a given number of minutes
     """
     interval = int(request.form["time"])
-    if interval <= current_app.config["MAX_TIME"]:
+    if interval <= Platelet.max_minutes:
         if zone_id == 0:
             Platelet.pump_on(timedelta(minutes=interval))
             flash(
