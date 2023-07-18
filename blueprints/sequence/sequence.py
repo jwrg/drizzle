@@ -16,6 +16,7 @@ from flask import (
 
 with current_app.app_context():
     from util.jsonny import Jsonny
+    from util.platelet import Platelet
     from util.sequencer import Sequencer
 sequence = Blueprint("sequence", __name__, url_prefix="/sequence")
 
