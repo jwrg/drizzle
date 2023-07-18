@@ -7,12 +7,14 @@
           <input type="range" class="range" id="time" name="time" value=10 min=1 max=120 />
           <output class="range-bubble" id="range-bubble"></output>
         </div>
+        <div class="button-wrapper" id="button-wrapper">
     {%- for label, action, endpoint, arguments, confirm, active in actions %}
-        <input type="submit" value="{{ label }}" class="gradient keypad zone
+          <input type="submit" value="{{ label }}" class="gradient keypad zone
       {%- if active == True %} active" {%- else %}" {% endif -%} onclick="
       {%- if confirm == True -%} return window.confirm('Really {{ action }} {{ subject }} {{ label }}?')
       {%- endif %}" formaction="{{ url_for(endpoint, **arguments) }}" />
     {%- endfor -%}
+        </div>
       </form>
       <script src="{{ url_for('static', filename='keypad.js') }}"></script>
   {% endblock %}

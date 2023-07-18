@@ -268,20 +268,22 @@ input.zone[type="submit"] {
 
 .range-wrapper {
   position: relative;
-  margin 0 auto 3rem;
+  width: 80%;
+  margin: 0 auto;
 }
 
 input[type="range"] {
   width: 100%;
-  margin: 3ex 0;
+  margin-top: 5ex;
 }
 
 .range-bubble {
   background: green;
   color: white;
-  padding: 4px 12px;
+  font-size: 24pt;
+  padding: 8px 18px;
   position: absolute;
-  border-radius: 4px;
+  border-radius: 1rem;
   left: 50%;
   transform: translateX(-50%);
  }
@@ -289,10 +291,10 @@ input[type="range"] {
  .range-bubble::after {
   content: "";
   position: absolute;
-  width: 2px;
-  height: 2px;
+  width: 0px;
+  height: 10px;
   background: green;
-  top: -1px;
+  top: 100%;
   left: 50%;
 }
 
