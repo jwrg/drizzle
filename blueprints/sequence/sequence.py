@@ -177,7 +177,6 @@ def edit_sequence(sequence_id):
                 )
             )
         }
-        resultant["sequence"]["columns"] = ["zone", "minutes"]
         sequences.update({str(sequence_id): resultant})
         Jsonny.put("sequences", sequences)
         flash(" ".join(["Sequence", resultant["name"], "updated."]), "success")
