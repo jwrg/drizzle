@@ -221,6 +221,49 @@ def edit_schedule(schedule_id):
                 )
             )
         }
+        if len(
+            [
+                dict(y)
+                for y in set(
+                    tuple(x.items())
+                    for x in list(
+                        map(
+                            lambda x: {key: x[key] for key in x if key != "sequence"},
+                            resultant["jobs"].values(),
+                        )
+                    )
+                )
+            ]
+        ) < len(list(resultant["jobs"].values())):
+            flash(
+                "Jobs may not be scheduled concurrently.  Please remove concurrently scheduled jobs",
+                "error",
+            )
+            for key, job in resultant["jobs"].items():
+                job["time"] = ":".join(
+                    [
+                        str(job["hour"]) if job["hour"] > 9 else "0" + str(job["hour"]),
+                        str(job["minute"])
+                        if job["minute"] > 9
+                        else "0" + str(job["minute"]),
+                    ]
+                )
+            return render_template(
+                "edit.html",
+                id=str(schedule_id),
+                subject="schedule",
+                item=resultant,
+                fields=["name", "description", "jobs"],
+                data_headings=["sequence", "weekday", "time"],
+                constrain={
+                    "sequence": {
+                        int(key): entry["name"]
+                        for key, entry in Jsonny.get("sequences").items()
+                    },
+                    "weekday": weekdays,
+                    "time": "time",
+                },
+            )
         schedules.update({str(schedule_id): resultant})
         Jsonny.put("schedules", schedules)
         scheduler.reload()
