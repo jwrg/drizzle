@@ -74,21 +74,21 @@ class Platelet:
     def get_state():
         """
         Method that determines which of the zone relays are on, if any.
-        Returns a list that can be passed as an argument to the index page
+        Returns a dict that can be passed as an argument to the index page
         """
         # Get state bits for each board
         states = {x: relaySTATE(x) for x in Platelet.boards}
         # Check bitwise each state against all zones for that board
-        active = [
-            zone.name
+        active = {
+            zone.name: zone.timer.remaining().total_seconds()
             for zone in Platelet.zones
             if (states[zone.board] >> (zone.relay - 1)) % 2
-        ]
+        }
         # Check the pump state, if applicable and only
         # append pump when no other zones are active
-        if Platelet.pump_zone is not None and active == []:
+        if Platelet.pump_zone is not None and active == {}:
             if (states[Platelet.pump_zone.board] >> (Platelet.pump_zone.relay - 1)) % 2:
-                active.append("Pump")
+                active["Pump"] = Platelet.pump_zone.timer.remaining().total_seconds()
         Platelet.logger.debug(
             " ".join(
                 ["Returned getState() with active zones"] + [str(x) for x in active]

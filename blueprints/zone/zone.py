@@ -20,11 +20,12 @@ def zone_select():
     actions = [
         (
             str(x),
-            "deactivate" if x in state else "activate",
-            "zone.disable" if x in state else "zone.enable",
+            "deactivate" if x in state.keys() else "activate",
+            "zone.disable" if x in state.keys() else "zone.enable",
             {"zone_id": x},
             True,
-            x in state,
+            x in state.keys(),
+            state[x] if x in state.keys() else None,
         )
         for x in range(1, Platelet.num_zones + 1)
     ]
@@ -32,11 +33,12 @@ def zone_select():
         actions.append(
             (
                 "Pump",
-                "deactivate" if "Pump" in state else "activate",
-                "zone.disable" if "Pump" in state else "zone.enable",
+                "deactivate" if "Pump" in state.keys() else "activate",
+                "zone.disable" if "Pump" in state.keys() else "zone.enable",
                 {"zone_id": 0},
                 True,
-                "Pump" in state,
+                "Pump" in state.keys(),
+                state["Pump"] if "Pump" in state.keys() else None,
             )
         )
     return render_template(

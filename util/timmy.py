@@ -23,13 +23,17 @@ class Timmy:
         self.callback = None
         self.args = None
 
+    def finished(self) -> datetime:
+        """
+        Returns datetime indicating when the timer will be finished counting
+        """
+        return self.start + self.interval if self.timer is not None else datetime()
+
     def remaining(self) -> timedelta:
         """
         Returns remaining timer interval
         """
-        if self.timer is not None:
-            return (self.start + self.interval) - datetime.now()
-        return timedelta()
+        return self.finished() - datetime.now() if self.timer is not None else timedelta()
 
     # Methods for setting and clearing timers
     def set(
