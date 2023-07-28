@@ -48,6 +48,7 @@ def zone_select():
         actions=actions,
         min_minutes=Platelet.min_minutes,
         max_minutes=Platelet.max_minutes,
+        default_minutes=Platelet.default_minutes,
     )
 
 

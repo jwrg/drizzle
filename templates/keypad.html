@@ -4,7 +4,7 @@
       <h2>{{ prompt }}</h2>
       <form method="post">
         <div class="range-wrapper" id="range-wrapper">
-          <input type="range" class="range" id="time" name="time" value=10 min={{ min_minutes }} max={{ max_minutes }} />
+          <input type="range" class="range" id="time" name="time" value={{ default_minutes }} min={{ min_minutes }} max={{ max_minutes }} />
           <output class="range-bubble" id="range-bubble"></output>
         </div>
         <div class="button-wrapper" id="button-wrapper">

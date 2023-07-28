@@ -59,6 +59,7 @@ class Platelet:
     max_zones = current_app.config["MAX_ZONES"]
     min_minutes = current_app.config["MIN_TIME"]
     max_minutes = current_app.config["MAX_TIME"]
+    default_minutes = current_app.config["DEFAULT_TIME"]
     pump_zone = (
         None
         if current_app.config["PUMP_ZONE"] is None
