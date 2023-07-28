@@ -13,8 +13,7 @@
       {%- if active %}{{ remaining }}{% else %}{{ label }}{% endif -%}
           " class="gradient keypad zone
       {%- if active %} active{% endif -%}
-          " name="{{ label }}
-          " onclick="
+          " name="{{ label }}" onclick="
       {%- if confirm %}return window.confirm('Really {{ action }} {{ subject }} {{ label }}?'){% endif -%}
           " formaction="{{ url_for(endpoint, **arguments) }}" />
     {%- endfor -%}
