@@ -36,7 +36,9 @@ function set_countdown(button, array, index) {
     seconds = get_seconds(button.value);
     if (seconds <= 0) {
       button.value = button.name;
-      button.classList.remove("active");
+      button.onclick = function() {return window.confirm('Really activate zone ' + button.name + '?')};
+      button.formAction = '/zone/zone/enable/' + button.name;
+      button.classList.remove('active');
       clearInterval(array[index]);
     } else {
       button.value = format_seconds(seconds - 1);
@@ -44,7 +46,7 @@ function set_countdown(button, array, index) {
   }, 1000);
 }
 
-const active_buttons = Array.from(document.getElementsByClassName("active"));
+const active_buttons = Array.from(document.getElementsByClassName('active'));
 let handles = [];
 for (let i = 0; i < active_buttons.length; ++i) {
   handles[i] = set_countdown(active_buttons[i], handles, i);
