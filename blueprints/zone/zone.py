@@ -46,6 +46,8 @@ def zone_select():
         subject="zone",
         prompt="Activate which zone?",
         actions=actions,
+        min_minutes=Platelet.min_minutes,
+        max_minutes=Platelet.max_minutes,
     )
 
 

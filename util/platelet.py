@@ -57,6 +57,7 @@ class Platelet:
     boards = {x[0] for x in current_app.config["ZONES"]}
     num_zones = current_app.config["NUM_ZONES"]
     max_zones = current_app.config["MAX_ZONES"]
+    min_minutes = current_app.config["MIN_TIME"]
     max_minutes = current_app.config["MAX_TIME"]
     pump_zone = (
         None
