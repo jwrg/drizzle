@@ -65,7 +65,7 @@ class Sequencer:
         """
         if index > 0:
             Platelet.zones[sequence[str(index - 1)]["zone"] - 1].off()
-        if index < len(sequence) - 1:
+        if index < len(sequence):
             Platelet.pump_zone.on(timedelta(minutes=sequence[str(index)]["minutes"]))
             Platelet.zones[sequence[str(index)]["zone"] - 1].on(
                 timedelta(minutes=sequence[str(index)]["minutes"]),
