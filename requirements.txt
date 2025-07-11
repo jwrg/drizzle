@@ -1,0 +1,6 @@
+pi-plates
+spidev
+RPi.GPIO
+bjoern
+#gevent
+#gunicorn
