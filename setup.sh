@@ -15,6 +15,9 @@
 INTERFACE=wlan0
 SRV_PORT=80
 APP_PORT=8080
+CONFIG_LOCATION=/etc/firewall.drizzle.conf
+PERSIST_LOCATION=/etc/network/if-pre-up.d/iptables
+SERVICE_LOCATION=/lib/systemd/system/drizzle.service
 
 # Install spidev, RPi.GPIO and bjoern
 sudo apt-get install libev-dev python2-dev python3-pip python3-flask iptables
@@ -26,9 +29,10 @@ sudo iptables -A INPUT -i $INTERFACE -p tcp --dport $SRV_PORT -j ACCEPT
 sudo iptables -A INPUT -i $INTERFACE -p tcp --dport $APP_PORT -j ACCEPT
 sudo iptables -A PREROUTING -t nat -i $INTERFACE -p tcp --dport $SRV_PORT -j REDIRECT --to-port $APP_PORT
 # Make the rules persistent
-sudo iptables-save | sudo tee -a /etc/firewall.drizzle.conf
-sudo echo "#!/bin/sh" | sudo tee -a /etc/network/if-pre-up.d/iptables
+sudo iptables-save | sudo tee /etc/firewall.drizzle.conf
+sudo echo "#!/bin/sh" | sudo tee /etc/network/if-pre-up.d/iptables
 sudo echo "/sbin/iptables-restore < /etc/firewall.drizzle.conf" | sudo tee -a /etc/network/if-pre-up.d/iptables
+sudo chmod +x /etc/network/if-pre-up.d/iptables
 
 # Copy the service file to /lib/systemd/system
 sudo cp rpi/drizzle.service /lib/systemd/system/
