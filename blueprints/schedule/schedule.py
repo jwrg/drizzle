@@ -53,7 +53,8 @@ def list_schedules():
         for _, job in entry["jobs"].items():
             job["time"] = ":".join(
                 [
-                    str(job["hour"]) if job["hour"] > 9 else "0" + str(job["hour"]),
+                    str(job["hour"]) if job["hour"] > 9 else "0" +
+                    str(job["hour"]),
                     str(job["minute"])
                     if job["minute"] > 9
                     else "0" + str(job["minute"]),
@@ -62,7 +63,8 @@ def list_schedules():
             del job["hour"]
             del job["minute"]
             job["weekday"] = weekdays[job["weekday"]]
-            job["sequence"] = Jsonny.get("sequences")[str(job["sequence"])]["name"]
+            job["sequence"] = Jsonny.get("sequences")[
+                str(job["sequence"])]["name"]
             new_item = [schedule_id]
         new_item.append({field: entry[field] for field in fields})
         if entry["active"]:
@@ -129,7 +131,11 @@ def new_schedule():
     """
     View that creates a new schedule
     """
-    schedule_id = str(max(int(x) for x in Jsonny.get("schedules").keys()) + 1)
+    schedules = Jsonny.get("schedules")
+    if len(schedules) == 0:
+        schedule_id = str(0)
+    else:
+        schedule_id = str(max(int(x) for x in schedules.keys()) + 1)
     if request.method == "POST":
         return redirect(url_for(".edit_schedule", schedule_id=schedule_id), code=307)
     return render_template(
@@ -228,7 +234,8 @@ def edit_schedule(schedule_id):
                     tuple(x.items())
                     for x in list(
                         map(
-                            lambda x: {key: x[key] for key in x if key != "sequence"},
+                            lambda x: {key: x[key]
+                                       for key in x if key != "sequence"},
                             resultant["jobs"].values(),
                         )
                     )
@@ -242,7 +249,8 @@ def edit_schedule(schedule_id):
             for key, job in resultant["jobs"].items():
                 job["time"] = ":".join(
                     [
-                        str(job["hour"]) if job["hour"] > 9 else "0" + str(job["hour"]),
+                        str(job["hour"]) if job["hour"] > 9 else "0" +
+                        str(job["hour"]),
                         str(job["minute"])
                         if job["minute"] > 9
                         else "0" + str(job["minute"]),
@@ -271,8 +279,10 @@ def edit_schedule(schedule_id):
     for key, job in schedules[str(schedule_id)]["jobs"].items():
         job["time"] = ":".join(
             [
-                str(job["hour"]) if job["hour"] > 9 else "0" + str(job["hour"]),
-                str(job["minute"]) if job["minute"] > 9 else "0" + str(job["minute"]),
+                str(job["hour"]) if job["hour"] > 9 else "0" +
+                str(job["hour"]),
+                str(job["minute"]) if job["minute"] > 9 else "0" +
+                str(job["minute"]),
             ]
         )
     return render_template(

@@ -28,7 +28,8 @@ class Sequencer:
         """
         if Sequencer.sequence is None:
             Sequencer.lock.acquire()
-            Sequencer.logger.info(" ".join(["Sequence", str(sequence_id), "starting."]))
+            Sequencer.logger.info(
+                " ".join(["Sequence", str(sequence_id), "starting."]))
             Sequencer.sequence = int(sequence_id)
             Sequencer.execute_sequence(
                 0, Jsonny.get("sequences")[str(sequence_id)]["sequence"]
@@ -53,7 +54,8 @@ class Sequencer:
         string (sc., it does not return None)
         """
         Sequencer.logger.debug(
-            " ".join(["Returned get_sequence_state() with", str(Sequencer.sequence)])
+            " ".join(["Returned get_sequence_state() with",
+                     str(Sequencer.sequence)])
         )
         return "" if Sequencer.sequence is None else str(Sequencer.sequence)
 
@@ -64,10 +66,9 @@ class Sequencer:
         NB. Don't call this, call its wrapper instead, init_sequence() above
         """
         if index > 0:
-            Platelet.zones[sequence[str(index - 1)]["zone"] - 1].off()
+            Platelet.relays[sequence[str(index - 1)]["relay"]].off()
         if index < len(sequence):
-            Platelet.pump_zone.on(timedelta(minutes=sequence[str(index)]["minutes"]))
-            Platelet.zones[sequence[str(index)]["zone"] - 1].on(
+            Platelet.relays[sequence[str(index)]["relay"]].on(
                 timedelta(minutes=sequence[str(index)]["minutes"]),
                 Sequencer.execute_sequence,
                 [index + 1, sequence],
@@ -83,11 +84,12 @@ class Sequencer:
     def cancel_sequence():
         """
         Cancels any currently active sequence (and heavy-handedly turns off
-        all zones for good measure)
+        all relays for good measure)
         """
-        Platelet.all_off()
+        Platelet.all_off()  # change this to only turn off what the sequence has turned on
         Sequencer.logger.debug(
             " ".join(["Sequence", str(Sequencer.sequence), "cancelled."])
         )
         Sequencer.sequence = None
-        Sequencer.lock.release()
+        if Sequencer.lock.locked():
+            Sequencer.lock.release()

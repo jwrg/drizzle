@@ -14,8 +14,8 @@
           <li class="drizzle">
             <a href="{{ url_for('index') }}">Drizzle</a>
           </li>
-          <li{% if subject == 'time' or subject == 'zone' %} class="current"{% endif %}>
-            <a href="{{ url_for('zone.zone_select') }}">Zones</a>
+          <li{% if subject == 'time' or subject == 'relay' %} class="current"{% endif %}>
+            <a href="{{ url_for('relay.relay_select') }}">Relays</a>
           </li>
           <li{% if subject == 'sequence' %} class="current"{% endif %}>
             <a href="{{ url_for('sequence.list_sequences') }}">Sequences</a>

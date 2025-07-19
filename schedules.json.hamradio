@@ -1,0 +1,1 @@
+{"0": {"active": true, "created": "2025-07-19T14:17:59.999Z", "description": "A scheduled test", "name": "test-schedule", "modified": "2025-07-19T14:25:39.999Z", "jobs": {"0": {"sequence": 0, "weekday": 6, "hour": 14, "minute": 26}, "1": {"sequence": 0, "weekday": 6, "hour": 14, "minute": 27}, "2": {"sequence": 0, "weekday": 6, "hour": 14, "minute": 28}}}}

@@ -29,6 +29,7 @@ def list_sequences():
     actions = {
         "run": "sequence.run_sequence",
         "edit": "sequence.edit_sequence",
+        # "duplicate": "sequence.dup_sequence",
         "delete": "sequence.delete_sequence",
     }
     active = {"stop": "sequence.stop_sequence"}
@@ -39,13 +40,15 @@ def list_sequences():
         new_item.append({field: entry[field] for field in fields})
         if sequence_id == str(Sequencer.sequence):
             new_item.append(
-                [(key.capitalize(), value, {}, True) for key, value in active.items()]
+                [(key.capitalize(), value, {}, True)
+                 for key, value in active.items()]
             )
             new_item.append(True)
         else:
             new_item.append(
                 [
-                    (key.capitalize(), value, {"sequence_id": sequence_id}, True)
+                    (key.capitalize(), value, {
+                     "sequence_id": sequence_id}, True)
                     for key, value in actions.items()
                 ]
             )
@@ -54,7 +57,7 @@ def list_sequences():
     return render_template(
         "list.html",
         allow_create=True,
-        data_headings=["zone", "minutes"],
+        data_headings=["index", "relay", "minutes"],
         data_name="sequence",
         subject="sequence",
         items=items,
@@ -109,7 +112,11 @@ def new_sequence():
     """
     View that creates a new sequence
     """
-    sequence_id = str(max(int(x) for x in Jsonny.get("sequences").keys()) + 1)
+    sequences = Jsonny.get("sequences")
+    if len(sequences) == 0:
+        sequence_id = str(0)
+    else:
+        sequence_id = str(max(int(x) for x in sequences.keys()) + 1)
     if request.method == "POST":
         return redirect(url_for(".edit_sequence", sequence_id=sequence_id), code=307)
     return render_template(
@@ -120,20 +127,19 @@ def new_sequence():
             "name": "",
             "description": "",
             "sequence": {
-                "0": {"zone": 1, "minutes": 1},
-                "columns": ["zone", "minutes"],
+                "0": {"relay": list(Platelet.relays)[0], "minutes": Platelet.default_minutes},
             },
         },
         fields=["name", "description", "sequence"],
-        data_headings=["zone", "minutes"],
+        data_headings=["relay", "minutes"],
         constrain={
-            "minutes": 120,
-            "zone": {
-                str(x): "Zone " + str(x)
-                for x in list(range(1, Platelet.num_zones + 1))
+            "minutes": Platelet.max_minutes,
+            "relay": {
+                relay.name: relay.name
+                for id, relay in Platelet.relays.items()
             },
         },
-        num_zones=Platelet.num_zones,
+        num_zones=len(Platelet.relays)
     )
 
 
@@ -158,14 +164,14 @@ def edit_sequence(sequence_id):
                 resultant[field] = request.form[field]
         resultant["modified"] = strftime("%Y-%m-%dT%H:%M:%S.999Z")
         resultant["sequence"] = {
-            str(p): {"zone": q, "minutes": r}
+            str(p): {"relay": q, "minutes": r, "index": str(p + 1)}
             for p, (q, r) in enumerate(
                 list(
                     zip(
                         [
-                            int(request.form.get(y))
+                            request.form.get(y)
                             for y in [
-                                z for z in request.form.keys() if match("zone-*", z)
+                                z for z in request.form.keys() if match("relay-*", z)
                             ]
                         ],
                         [
@@ -188,15 +194,15 @@ def edit_sequence(sequence_id):
         subject="sequence",
         item=Jsonny.get("sequences")[str(sequence_id)],
         fields=["name", "description", "sequence"],
-        data_headings=["zone", "minutes"],
+        data_headings=["relay", "minutes"],
         constrain={
             "minutes": Platelet.max_minutes,
-            "zone": {
-                x: "Zone " + str(x)
-                for x in list(range(1, Platelet.num_zones + 1))
+            "relay": {
+                relay.name: relay.name
+                for id, relay in Platelet.relays.items()
             },
         },
-        num_zones=Platelet.num_zones,
+        num_zones=len(Platelet.relays),
     )
 
 

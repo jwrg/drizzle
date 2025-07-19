@@ -1,146 +1,87 @@
 """
 Controller helper classes for Pi-Plates RelayPlate
 """
+from __future__ import annotations
 from datetime import timedelta
-from test.plates import relayOFF, relayON, relaySTATE
-from typing import Any, Callable
+from re import match
 
 from flask import current_app
 
-from util.timmy import Timmy
-
-# from piplates.RELAYplate import relayOFF, relayON, relaySTATE
-
-
-class Zone:
-    """
-    Helper class that couples relays to timers
-    """
-
-    logger = current_app.logger
-
-    def __init__(self, name: str, board: int, relay: int) -> None:
-        self.name = name
-        self.board = board
-        self.relay = relay
-        self.timer = Timmy(self.name)
-        Zone.logger.debug(" ".join(["Zone", str(self.name), "initialized"]))
-
-    def on(
-        self,
-        interval: timedelta,
-        callback: Callable[[...], Any] = None,
-        args: list[str] = None,
-    ) -> None:
-        """
-        Turns on the zone
-        """
-        relayON(self.board, self.relay)
-        self.timer.set(interval, self.off if callback is None else callback, args)
-        Zone.logger.info(" ".join(["Zone", str(self.name), "on"]))
-
-    def off(self) -> None:
-        """
-        Turns off the zone
-        """
-        relayOFF(self.board, self.relay)
-        self.timer.clear()
-        Zone.logger.info(" ".join(["Zone", str(self.name), "off"]))
+from util.relay import Relay, Dependency
 
 
 class Platelet:
     """
-    Static controller class for manipulating Zone objects
+    Static controller class for manipulating Relay objects
     """
 
-    zones = [Zone(x + 1, y, z) for x, (y, z) in enumerate(current_app.config["ZONES"])]
-    boards = {x[0] for x in current_app.config["ZONES"]}
-    num_zones = current_app.config["NUM_ZONES"]
-    max_zones = current_app.config["MAX_ZONES"]
+    class Platter:
+        """
+        Static class for loading up relays from app config
+        """
+
+        @staticmethod
+        def get_relays():
+            levels = len([x for x in current_app.config.keys()
+                         if match("RELAYS_.*", x)])
+            objects = {
+                name: Relay(name, board, relay)
+                for x, (name, board, relay)
+                in enumerate(current_app.config["RELAYS"])
+            }
+            for x in range(levels):
+                objects = objects | {
+                    name: Relay(name, board, relay, [
+                        Dependency(objects[dep], spin_up)
+                        for (dep, spin_up) in requires
+                    ]
+                    )
+                    for x, (name, board, relay, requires)
+                    in enumerate(current_app.config["RELAYS_" + str(x + 1)])
+                }
+            return objects
+
+    relays = Platter.get_relays()
+    boards = {y.board for x, y in relays.items()}
+    num_relays = len(relays)
+    max_relays = current_app.config["MAX_RELAYS"]
     min_minutes = current_app.config["MIN_TIME"]
     max_minutes = current_app.config["MAX_TIME"]
     default_minutes = current_app.config["DEFAULT_TIME"]
-    pump_zone = (
-        None
-        if current_app.config["PUMP_ZONE"] is None
-        else Zone(
-            "Pump",
-            current_app.config["PUMP_ZONE"][0],
-            current_app.config["PUMP_ZONE"][1],
-        )
-    )
-
     logger = current_app.logger
 
     @staticmethod
     def get_state():
         """
-        Method that determines which of the zone relays are on, if any.
+        Method that determines which of the relays are on, if any.
         Returns a dict that can be passed as an argument to the index page
         """
-        # Get state bits for each board
-        states = {x: relaySTATE(x) for x in Platelet.boards}
-        # Check bitwise each state against all zones for that board
         active = {
-            zone.name: zone.timer.remaining().total_seconds()
-            for zone in Platelet.zones
-            if (states[zone.board] >> (zone.relay - 1)) % 2
+            relay.name: relay.timer.remaining().total_seconds()
+            for name, relay in Platelet.relays.items()
+            if relay.timer.remaining().total_seconds() > 0
         }
-        # Check the pump state, if applicable and only
-        # append pump when no other zones are active
-        if Platelet.pump_zone is not None and active == {}:
-            if (states[Platelet.pump_zone.board] >> (Platelet.pump_zone.relay - 1)) % 2:
-                active["Pump"] = Platelet.pump_zone.timer.remaining().total_seconds()
         Platelet.logger.debug(
             " ".join(
-                ["Returned getState() with active zones"] + [str(x) for x in active]
+                ["Returned getState() with active relays"] + [str(x)
+                                                              for x in active]
             )
         )
         return active
 
     @staticmethod
-    def pump_on(interval: timedelta) -> None:
-        """
-        Turn on the pump, if it is present, for a given timedelta
-        """
-        if Platelet.pump_zone is not None:
-            Platelet.pump_zone.on(interval)
-            Platelet.logger.info(
-                " ".join(
-                    [
-                        "Pump was turned on for",
-                        str(interval),
-                    ]
-                )
-            )
-        else:
-            Platelet.logger.debug(
-                "Call to pumpOn() but pump NOT turned on; no pump zone set"
-            )
-
-    @staticmethod
-    def pump_off() -> None:
-        """
-        Turn off the pump, if present
-        """
-        if Platelet.pump_zone is not None:
-            Platelet.pump_zone.off()
-            Platelet.logger.info("Pump was turned off")
-
-    @staticmethod
-    def zone_on(zone_id: int, interval: timedelta) -> None:
+    def relay_on(relay_id: str, interval: timedelta) -> None:
         """
         Turn a relay specified by id on for a given timedelta, but only if the number
         of active relays is fewer than what is specified in the configuration
         """
-        if len(Platelet.get_state()) < Platelet.max_zones:
-            Platelet.pump_on(interval)
-            Platelet.zones[int(zone_id) - 1].on(interval)
+        if len(Platelet.get_state()) < Platelet.max_relays:
+            Platelet.relays[relay_id].on(interval)
             Platelet.logger.info(
                 " ".join(
                     [
-                        "Zone",
-                        str(zone_id),
+                        "Relay",
+                        str(relay_id),
                         "was turned on for",
                         str(interval),
                     ]
@@ -148,20 +89,18 @@ class Platelet:
             )
 
     @staticmethod
-    def zone_off(zone_id: int) -> None:
+    def relay_off(relay_id: str) -> None:
         """
-        Method that turns a zone off, given its id
+        Method that turns a relay off, given its id
         """
-        if len(Platelet.get_state()) == 1:
-            Platelet.pump_off()
-        Platelet.zones[int(zone_id) - 1].off()
-        Platelet.logger.info(" ".join(["Zone", str(zone_id), "was turned off"]))
+        Platelet.relays[relay_id].off()
+        Platelet.logger.info(
+            " ".join(["Relay", str(relay_id), "was turned off"]))
 
     @staticmethod
     def all_off() -> None:
         """
         Method that turns everything off
         """
-        for zone in Platelet.zones:
-            zone.off()
-        Platelet.pump_off()
+        for name, relay in Platelet.relays.items():
+            relay.off()

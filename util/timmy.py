@@ -35,6 +35,12 @@ class Timmy:
         """
         return self.finished() - datetime.now() if self.timer is not None else timedelta()
 
+    def is_set(self) -> bool:
+        """
+        Returns boolean indicating whether the timer is currently set
+        """
+        return False if self.remaining() == timedelta() else True
+
     # Methods for setting and clearing timers
     def set(
         self, interval: timedelta, callback: Callable[[...], Any], args: list[str]
@@ -96,6 +102,7 @@ class Timmy:
                         str(self.timer.native_id),
                         "set for",
                         str(interval),
+                        "from now"
                     ]
                 )
             )
