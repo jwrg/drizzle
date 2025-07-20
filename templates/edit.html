@@ -36,7 +36,7 @@
             {%- endif %}
                     </td>
           {%- endfor %}
-                    <td><a class="delete warning" id="delete_row-{{ loop.index0 }}" onClick="delete_row(this)">x</a></td>
+                    <td><a class="button promote success" id="promote_row-{{ loop.index0 }}" onClick="promote_row(this)">&uarr;</a>&nbsp;<a class="button demote success" id="demote_row-{{ loop.index0 }}" onClick="demote_row(this)">&darr;</a>&nbsp;&nbsp;<a class="button delete warning" id="delete_row-{{ loop.index0 }}" onClick="delete_row(this)">&#128465;</a></td>
                   </tr>
         {%- endfor %}
                 </table>
