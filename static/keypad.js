@@ -35,11 +35,7 @@ function set_countdown(button, array, index) {
   return setInterval(function() {
     seconds = get_seconds(button.value);
     if (seconds <= 0) {
-      button.value = button.name;
-      button.onclick = function() {return window.confirm('Really activate zone ' + button.name + '?')};
-      button.formAction = '/zone/zone/enable/' + button.name;
-      button.classList.remove('active');
-      clearInterval(array[index]);
+      window.location.reload();
     } else {
       button.value = format_seconds(seconds - 1);
     }
