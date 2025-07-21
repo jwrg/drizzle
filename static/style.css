@@ -256,7 +256,7 @@ textarea.name {
   height: 3ex;
 }
 
-input.zone[type="submit"] {
+input.relay[type="submit"] {
   width: 40vw;
   height: 20vw;
   margin: 2.0vw;

@@ -140,8 +140,7 @@ def new_sequence():
                 id: relay.name
                 for id, relay in Platelet.relays.items()
             },
-        },
-        num_zones=len(Platelet.relays)
+        }
     )
 
 
@@ -205,8 +204,7 @@ def edit_sequence(sequence_id):
                 id: relay.name
                 for id, relay in Platelet.relays.items()
             },
-        },
-        num_zones=len(Platelet.relays),
+        }
     )
 
 
