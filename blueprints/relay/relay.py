@@ -40,7 +40,7 @@ def relay_select():
     )
 
 
-@relay.route("/relay/disable/<string:relay_id>/", methods=(["POST"]))
+@relay.route("/disable/<string:relay_id>/", methods=(["POST"]))
 def disable(relay_id):
     """
     API command for turning off a relay, given its id
@@ -58,7 +58,7 @@ def disable(relay_id):
     return redirect(url_for("index"))
 
 
-@relay.route("/relay/enable/<string:relay_id>/", methods=(["POST"]))
+@relay.route("/enable/<string:relay_id>/", methods=(["POST"]))
 def enable(relay_id):
     """
     API command that activates a relay specified by id for a given number of minutes
