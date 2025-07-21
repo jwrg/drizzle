@@ -19,15 +19,15 @@ def relay_select():
     state = Platelet.get_state()
     actions = [
         (
-            v.name,
-            "deactivate" if v.name in state.keys() else "activate",
-            "relay.disable" if v.name in state.keys() else "relay.enable",
-            {"relay_id": v.name},
+            relay.name,
+            "deactivate" if id in state.keys() else "activate",
+            "relay.disable" if id in state.keys() else "relay.enable",
+            {"relay_id": id},
             True,
-            v.name in state.keys(),
-            state[v.name] if v.name in state.keys() else None,
+            id in state.keys(),
+            state[id] if id in state.keys() else None,
         )
-        for k, v in Platelet.relays.items()
+        for id, relay in Platelet.relays.items()
     ]
     return render_template(
         "keypad.html",
@@ -43,17 +43,25 @@ def relay_select():
 @relay.route("/relay/disable/<string:relay_id>/", methods=(["POST"]))
 def disable(relay_id):
     """
-    API command for turning off a relay, given its id number
+    API command for turning off a relay, given its id
     """
     Platelet.relay_off(relay_id)
-    flash(" ".join(["Relay", str(relay_id), "was turned off."]), "success")
+    flash(
+        " ".join(
+            [
+                "Relay", Platelet.relays[relay_id].name,
+                "was turned off."
+            ]
+        ),
+        "success"
+    )
     return redirect(url_for("index"))
 
 
 @relay.route("/relay/enable/<string:relay_id>/", methods=(["POST"]))
 def enable(relay_id):
     """
-    API command that activates a relay specified by id number for a given number of minutes
+    API command that activates a relay specified by id for a given number of minutes
     """
     interval = int(request.form["time"])
     if interval <= Platelet.max_minutes:
@@ -62,7 +70,7 @@ def enable(relay_id):
                 " ".join(
                     [
                         "Relay",
-                        relay_id,
+                        Platelet.relays[relay_id].name,
                         "was not turned on for",
                         str(interval),
                         "minute." if interval == 1 else "minutes.",
@@ -79,7 +87,7 @@ def enable(relay_id):
                 " ".join(
                     [
                         "Relay",
-                        relay_id,
+                        Platelet.relays[relay_id].name,
                         "was turned on for",
                         str(interval),
                         "minute." if interval == 1 else "minutes.",

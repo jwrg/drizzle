@@ -37,6 +37,8 @@ def list_sequences():
     items = []
     for sequence_id, entry in Jsonny.get("sequences").items():
         new_item = [sequence_id]
+        for index, job in entry["sequence"].items():
+            entry["sequence"][index]["relay"] = Platelet.relays[job["relay"]].name
         new_item.append({field: entry[field] for field in fields})
         if sequence_id == str(Sequencer.sequence):
             new_item.append(
@@ -127,7 +129,7 @@ def new_sequence():
             "name": "",
             "description": "",
             "sequence": {
-                "0": {"relay": list(Platelet.relays)[0], "minutes": Platelet.default_minutes},
+                "0": {"relay": list(Platelet.relays.keys())[0], "minutes": Platelet.default_minutes},
             },
         },
         fields=["name", "description", "sequence"],
@@ -135,7 +137,7 @@ def new_sequence():
         constrain={
             "minutes": Platelet.max_minutes,
             "relay": {
-                relay.name: relay.name
+                id: relay.name
                 for id, relay in Platelet.relays.items()
             },
         },
@@ -171,13 +173,15 @@ def edit_sequence(sequence_id):
                         [
                             request.form.get(y)
                             for y in [
-                                z for z in request.form.keys() if match("relay-*", z)
+                                z for z in request.form.keys()
+                                if match("relay-*", z)
                             ]
                         ],
                         [
                             int(request.form.get(y))
                             for y in [
-                                z for z in request.form.keys() if match("minutes-*", z)
+                                z for z in request.form.keys()
+                                if match("minutes-*", z)
                             ]
                         ],
                     )
@@ -198,7 +202,7 @@ def edit_sequence(sequence_id):
         constrain={
             "minutes": Platelet.max_minutes,
             "relay": {
-                relay.name: relay.name
+                id: relay.name
                 for id, relay in Platelet.relays.items()
             },
         },

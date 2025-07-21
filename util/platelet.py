@@ -25,18 +25,18 @@ class Platelet:
             levels = len([x for x in current_app.config.keys()
                          if match("RELAYS_.*", x)])
             objects = {
-                name: Relay(name, board, relay)
-                for x, (name, board, relay)
+                id: Relay(id, name, board, relay)
+                for x, (id, name, board, relay)
                 in enumerate(current_app.config["RELAYS"])
             }
             for x in range(levels):
                 objects = objects | {
-                    name: Relay(name, board, relay, [
+                    id: Relay(id, name, board, relay, [
                         Dependency(objects[dep], spin_up)
                         for (dep, spin_up) in requires
                     ]
                     )
-                    for x, (name, board, relay, requires)
+                    for x, (id, name, board, relay, requires)
                     in enumerate(current_app.config["RELAYS_" + str(x + 1)])
                 }
             return objects
@@ -57,14 +57,16 @@ class Platelet:
         Returns a dict that can be passed as an argument to the index page
         """
         active = {
-            relay.name: relay.timer.remaining().total_seconds()
-            for name, relay in Platelet.relays.items()
-            if relay.timer.remaining().total_seconds() > 0
+            id: relay.timer.remaining().total_seconds()
+            for id, relay in Platelet.relays.items()
+            if relay.timer.is_set()
         }
         Platelet.logger.debug(
             " ".join(
-                ["Returned getState() with active relays"] + [str(x)
-                                                              for x in active]
+                [
+                    "Returned getState() with",
+                    "no relays active" if len(active) == 0 else "active relays"
+                ] + [Platelet.relays[x].name for x in active]
             )
         )
         return active
@@ -81,7 +83,7 @@ class Platelet:
                 " ".join(
                     [
                         "Relay",
-                        str(relay_id),
+                        Platelet.relays[relay_id].name,
                         "was turned on for",
                         str(interval),
                     ]
@@ -95,12 +97,19 @@ class Platelet:
         """
         Platelet.relays[relay_id].off()
         Platelet.logger.info(
-            " ".join(["Relay", str(relay_id), "was turned off"]))
+            " ".join(
+                [
+                    "Relay",
+                    Platelet.relays[relay_id].name,
+                    "was turned off"
+                ]
+            )
+        )
 
     @staticmethod
     def all_off() -> None:
         """
         Method that turns everything off
         """
-        for name, relay in Platelet.relays.items():
+        for id, relay in Platelet.relays.items():
             relay.off()

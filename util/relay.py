@@ -34,12 +34,15 @@ class Relay:
     mutex = Lock()
 
     def __init__(
-        self, name: str,
+        self,
+        id: str,
+        name: str,
         board: int,
         relay: int,
         requires: list[Dependency] = None,
         #  is_dependency: bool = False
     ) -> None:
+        self.id = id
         self.name = name
         self.board = board
         self.relay = relay
