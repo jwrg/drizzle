@@ -6,7 +6,7 @@ from json import load
 from flask import Flask, redirect, request, url_for
 
 app = Flask(__name__)
-app.config.from_file("config.json", load=load)
+app.config.from_file("config/config.json", load=load)
 app.logger.setLevel(app.config["LOG_LEVEL"])
 
 

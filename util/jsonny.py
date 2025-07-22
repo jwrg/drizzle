@@ -11,6 +11,7 @@ class Jsonny:
 
     encoding = "utf8"
     extension = "json"
+    prefix = "config/"
 
     @staticmethod
     def get(file):
@@ -18,7 +19,17 @@ class Jsonny:
         Returns a dict from a JSON file with implicit extension in base directory
         """
         with open(
-            ".".join([file, Jsonny.extension]), "r", encoding=Jsonny.encoding
+            "/".join(
+                [
+                    Jsonny.prefix,
+                    ".".join(
+                        [
+                            file,
+                            Jsonny.extension
+                        ]
+                    )
+                ]
+            ), "r", encoding=Jsonny.encoding
         ) as f:
             return load(f)
 
@@ -28,6 +39,16 @@ class Jsonny:
         Persists some JSON data to disk with implicit extension in base directory
         """
         with open(
-            ".".join([file, Jsonny.extension]), "w", encoding=Jsonny.encoding
+            "/".join(
+                [
+                    Jsonny.prefix,
+                    ".".join(
+                        [
+                            file,
+                            Jsonny.extension
+                        ]
+                    )
+                ]
+            ), "w", encoding=Jsonny.encoding
         ) as f:
             return dump(data, f, sort_keys=sort)
