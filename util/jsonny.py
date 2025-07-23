@@ -6,7 +6,7 @@ from json import dump, load
 
 class Jsonny:
     """
-    Static class for manipulating simple utf8 JSON data
+    Class for manipulating JSON configuration data
     """
 
     encoding = "utf8"
@@ -52,3 +52,13 @@ class Jsonny:
             ), "w", encoding=Jsonny.encoding
         ) as f:
             return dump(data, f, sort_keys=sort)
+
+    def __init__(self, filename: str):
+        self.filename = filename
+        self.json = self.load()
+
+    def load(self):
+        return Jsonny.get(self.filename)
+
+    def save(self):
+        return Jsonny.put(self.filename, self.json)

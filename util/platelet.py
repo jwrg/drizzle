@@ -7,6 +7,7 @@ from re import match
 
 from flask import current_app
 
+from util.jsonny import Jsonny
 from util.relay import Relay, Dependency
 
 
@@ -19,15 +20,13 @@ class Platelet:
         """
         Static class for loading up relays from app config
         """
-
-        @staticmethod
-        def get_relays():
-            levels = len([x for x in current_app.config.keys()
+        def init_relays(json) -> dict[str, Relay]:
+            levels = len([x for x in json.keys()
                          if match("RELAYS_.*", x)])
             objects = {
                 id: Relay(id, name, board, relay)
                 for x, (id, name, board, relay)
-                in enumerate(current_app.config["RELAYS"])
+                in enumerate(json["RELAYS"])
             }
             for x in range(levels):
                 objects = objects | {
@@ -37,21 +36,24 @@ class Platelet:
                     ]
                     )
                     for x, (id, name, board, relay, requires)
-                    in enumerate(current_app.config["RELAYS_" + str(x + 1)])
+                    in enumerate(json["RELAYS_" + str(x + 1)])
                 }
             return objects
 
-    relays = Platter.get_relays()
-    boards = {y.board for x, y in relays.items()}
-    num_relays = len(relays)
-    max_relays = current_app.config["MAX_RELAYS"]
-    min_minutes = current_app.config["MIN_TIME"]
-    max_minutes = current_app.config["MAX_TIME"]
-    default_minutes = current_app.config["DEFAULT_TIME"]
+    default_filename = "relays"
+    jsonny = Jsonny(default_filename)
     logger = current_app.logger
 
+    relays = Platter.init_relays(jsonny.json)
+    boards = {relay.board for relay in relays.values()}
+    num_relays = len(relays)
+    max_relays = jsonny.json["MAX_RELAYS"]
+    min_minutes = jsonny.json["MIN_TIME"]
+    max_minutes = jsonny.json["MAX_TIME"]
+    default_minutes = jsonny.json["DEFAULT_TIME"]
+
     @staticmethod
-    def get_state():
+    def get_state() -> dict:
         """
         Method that determines which of the relays are on, if any.
         Returns a dict that can be passed as an argument to the index page
@@ -64,7 +66,7 @@ class Platelet:
         Platelet.logger.debug(
             " ".join(
                 [
-                    "Returned getState() with",
+                    "Returned get_state() with",
                     "no relays active" if len(active) == 0 else "active relays"
                 ] + [Platelet.relays[x].name for x in active]
             )
@@ -111,5 +113,5 @@ class Platelet:
         """
         Method that turns everything off
         """
-        for id, relay in Platelet.relays.items():
+        for relay in Platelet.relays.values():
             relay.off()
