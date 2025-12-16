@@ -8,9 +8,69 @@ from datetime import date, datetime, time, timedelta
 
 from flask import current_app
 
-from util.jsonny import Jsonny
-from util.sequencer import Sequencer
+from util.sequencer import Sequencer, Sequitur
+from util.singleton import singleton
+from util.persist import PersistentMapping
 from util.timmy import Timmy
+
+sequences = Sequencer()
+
+
+class Job:
+    """
+    Helper class that wraps weekly time info and compares on next run time
+    """
+
+    def __init__(
+        self,
+        sequence: Sequitur,
+        weekday: int,
+        hour: int,
+        minute: int
+    ) -> None:
+        self.sequence = sequence
+        self.weekday = weekday
+        self.hour = hour
+        self.minute = minute
+
+    def __eq__(self, obj: Job) -> bool:
+        return self.upcoming() == obj.upcoming()
+
+    def __ne__(self, obj: Job) -> bool:
+        return self.upcoming() != obj.upcoming()
+
+    def __lt__(self, obj: Job) -> bool:
+        return self.upcoming() < obj.upcoming()
+
+    def __le__(self, obj: Job) -> bool:
+        return self.upcoming() <= obj.upcoming()
+
+    def __gt__(self, obj: Job) -> bool:
+        return self.upcoming() > obj.upcoming()
+
+    def __ge__(self, obj: Job) -> bool:
+        return self.upcoming() >= obj.upcoming()
+
+    def remaining(self) -> timedelta:
+        """
+        Return timedelta between now and the next run of this job
+        """
+        return self.upcoming() - datetime.now()
+
+    def upcoming(self) -> datetime:
+        """
+        Return datetime when the next time tmessagehis job will run
+        """
+        today = datetime.combine(date.today(), time())
+        thisweek = today + timedelta(
+            days=self.weekday - (today.isoweekday() % 7),
+            hours=self.hour,
+            minutes=self.minute,
+        )
+        return (
+            thisweek if thisweek > datetime.now()
+            else thisweek + timedelta(days=7)
+        )
 
 
 class Schedule:
@@ -21,83 +81,78 @@ class Schedule:
     logger = current_app.logger
 
     def __init__(
-        self, id_number: int, name: str, jobs: dict[int, int, int, int]
+        self,
+        id: str,
+        name: str,
+        description: str,
+        active: bool,
+        jobs: deque[Job]
     ) -> None:
-        self.id_number = id_number
+        self.id = id
         self.name = name
-        self.jobs = deque(
-            sorted(
-                self.Job(
-                    entry["sequence"], entry["weekday"], entry["hour"], entry["minute"]
-                )
-                for schedule_id, entry in jobs.items()
-            )
-        )
+        self.description = description
+        self.active = active
+        self.jobs = jobs
         self.timer = Timmy(name)
-        self.timer.set(self.jobs[0].remaining(), self.next, [])
         Schedule.logger.debug(
             " ".join(
                 [
                     "Schedule",
                     self.name,
-                    "with id number",
-                    self.id_number,
+                    "with id",
+                    self.id,
                     "initialized containing",
                     str(len(self.jobs)),
-                    "jobs.  Next job runs in",
+                    "jobs.",
+                ]
+            )
+        )
+        if self.active:
+            self.on()
+
+    def off(self) -> None:
+        self.timer.clear()
+        self.active = False
+        Schedule.logger.debug(
+            " ".join(
+                [
+                    "Schedule",
+                    str(self.name),
+                    "turned off.",
+                ]
+            )
+        )
+
+    def on(self) -> None:
+        self.jobs = deque(sorted(self.jobs))
+        self.timer.set(self.jobs[0].remaining(), self.next, [])
+        self.active = True
+        Schedule.logger.debug(
+            " ".join(
+                [
+                    "Schedule",
+                    str(self.name),
+                    "turned on.",
+                    "Next job runs in",
                     str(self.jobs[0].remaining()),
                 ]
             )
         )
 
-    def __del__(self) -> None:
-        Schedule.logger.debug(
-            " ".join(
-                [
-                    "Schedule",
-                    self.name,
-                    "with id number",
-                    self.id_number,
-                    "terminated.",
-                ]
-            )
-        )
-
-    def cleanup(self) -> None:
-        """
-        Destroy object contents in preparation for object deletion
-        """
-        self.timer.clear()
-        del self.timer
-        for job in self.jobs:
-            del job
-        self.jobs = []
-        Schedule.logger.debug(
-            " ".join(
-                [
-                    "Schedule",
-                    self.name,
-                    "with id number",
-                    self.id_number,
-                    "cleaned up",
-                ]
-            )
-        )
-
     def next(self) -> None:
-        """
-        Run the next job
-        """
-        Sequencer.init_sequence(self.jobs[0].sequence)
+        # """
+        # Run the next job
+        # """
+        self.jobs[0].sequence.start()
         Schedule.logger.info(
             " ".join(
                 [
                     "Schedule",
                     str(self.name),
-                    "with id number",
-                    str(self.id_number),
-                    "running job for sequence",
-                    str(self.jobs[0].sequence),
+                    "with id",
+                    str(self.id),
+                    "running job, sequence",
+                    str(self.jobs[0].sequence.name),
                 ]
             )
         )
@@ -106,7 +161,7 @@ class Schedule:
             " ".join(
                 [
                     "Next job is for sequence",
-                    str(self.jobs[0].sequence),
+                    str(self.jobs[0].sequence.name),
                     "and runs in",
                     str(self.jobs[0].remaining()),
                 ]
@@ -114,124 +169,76 @@ class Schedule:
         )
         self.timer.set(self.jobs[0].remaining(), self.next, [])
 
-    class Job:
-        """
-        Helper class that wraps weekly time info and compares on next run time
-        """
 
-        def __init__(self, sequence: int, weekday: int, hour: int, minute: int) -> None:
-            self.sequence = sequence
-            self.weekday = weekday
-            self.hour = hour
-            self.minute = minute
-
-        def __eq__(self, obj: Job) -> bool:
-            return self.upcoming() == obj.upcoming()
-
-        def __ne__(self, obj: Job) -> bool:
-            return self.upcoming() != obj.upcoming()
-
-        def __lt__(self, obj: Job) -> bool:
-            return self.upcoming() < obj.upcoming()
-
-        def __le__(self, obj: Job) -> bool:
-            return self.upcoming() <= obj.upcoming()
-
-        def __gt__(self, obj: Job) -> bool:
-            return self.upcoming() > obj.upcoming()
-
-        def __ge__(self, obj: Job) -> bool:
-            return self.upcoming() >= obj.upcoming()
-
-        def remaining(self) -> timedelta:
-            """
-            Return timedelta between now and the next run of this job
-            """
-            return self.upcoming() - datetime.now()
-
-        def upcoming(self) -> datetime:
-            """
-            Return datetime when the next time this job will run
-            """
-            today = datetime.combine(date.today(), time())
-            thisweek = today + timedelta(
-                days=self.weekday - (today.isoweekday() % 7),
-                hours=self.hour,
-                minutes=self.minute,
-            )
-            return (
-                thisweek if thisweek > datetime.now() else thisweek + timedelta(days=7)
-            )
-
-
-class Scheduler:
+@singleton
+class Scheduler(PersistentMapping):
     """
-    Static class for manipulating and keeping track of schedule objects
+    Class for keeping track of schedule objects
     """
 
+    default_filename = "schedules"
     logger = current_app.logger
 
-    def __init__(self) -> None:
-        self.json = Jsonny.get("schedules")
-        self.schedules = self.load(self.json.items())
+    def __init__(self, filename: str = default_filename) -> None:
+        super().__init__(filename)
 
-    def load(
-        self, schedule_list: dict[bool, str, str, str, str, dict]
-    ) -> list[Schedule]:
-        """
-        Return a list of Schedule objects initialized using config data
-        """
-        return list(
-            Schedule(schedule_id, entry["name"], entry["jobs"])
-            for schedule_id, entry in schedule_list
-            if entry["active"] is True
-        )
-
-    def reload(self) -> None:
-        """
-        Re-initialize all schedules
-        """
-        Scheduler.logger.info("Reloading all schedules")
-        for schedule in self.schedules:
-            schedule.cleanup()
-            del schedule
-        self.json = Jsonny.get("schedules")
-        self.schedules = self.load(self.json.items())
-
-    def activate(self, schedule_id: int) -> None:
-        """
-        Sets a schedule to active and persists the change
-        """
-        self.json[str(schedule_id)]["active"] = True
-        Jsonny.put("schedules", self.json)
-        self.reload()
-        Scheduler.logger.info(
+    def __delitem__(self, key):
+        self.collection[key].timer.clear()
+        del self.collection[key].timer
+        for job in self.collection[key].jobs:
+            del job
+        self.collection[key].jobs = []
+        Scheduler.logger.debug(
             " ".join(
                 [
                     "Schedule",
-                    self.json[str(schedule_id)]["name"],
-                    "with id number",
-                    str(schedule_id),
-                    "set as active.",
+                    self.collection[key].name,
+                    "with id",
+                    self.collection[key].id,
+                    "deleted.",
                 ]
             )
         )
+        super().__delitem__(key)
 
-    def deactivate(self, schedule_id: int) -> None:
-        """
-        Sets a schedule to not active and persists the change
-        """
-        self.json[str(schedule_id)]["active"] = False
-        Jsonny.put("schedules", self.json)
-        self.reload()
-        Scheduler.logger.info(
-            " ".join(
-                [
-                    "Schedule",
-                    self.json[str(schedule_id)]["name"],
-                    "with id number",
-                    str(schedule_id),
-                    "set as inactive.",
-                ]
+    def to_obj(
+        self, collection: dict[str, dict]
+    ) -> dict[str, Schedule]:
+        return {
+            id: Schedule(
+                id,
+                schedule["name"],
+                schedule["description"],
+                schedule["active"],
+                deque(
+                    Job(
+                        sequences[job["sequence"]],
+                        job["weekday"],
+                        job["hour"],
+                        job["minute"]
+                    )
+                    for job in schedule["jobs"]
+                ),
             )
-        )
+            for id, schedule in collection.items()
+        }
+
+    def to_json(self, collection: dict[str, Schedule]):
+        return {
+            id: {
+                "description": schedule.description,
+                "name": schedule.name,
+                "modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%Z"),
+                "active": schedule.active,
+                "jobs": [
+                    {
+                        "sequence": job.sequence.id,
+                        "weekday": job.weekday,
+                        "hour": job.hour,
+                        "minute": job.minute
+                    }
+                    for job in list(schedule.jobs)
+                ]
+            }
+            for id, schedule in collection.items()
+        }

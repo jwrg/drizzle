@@ -1,0 +1,26 @@
+{% macro render_field(field) %}
+  {% if field.type == "FieldList" %}
+  <br /><hr />
+  <dt class="fieldlist">{{ field.label }}
+  <input class="right" type="button" id="append" name="append" onClick="append_row()" value="Add Field" />
+    {% for subfield in field.entries %}
+      <dd>{{ subfield(**kwargs)|safe }}
+      <input type="button" id="demote" name="demote" onClick="demote_row(this)" value="Up" />
+      <input type="button" id="promote" name="promote" onClick="promote_row(this)" value="Down" />
+      <input type="button" id="delete" name="delete" onClick="if(window.confirm('Are you sure?')){delete_row(this)}" value="Delete" />
+    {% endfor %}
+  {% else %}
+  <dt>{{ field.label }}
+  <dd>{{ field(**kwargs)|safe }}
+  {% endif %}
+  {% if field.type == "FieldList" %}
+  {% endif %}
+  {% if field.errors %}
+    <ul class=errors>
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+  </dd>
+{% endmacro %}

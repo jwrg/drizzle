@@ -5,12 +5,18 @@ body {
   min-height: 100vh;
   font-family: Geneva, Verdana, sans-serif;
   text-align: left;
-  background-image: linear-gradient(azure, lightskyblue);
+  background-image: linear-gradient(floralwhite, azure);
 }
 
 main {
   width: 90%;
   margin: 1em auto 0 auto;
+}
+
+main#content {
+  display: block;
+  min-height: 90vh;
+  
 }
 
 main#messages {
@@ -46,6 +52,7 @@ h2 {
 td, li, input, label, textarea {
   color: navy;
   font-size: 18pt;
+  margin-top: 0.25ex;
 }
 
 li.name, h3, p {
@@ -86,7 +93,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14pt;
-  margin: 0.5em 0;
+  margin: 1.5em 0;
 }
 
 td, th {
@@ -134,11 +141,13 @@ header nav ul {
 }
 
 header nav ul li {
+  flex-grow: 4;
   text-align: left;
   font-size: 24pt;
   font-family: Trebuchet, Tahoma, Arial, sans-serif;
   height: 3ex;
   padding: 0 1.5ex;
+  margin: 0;
   border-left: 2px solid #015;
   border-right: 2px solid #99f;
 }
@@ -168,6 +177,7 @@ header nav ul li.current {
 
 header nav li a.icon svg {
   display: inline-block;
+  width: 28px;
   text-align: right;
   vertical-align: middle;
   fill: white;
@@ -200,19 +210,40 @@ ul.entry {
 
 /* Classes */
 
+/* careful now... */
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+.right {
+  float: right;
+}
+
 .gradient {
   background-image: linear-gradient(48deg, honeydew, floralwhite);
+}
+
+.rounded {
   border-radius: 15px;
   border-width: 1px;
+}
+
+.shadow {
   -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
   -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
 }
 
-.active {
+div.active {
   color: white;
   border-width: 2px;
   border-color: cornflowerblue;
   background-image: linear-gradient(48deg, floralwhite, skyblue);
+}
+
+p.describe {
+  font-size: large;
+  text-align: left;
 }
 
 .append {
@@ -246,17 +277,59 @@ ul.entry {
 
 /* Inputs */
 
-textarea {
+form {
+  min-height: 90vh;
+}
+
+form input[type="text"] {
   min-width: 100%;
   max-width: 100%;
   min-height: 3ex;
 }
 
-textarea.name {
-  height: 3ex;
+form textarea.name {
+  height: 2em;
 }
 
-input.relay[type="submit"] {
+form th label{
+  color: floralwhite;
+}
+
+form table{
+  margin-bottom: 0;
+}
+
+form li.boolean, form li.number {
+  width: 49%;
+  display: inline-block;
+  margin: 0.5ex 0;
+}
+
+form li.boolean label, form li.number label {
+  display: inline-block;
+  width: 72%;
+  }
+  
+form li.boolean input, form li.number input {
+  width: 24%;
+}
+
+.button-wrapper,
+.time-wrapper fieldset{
+  display: flex;
+  flex-flow: row wrap;
+  align-items: stretch;
+  align-content: stretch;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.button-wrapper {
+  height: 100%;
+  /* width: 100%; */
+}
+
+/*input.relay[type="submit"] {
   width: 40vw;
   height: 20vw;
   margin: 2.0vw;
@@ -264,6 +337,45 @@ input.relay[type="submit"] {
   font-size: 36pt;
   border-radius: 5vw;
   border-width: 1px;
+}*/
+
+.button-wrapper input.relay[type="submit"]{
+  flex: 1 1 auto;
+}
+
+.time-wrapper label.time-label{
+  flex: 1 1 1px;
+}
+
+.button-wrapper input.relay[type="submit"],
+.time-wrapper label.time-label{
+  padding: 2em 1em;
+  margin: 1em;
+  color: navy;
+  font-size: huge;
+  text-align: center;
+  border-radius: 2vw;
+  border-width: 1px;
+  white-space: normal;
+  -webkit-transition: all .1s ease;
+  -moz-transition: all .1s ease;
+  -ms-transition: all .1s ease;
+  -o-transition: all .1s ease;
+  transition: all .1s ease;
+  -moz-box-shadow: 0px 9px 0px navy, 0px 9px 25px #444545;
+  -webkit-box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
+  box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
+}
+
+.time-wrapper label.time-label:active,
+.button-wrapper input.relay[type="submit"]:active {
+  box-shadow: 0px 3px 0px #24a, 0px 3px 6px rgba(0,0,0,.9);
+  position: relative;
+  top: 6px;
+}
+
+.time-wrapper input[type="radio"]:checked+label{
+  background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
 }
 
 .range-wrapper {
@@ -298,6 +410,7 @@ input[type="range"] {
   left: 50%;
 }
 
+input.selected,
 input.active {
   color: white;
   border-color: cornflowerblue;
@@ -319,8 +432,8 @@ input.submit {
 }
 
 input:active {
-  color: white !important;
-  background: powderblue;
+  color: #24a !important;
+  background: honeydew;
   border-color: aliceblue !important;
 }
 

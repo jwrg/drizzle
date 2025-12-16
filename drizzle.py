@@ -31,10 +31,12 @@ def log_request():
 
 
 with app.app_context():
-    from blueprints.schedule import schedule
-    from blueprints.sequence import sequence
+    from blueprints.board import board
     from blueprints.relay import relay
+    from blueprints.sequence import sequence
+    from blueprints.schedule import schedule
 
+app.register_blueprint(board.board)
 app.register_blueprint(relay.relay)
 app.register_blueprint(sequence.sequence)
 app.register_blueprint(schedule.schedule)
@@ -45,7 +47,7 @@ def index():
     """
     Redirect to index view
     """
-    return redirect(url_for("relay.relay_select"))
+    return redirect(url_for("relay.select_relay"))
 
 
 if __name__ == "__main__":

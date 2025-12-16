@@ -1,14 +1,20 @@
 {% extends "base.html" %}
   {% block title %}{{ subject|capitalize }} Menu{% endblock %}
   {% block content %}
-      <h2>{{ prompt }}</h2>
+      <h2>{{ datetime }}</h2>
       <form method="post">
-        <div class="range-wrapper" id="range-wrapper">
-          <input type="range" class="range" id="time" name="time" value={{ default_minutes }} min={{ min_minutes }} max={{ max_minutes }} />
-          <output class="range-bubble" id="range-bubble"></output>
+        <div class="time-wrapper" id="time-wrapper">
+          <fieldset>
+    {%- for time in times %}
+            <input type="radio" class="hidden" id="minutes-{{ time }}" name="minutes" value="{{ time }}" />
+            <label for="minutes-{{ time }}" class="time-label">{{ time }}</label>
+    {%- endfor %}
+          <!-- <input type="range" class="range" id="time" name="time" value=5 min=1 max=100 /> -->
+          <!-- <output class="range-bubble" id="range-bubble"></output> -->
+          </fieldset>
         </div>
         <div class="button-wrapper" id="button-wrapper">
-    {%- for label, action, endpoint, arguments, confirm, active, remaining in actions %}
+    {%- for label, action, endpoint, arguments, confirm, active, remaining, default, max in actions %}
           <input type="submit" value="
       {%- if active %}{{ remaining }}{% else %}{{ label }}{% endif -%}
           " class="gradient keypad relay

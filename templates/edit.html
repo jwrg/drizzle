@@ -2,55 +2,25 @@
   {% block title %}Edit {{ subject|capitalize }}{% endblock %}
   {% block content %}
       <script src="{{ url_for('static', filename='edit.js') }}"></script>
+    {%- if title is defined %}
+      <h2>{{ title|capitalize }}</h2>
+    {%- endif %}
+    {%- if describe is defined %}
+      <p class="describe">{{ describe }}</p>
+    {%- endif %}
       <ul class="entries">
         <li>
-          <div class="box gradient">
+          <div class="box gradient rounded shadow">
             <ul class="entry">
               <form method="post">
+                <dl>
+    {%- from "macro.html" import render_field %}
     {%- for fieldName in fields %}
-      {%- if item[fieldName] is mapping %}
-                <table class="{{ subject }}">
-        {%- if data_headings != [] %}
-                  <tr>
-          {%- for heading in data_headings %}
-                    <th>{{ heading|capitalize }}</th>
-          {%- endfor %}
-                    <th><a class="append white" id="append_row" onClick="append_row()">+</a></th>
-                  </tr>
-        {%-  endif %}
-        {%- for key, tuple in item[fieldName].items() if not key == 'columns' %}
-                  <tr>
-          {%- for columnName in data_headings %}
-                    <td>
-                      <label for="{{ columnName }}-{{ key }}" >{{ columnName|capitalize }}:</label>&nbsp;
-            {%- if constrain[columnName] is integer %}
-                      <input type="number" id="{{ columnName }}-{{ key }}" name="{{ columnName }}-{{ key }}" min="1" max="{{ constrain[columnName] }}" value="{{ tuple[columnName] }}"/>
-            {%- elif constrain[columnName] is string %}
-                      <input type="{{ constrain[columnName] }}" id="{{ columnName }}-{{ key }}" name="{{ columnName }}-{{ key }}" value="{{ tuple[columnName] }}"/>
-            {%- elif constrain[columnName] is mapping %}
-                      <select id="{{ columnName }}-{{ key }}" name="{{ data_headings[loop.index0]}}-{{ key }}">
-              {%- for constraint_key, constraint in constrain[columnName].items() %}
-                        <option value="{{ constraint_key }}" {% if constraint_key == tuple[columnName] %}selected{% endif %}>{{ constraint }}</option>
-              {%- endfor %}
-                      </select>
-            {%- endif %}
-                    </td>
-          {%- endfor %}
-                    <td><a class="button promote success" id="promote_row-{{ loop.index0 }}" onClick="promote_row(this)">&uarr;</a>&nbsp;<a class="button demote success" id="demote_row-{{ loop.index0 }}" onClick="demote_row(this)">&darr;</a>&nbsp;&nbsp;<a class="button delete warning" id="delete_row-{{ loop.index0 }}" onClick="delete_row(this)">&#128465;</a></td>
-                  </tr>
-        {%- endfor %}
-                </table>
-      {%- else %}
-        {%- if fieldName in constrain.keys() %}
-        {%- else %}
-                <li>
-                  <label for="{{ fieldName }}" class="{{ fieldName }}">{{ fieldName|capitalize }}:</label>
-                  <textarea class="{{ fieldName }}" name="{{ fieldName }}">{{ item[fieldName] }}</textarea>
-                </li>
-        {%- endif %}
-      {%- endif %}
+      {{ render_field(form[fieldName]) }}
     {%- endfor %}
-                <input type="submit" id="save" name="save" value="Save" />
+                </dl>
+                <br /><hr />
+    {{ form.submit() }}
                 <input type="button" id="cancel" name="cancel" onClick="javascript:history.back()" value="Cancel" />
               </form>
             </ul>

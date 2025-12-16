@@ -1,95 +1,106 @@
 """
 Helper class for recursively sequencing relays on and off
 """
-from datetime import timedelta
-from threading import Lock
+from dataclasses import dataclass
+from datetime import datetime, timedelta
 
 from flask import current_app
 
-from util.jsonny import Jsonny
-from util.platelet import Platelet
+from util.persist import PersistentMapping
+from util.singleton import singleton
+from util.relay import Relay, Baton
+
+relays = Baton()
 
 
-class Sequencer:
+@dataclass
+class Sequor:
     """
-    Static class that executes, cancels sequences, and handles JSON I/O to read and
-    write sequence data
+    Class to hold the individual entries in a sequence
+    """
+    relay: Relay
+    minutes: int
+
+
+class Sequitur:
+    """
+    Class that contains and executes a sequence of relays
     """
 
-    sequence = None
-    lock = Lock()
+    def __init__(
+        self, id: str, name: str, description: str, sequence: list[Sequor]
+    ) -> None:
+        self.id = id
+        self.name = name
+        self.description = description
+        self.sequence = sequence
+        self.active = False
+        self.current = None
 
+    def start(self):
+
+        def secutus(pos):
+            if pos == len(self.sequence):
+                self.stop()
+                return
+            else:
+                self.active = True
+                if self.current is not None:
+                    self.current.off()
+                self.current = self.sequence[pos].relay
+                self.current.on(
+                    timedelta(minutes=self.sequence[pos].minutes),
+                    secutus, [pos + 1],
+                )
+        secutus(0)
+
+    def stop(self):
+        if self.current is not None:
+            self.current.off()
+        self.active = False
+        self.current = None
+
+
+@singleton
+class Sequencer(PersistentMapping):
+    """
+    Class for keeping track of sequence (Sequitur) objects
+    """
+
+    default_filename = "sequences"
     logger = current_app.logger
 
-    @staticmethod
-    def init_sequence(sequence_id):
-        """
-        Initializes and activates the sequence with specified id number
-        """
-        if Sequencer.sequence is None:
-            Sequencer.lock.acquire()
-            Sequencer.logger.info(
-                " ".join(["Sequence", str(sequence_id), "starting."]))
-            Sequencer.sequence = int(sequence_id)
-            Sequencer.execute_sequence(
-                0, Jsonny.get("sequences")[str(sequence_id)]["sequence"]
-            )
-        else:
-            Sequencer.logger.debug(
-                " ".join(
-                    [
-                        "Sequence",
-                        str(sequence_id),
-                        "NOT started. Sequence",
-                        str(Sequencer.sequence),
-                        "currently running.",
-                    ]
-                )
-            )
+    def __init__(self, filename: str = default_filename) -> None:
+        super().__init__(filename)
 
-    @staticmethod
-    def get_sequence_state():
-        """
-        Returns the currently active sequence id, otherwise returns a blank
-        string (sc., it does not return None)
-        """
-        Sequencer.logger.debug(
-            " ".join(["Returned get_sequence_state() with",
-                     str(Sequencer.sequence)])
-        )
-        return "" if Sequencer.sequence is None else str(Sequencer.sequence)
-
-    @staticmethod
-    def execute_sequence(index: int, sequence):
-        """
-        Recursively executes a sequence
-        NB. Don't call this, call its wrapper instead, init_sequence() above
-        """
-        if index > 0:
-            Platelet.relays[sequence[str(index - 1)]["relay"]].off()
-        if index < len(sequence):
-            Platelet.relays[sequence[str(index)]["relay"]].on(
-                timedelta(minutes=sequence[str(index)]["minutes"]),
-                Sequencer.execute_sequence,
-                [index + 1, sequence],
+    def to_obj(self, collection: dict[str, dict]) -> dict[str, Sequitur]:
+        return {
+            id: Sequitur(
+                id,
+                sequitur["name"],
+                sequitur["description"],
+                [
+                    Sequor(relays[
+                        sequor["relay"]], sequor["minutes"])
+                    for sequor in sequitur["sequence"]
+                ]
             )
-        else:
-            Sequencer.logger.info(
-                " ".join(["Sequence", str(Sequencer.sequence), "completed."])
-            )
-            Sequencer.sequence = None
-            Sequencer.lock.release()
+            for id, sequitur in collection.items()
+        }
 
-    @staticmethod
-    def cancel_sequence():
-        """
-        Cancels any currently active sequence (and heavy-handedly turns off
-        all relays for good measure)
-        """
-        Platelet.all_off()  # change this to only turn off what the sequence has turned on
-        Sequencer.logger.debug(
-            " ".join(["Sequence", str(Sequencer.sequence), "cancelled."])
-        )
-        Sequencer.sequence = None
-        if Sequencer.lock.locked():
-            Sequencer.lock.release()
+    def to_json(self, collection: dict[str, Sequitur]):
+        return {
+            id: {
+                "description": sequitur.description,
+                "name": sequitur.name,
+                "modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%Z"),
+                "sequence": [
+                    {
+                        "relay": sequor.relay.id,
+                        "minutes": sequor.minutes,
+                    }
+                    for sequor in sequitur.sequence
+                ]
+            }
+            for id, sequitur in collection.items()
+        }

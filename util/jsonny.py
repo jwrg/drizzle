@@ -60,5 +60,6 @@ class Jsonny:
     def load(self):
         return Jsonny.get(self.filename)
 
-    def save(self):
+    def save(self, json):
+        self.json = json
         return Jsonny.put(self.filename, self.json)

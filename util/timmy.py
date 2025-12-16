@@ -27,13 +27,21 @@ class Timmy:
         """
         Returns datetime indicating when the timer will be finished counting
         """
-        return self.start + self.interval if self.timer is not None else datetime()
+        return (
+            self.start + self.interval
+            if self.timer is not None
+            else datetime()
+        )
 
     def remaining(self) -> timedelta:
         """
         Returns remaining timer interval
         """
-        return self.finished() - datetime.now() if self.timer is not None else timedelta()
+        return (
+            self.finished() - datetime.now()
+            if self.timer is not None
+            else timedelta()
+        )
 
     def is_set(self) -> bool:
         """
@@ -43,7 +51,10 @@ class Timmy:
 
     # Methods for setting and clearing timers
     def set(
-        self, interval: timedelta, callback: Callable[[...], Any], args: list[str]
+        self,
+        interval: timedelta,
+        callback: Callable[[...], Any],
+        args: list[str]
     ) -> None:
         """
         Sets the timer
