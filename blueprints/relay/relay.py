@@ -309,8 +309,8 @@ def edit_relay(relay_id):
             "id": relay_id,
         } | {
 
-            "name": "New Relay " + ''.join(choices(ascii_uppercase + digits, k=5)),
-            "description": "",
+            "name": "New Relay " + ''.join(choices(ascii_uppercase, k=5)),
+            "description": "A relay",
             "active": True,
             "visible": True,
             "default_time": 10,

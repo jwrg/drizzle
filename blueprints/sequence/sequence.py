@@ -2,7 +2,7 @@
 Routes for sequencing relays
 """
 from random import choices
-from string import ascii_lowercase, digits
+from string import ascii_uppercase, ascii_lowercase, digits
 
 from flask import (
     Blueprint,
@@ -161,8 +161,8 @@ def edit_sequence(sequence_id):
     ) else Sequitur(
         **{
             "id": sequence_id,
-            "name": "New relay sequence",
-            "description": "A relay sequence",
+            "name": "New relay sequence" + ''.join(choices(ascii_uppercase, k=5)),
+            "description": "A sequence of relays and durations",
             "sequence": [Sequor(str(next(iter(relays.values()))), 1)]
         }
     )

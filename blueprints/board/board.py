@@ -99,8 +99,8 @@ def edit_board(board_id: str):
         **{
             "id": board_id
         } | {
-            "name": "New PiPlates Relay Board",
-            "description": "An attached PiPlates relay board",
+            "name": "New Relay Board " + ''.join(choices(ascii_uppercase, k=5)),
+            "description": "A relay board on a raspberry pi",
             "index": min(
                 [
                     x for x in range(0, 8)

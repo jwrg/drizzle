@@ -2,7 +2,7 @@
 Routes for scheduling relays and sequences
 """
 from random import choices
-from string import ascii_lowercase, digits
+from string import ascii_uppercase, ascii_lowercase, digits
 
 from flask import (
     Blueprint,
@@ -179,7 +179,7 @@ def edit_schedule(schedule_id):
     ) else Schedule(
         **{
             "id": schedule_id,
-            "name": "New Schedule",
+            "name": "New Schedule" + ''.join(choices(ascii_uppercase, k=5)),
             "description": "A new schedule of sequences",
             "active": False,
             "jobs": [Job(str(next(iter(sequences.values()))), 0, 0, 0)]
