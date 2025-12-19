@@ -158,11 +158,14 @@ class Holder(PersistentMapping):
     def to_obj(self, collection: dict[str, dict[str, str]]) -> dict[str, Board]:
         return {
             id: Board(
-                id,
-                board["name"],
-                board["description"],
-                board["index"],
-                board["type"],
+                **{
+                    "id": id,
+                    "name": board["name"],
+                    "description": board["description"],
+                    "index": board["index"],
+                    "active": board["active"],
+                    "type": board["type"],
+                }
             )
             for id, board in collection.items()
         }
@@ -173,6 +176,7 @@ class Holder(PersistentMapping):
                 "name": board.name,
                 "description": board.description,
                 "index": board.index,
+                "active": board.active,
                 "type": board.type,
                 "modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%Z"),
             }
