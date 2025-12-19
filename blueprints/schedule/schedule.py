@@ -70,15 +70,6 @@ def list_schedules():
                             "endpoint": ".activate_schedule",
                             "args": {"schedule_id": id},
                         },
-                    },
-                    "active": {
-                        "deactivate": {
-                            "name": "deactivate".capitalize(),
-                            "endpoint": ".deactivate_schedule",
-                            "args": {"schedule_id": id},
-                        },
-                    },
-                    "always": {
                         "edit": {
                             "name": "edit".capitalize(),
                             "endpoint": ".edit_schedule",
@@ -95,6 +86,15 @@ def list_schedules():
                                 "cannot be undone."
                             ]),
                         }
+                    },
+                    "active": {
+                        "deactivate": {
+                            "name": "deactivate".capitalize(),
+                            "endpoint": ".deactivate_schedule",
+                            "args": {"schedule_id": id},
+                        },
+                    },
+                    "always": {
                     },
                 },
                 "active": schedule.active
@@ -181,7 +181,7 @@ def edit_schedule(schedule_id):
             "id": schedule_id,
             "name": "New Schedule",
             "description": "A new schedule of sequences",
-            "active": True,
+            "active": False,
             "jobs": [Job(str(next(iter(sequences.values()))), 0, 0, 0)]
         }
     )
