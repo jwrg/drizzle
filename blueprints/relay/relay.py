@@ -21,6 +21,7 @@ with current_app.app_context():
     from util.board import Holder
     from util.relay import Baton, Relay, Dependency
     from util.form import RelayForm, DependencyForm
+    from util.redirected import redirected
     relays = Baton()
     boards = Holder()
 
@@ -32,6 +33,7 @@ fields = [
     "board", "index"
 ]
 mappings = ["requires"]
+redirected = redirected(relays, "relay", ".index")
 
 
 @relay.route("/")
@@ -158,7 +160,7 @@ def enable_relay(relay_id):
 
 
 @relay.route("/config/")
-def list_relays():
+def index():
     fields = ["name", "description", "address",
               "max_time", "default_time", "visible", "requires"]
     return render_template(
@@ -188,14 +190,14 @@ def list_relays():
                     "inactive": {
                         "activate": {
                             "name": "activate".capitalize(),
-                            "endpoint": ".activate_relay",
+                            "endpoint": ".activate",
                             "args": {"relay_id": id},
                         },
                     },
                     "active": {
                         "deactivate": {
                             "name": "deactivate".capitalize(),
-                            "endpoint": ".deactivate_relay",
+                            "endpoint": ".deactivate",
                             "args": {"relay_id": id},
                         },
                     },
@@ -207,7 +209,7 @@ def list_relays():
                         },
                         "delete": {
                             "name": "delete".capitalize(),
-                            "endpoint": "relay.delete_relay",
+                            "endpoint": ".delete",
                             "args": {"relay_id": id},
                             "confirm": ' '.join([
                                 "Are you sure?",
@@ -241,24 +243,6 @@ def new_relay():
             )
         ), code=307
     )
-
-
-@relay.route("/config/activate/<string:relay_id>")
-def activate_relay(relay_id):
-    relays[relay_id].active = True
-    relays.save()
-    flash("Relay " + relays[relay_id].name + " is now set as active.")
-    return redirect(url_for(".list_relays"))
-
-
-@relay.route("/config/deactivate/<string:relay_id>")
-def deactivate_relay(relay_id):
-    relays[relay_id].active = False
-    relays.save()
-    flash(
-        "Relay " + relays[relay_id].name + " is now set as inactive."
-    )
-    return redirect(url_for(".list_relays"))
 
 
 @relay.route("/config/edit/<string:relay_id>/", methods=(["GET", "POST"]))
@@ -367,7 +351,7 @@ def edit_relay(relay_id):
         relays[relay_id] = relay
         new_board[relay.index] = relay
         flash("Updated relay " + relay.name + " .")
-        return redirect(url_for(".list_relays"))
+        return redirect(url_for(".index"))
     return render_template(
         "edit.html",
         title="edit relay configuration",
@@ -396,28 +380,20 @@ def edit_relay(relay_id):
 
 
 @relay.route("/config/delete/<string:relay_id>")
-def delete_relay(relay_id):
-    if relay_id in relays.keys():
-        flash(
-            " ".join(
-                [
-                    "Relay",
-                    relays[str(relay_id)].name,
-                    "deleted.",
-                ]
-            ),
-            "success",
-        )
-        del relays[relay_id]
-    else:
-        flash(
-            " ".join(
-                [
-                    "relay id",
-                    str(relay_id),
-                    "not found.",
-                ]
-            ),
-            "caution",
-        )
-    return redirect(url_for(".list_relays"))
+@redirected()
+def delete(relay_id):
+    del relays[relay_id]
+
+
+@relay.route("/config/activate/<string:relay_id>")
+@redirected()
+def activate(relay_id):
+    relays[relay_id].active = True
+    relays.save()
+
+
+@relay.route("/config/deactivate/<string:relay_id>")
+@redirected()
+def deactivate(relay_id):
+    relays[relay_id].active = False
+    relays.save()

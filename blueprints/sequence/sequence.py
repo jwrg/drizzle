@@ -18,15 +18,17 @@ with current_app.app_context():
     from util.sequencer import Sequor, Sequitur, Sequencer
     from util.form import SequiturForm
     from util.relay import Baton
+    from util.redirected import redirected
     relays = Baton()
     sequences = Sequencer()
 sequence = Blueprint("sequence", __name__, url_prefix="/sequence")
 
 fields = ["name", "description", "sequence"]
+redirected = redirected(sequences, "sequence", ".index")
 
 
 @sequence.route("/")
-def list_sequences():
+def index():
     return render_template(
         "list.html",
         allow_create=True,
@@ -51,19 +53,19 @@ def list_sequences():
                 },
                 "actions": {
                     "inactive": {
-                        "run": {
-                            "name": "run".capitalize(),
-                            "endpoint": ".run_sequence",
+                        "start": {
+                            "name": "start".capitalize(),
+                            "endpoint": ".start",
                             "args": {"sequence_id": id},
                         },
                         "edit": {
                             "name": "edit".capitalize(),
-                            "endpoint": ".edit_sequence",
+                            "endpoint": ".edit",
                             "args": {"sequence_id": id},
                         },
                         "delete": {
                             "name": "delete".capitalize(),
-                            "endpoint": ".delete_sequence",
+                            "endpoint": ".delete",
                             "args": {"sequence_id": id},
                             "confirm": ' '.join([
                                 "Are you sure?",
@@ -76,7 +78,7 @@ def list_sequences():
                     "active": {
                         "stop": {
                             "name": "stop".capitalize(),
-                            "endpoint": ".stop_sequence",
+                            "endpoint": ".stop",
                             "args": {"sequence_id": id},
                         },
                     },
@@ -90,65 +92,11 @@ def list_sequences():
     )
 
 
-@sequence.route("/run/<string:sequence_id>/")
-def run_sequence(sequence_id):
-    if sequence_id in sequences.keys():
-        sequences[sequence_id].start()
-        flash(
-            " ".join(
-                [
-                    "Sequence",
-                    sequences[str(sequence_id)].name,
-                    "started.",
-                ]
-            ),
-            "success",
-        )
-    else:
-        flash(
-            " ".join(
-                [
-                    "Sequence id",
-                    str(sequence_id),
-                    "not found.",
-                ]
-            )
-        )
-    return redirect(url_for(".list_sequences"))
-
-
-@sequence.route("/stop/<string:sequence_id>/")
-def stop_sequence(sequence_id: str):
-    if sequence_id in sequences.keys():
-        sequences[sequence_id].stop()
-        flash(
-            " ".join(
-                [
-                    "Sequence",
-                    sequences[str(sequence_id)].name,
-                    "stopped.",
-                ]
-            ),
-            "success",
-        )
-    else:
-        flash(
-            " ".join(
-                [
-                    "Sequence id",
-                    str(sequence_id),
-                    "not found.",
-                ]
-            )
-        )
-    return redirect(url_for(".list_sequences"))
-
-
 @sequence.route("/new/", methods=("GET", "POST"))
-def new_sequence():
+def new():
     return redirect(
         url_for(
-            ".edit_sequence", sequence_id=''.join(
+            ".edit", sequence_id=''.join(
                 choices(ascii_lowercase + digits, k=5)
             )
         ), code=307
@@ -156,7 +104,7 @@ def new_sequence():
 
 
 @sequence.route("/edit/<string:sequence_id>/", methods=("GET", "POST"))
-def edit_sequence(sequence_id):
+def edit(sequence_id):
     seq = sequences[sequence_id] if sequence_id in sequences.keys(
     ) else Sequitur(
         **{
@@ -186,7 +134,7 @@ def edit_sequence(sequence_id):
             sequor.relay = relays[sequor.relay]
         sequences[sequence_id] = seq
         flash("Updated sequence " + seq.name, "success")
-        return redirect(url_for(".list_sequences"))
+        return redirect(url_for(".index"))
     return render_template(
         "edit.html",
         title="edit sequence",
@@ -206,28 +154,18 @@ def edit_sequence(sequence_id):
 
 
 @sequence.route("/delete/<string:sequence_id>/")
-def delete_sequence(sequence_id):
-    if sequence_id in sequences.keys():
-        flash(
-            " ".join(
-                [
-                    "Sequence",
-                    sequences[str(sequence_id)].name,
-                    "deleted.",
-                ]
-            ),
-            "success",
-        )
-        del sequences[sequence_id]
-    else:
-        flash(
-            " ".join(
-                [
-                    "Sequence id",
-                    str(sequence_id),
-                    "not found.",
-                ]
-            ),
-            "caution",
-        )
-    return redirect(url_for(".list_sequences"))
+@redirected()
+def delete(sequence_id):
+    del sequences[sequence_id]
+
+
+@sequence.route("/start/<string:sequence_id>/")
+@redirected()
+def start(sequence_id):
+    sequences[sequence_id].start()
+
+
+@sequence.route("/stop/<string:sequence_id>/")
+@redirected()
+def stop(sequence_id: str):
+    sequences[sequence_id].stop()

@@ -1,9 +1,7 @@
 """
 Routes for configuring connected relay boards
 """
-from datetime import timedelta, datetime
 from random import choices
-from re import match
 from string import ascii_uppercase, ascii_lowercase, digits
 
 from flask import (
@@ -19,15 +17,17 @@ from flask import (
 with current_app.app_context():
     from util.board import Board, Holder
     from util.form import BoardForm
+    from util.redirected import redirected
     boards = Holder()
 
 board = Blueprint("board", __name__, url_prefix="/board")
 
 fields = ["name", "description", "type", "index", "active"]
+redirected = redirected(boards, "board", ".index")
 
 
 @board.route("/")
-def list_boards():
+def index():
     return render_template(
         "list.html",
         allow_create=True,
@@ -53,26 +53,26 @@ def list_boards():
                     "inactive": {
                         "activate": {
                             "name": "activate".capitalize(),
-                            "endpoint": ".activate_board",
+                            "endpoint": ".activate",
                             "args": {"board_id": id},
                         },
                     },
                     "active": {
                         "deactivate": {
                             "name": "deactivate".capitalize(),
-                            "endpoint": ".deactivate_board",
+                            "endpoint": ".deactivate",
                             "args": {"board_id": id},
                         },
                     },
                     "always": {
                         "edit": {
                             "name": "edit".capitalize(),
-                            "endpoint": ".edit_board",
+                            "endpoint": ".edit",
                             "args": {"board_id": id},
                         },
                         "delete": {
                             "name": "delete".capitalize(),
-                            "endpoint": ".delete_board",
+                            "endpoint": ".delete",
                             "args": {"board_id": id},
                             "confirm": ' '.join([
                                 "Are you sure?",
@@ -92,8 +92,19 @@ def list_boards():
     )
 
 
+@board.route("/new/")
+def new():
+    return redirect(
+        url_for(
+            ".edit", board_id=''.join(
+                choices(ascii_lowercase + digits, k=5)
+            )
+        ), code=307
+    )
+
+
 @board.route("/edit/<string:board_id>/", methods=(["GET", "POST"]))
-def edit_board(board_id: str):
+def edit(board_id: str):
     board = boards[board_id] if board_id in boards.keys(
     ) else Board(
         **{
@@ -133,7 +144,7 @@ def edit_board(board_id: str):
             form.populate_obj(board)
             boards[board_id] = board
             flash("Updated board " + board.name, "success")
-            return redirect(url_for(".list_boards"))
+            return redirect(url_for(".index"))
     return render_template(
         "edit.html",
         title="edit board configuration",
@@ -150,37 +161,21 @@ def edit_board(board_id: str):
     )
 
 
-@board.route("/new/")
-def new_board():
-    return redirect(
-        url_for(
-            ".edit_board", board_id=''.join(
-                choices(ascii_lowercase + digits, k=5)
-            )
-        ), code=307
-    )
-
-
 @board.route("/delete/<string:board_id>/")
-def delete_board(board_id: str):
-    flash("Deleted board " + boards[board_id].name)
+@redirected()
+def delete(board_id: str):
     del boards[board_id]
-    return redirect(url_for(".list_boards"))
 
 
 @board.route("/activate/<string:board_id>")
-def activate_board(board_id: str):
+@redirected()
+def activate(board_id: str):
     boards[board_id].active = True
     boards.save()
-    flash("Board " + boards[board_id].name + " is now set as active.")
-    return redirect(url_for(".list_boards"))
 
 
 @board.route("/deactivate/<string:board_id>")
-def deactivate_board(board_id: str):
+@redirected()
+def deactivate(board_id: str):
     boards[board_id].active = False
     boards.save()
-    flash(
-        "Board " + boards[board_id].name + " is now set as inactive."
-    )
-    return redirect(url_for(".list_boards"))

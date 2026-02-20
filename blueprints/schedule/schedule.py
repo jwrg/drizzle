@@ -18,11 +18,13 @@ with current_app.app_context():
     from util.schedule import Schedule, Job, Scheduler
     from util.sequencer import Sequencer
     from util.form import ScheduleForm
+    from util.redirected import redirected
     schedules = Scheduler()
     sequences = Sequencer()
 schedule = Blueprint("schedule", __name__, url_prefix="/schedule")
 
 fields = ["name", "description", "jobs"]
+redirected = redirected(schedules, "schedule", ".index")
 
 weekdays = {
     0: "Sunday",
@@ -36,7 +38,7 @@ weekdays = {
 
 
 @schedule.route("/")
-def list_schedules():
+def index():
     return render_template(
         "list.html",
         allow_create=True,
@@ -67,17 +69,17 @@ def list_schedules():
                     "inactive": {
                         "activate": {
                             "name": "activate".capitalize(),
-                            "endpoint": ".activate_schedule",
+                            "endpoint": ".activate",
                             "args": {"schedule_id": id},
                         },
                         "edit": {
                             "name": "edit".capitalize(),
-                            "endpoint": ".edit_schedule",
+                            "endpoint": ".edit",
                             "args": {"schedule_id": id},
                         },
                         "delete": {
                             "name": "delete".capitalize(),
-                            "endpoint": ".delete_schedule",
+                            "endpoint": ".delete",
                             "args": {"schedule_id": id},
                             "confirm": ' '.join([
                                 "Are you sure?",
@@ -90,7 +92,7 @@ def list_schedules():
                     "active": {
                         "deactivate": {
                             "name": "deactivate".capitalize(),
-                            "endpoint": ".deactivate_schedule",
+                            "endpoint": ".deactivate",
                             "args": {"schedule_id": id},
                         },
                     },
@@ -104,69 +106,11 @@ def list_schedules():
     )
 
 
-@schedule.route("/activate/<string:schedule_id>/")
-def activate_schedule(schedule_id):
-    if schedule_id in schedules.keys():
-        flash(
-            " ".join(
-                [
-                    "Schedule",
-                    schedules[str(schedule_id)].name,
-                    "set as active.",
-                ]
-            ),
-            "success",
-        )
-        schedules[schedule_id].on()
-        schedules.save()
-    else:
-        flash(
-            " ".join(
-                [
-                    "Schedule id",
-                    str(schedule_id),
-                    "not found.",
-                ]
-            ),
-            "caution",
-        )
-    return redirect(url_for(".list_schedules"))
-
-
-@schedule.route("/deactivate/<string:schedule_id>/")
-def deactivate_schedule(schedule_id):
-    if schedule_id in schedules.keys():
-        flash(
-            " ".join(
-                [
-                    "Schedule",
-                    schedules[str(schedule_id)].name,
-                    "set as inactive.",
-                ]
-            ),
-            "success",
-        )
-        schedules[schedule_id].off()
-        schedules.save()
-    else:
-        flash(
-            " ".join(
-                [
-                    "Schedule id",
-                    str(schedule_id),
-                    "not found.",
-                ]
-            ),
-            "caution",
-        )
-    return redirect(url_for(".list_schedules"))
-
-
 @schedule.route("/new/", methods=("GET", "POST"))
-def new_schedule():
+def new():
     return redirect(
         url_for(
-            ".edit_schedule", schedule_id=''.join(
+            ".edit", schedule_id=''.join(
                 choices(ascii_lowercase + digits, k=5)
             )
         ), code=307
@@ -174,7 +118,7 @@ def new_schedule():
 
 
 @schedule.route("/edit/<string:schedule_id>/", methods=("GET", "POST"))
-def edit_schedule(schedule_id):
+def edit(schedule_id):
     schedule = schedules[schedule_id] if schedule_id in schedules.keys(
     ) else Schedule(
         **{
@@ -209,7 +153,7 @@ def edit_schedule(schedule_id):
                 job.sequence = sequences[job.sequence]
             schedules[schedule_id] = schedule
             flash("Updated schedule " + schedule.name, "success")
-            return redirect(url_for(".list_schedules"))
+            return redirect(url_for(".index"))
     return render_template(
         "edit.html",
         id=str(schedule_id),
@@ -228,28 +172,20 @@ def edit_schedule(schedule_id):
 
 
 @schedule.route("/delete/<string:schedule_id>/")
-def delete_schedule(schedule_id):
-    if schedule_id in schedules.keys():
-        flash(
-            " ".join(
-                [
-                    "Schedule",
-                    schedules[str(schedule_id)].name,
-                    "deleted.",
-                ]
-            ),
-            "success",
-        )
-        del schedules[schedule_id]
-    else:
-        flash(
-            " ".join(
-                [
-                    "Schedule id",
-                    str(schedule_id),
-                    "not found.",
-                ]
-            ),
-            "caution",
-        )
-    return redirect(url_for(".list_schedules"))
+@redirected()
+def delete(schedule_id):
+    del schedules[schedule_id]
+
+
+@schedule.route("/activate/<string:schedule_id>/")
+@redirected()
+def activate(schedule_id):
+    schedules[schedule_id].on()
+    schedules.save()
+
+
+@schedule.route("/deactivate/<string:schedule_id>/")
+@redirected()
+def deactivate(schedule_id):
+    schedules[schedule_id].off()
+    schedules.save()
