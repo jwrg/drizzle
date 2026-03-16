@@ -354,10 +354,11 @@ def edit_relay(relay_id):
             for r in relays.values()
             if r is not relay
         ))
-    if request.method == "POST" and not form.validate_on_submit():
+    form_is_validated = form.validate_on_submit()
+    if request.method == "POST" and not form_is_validated:
         flash("Form failed to validate")
         flash(form.errors)
-    elif request.method == "POST" and form.validate_on_submit():
+    elif request.method == "POST" and form_is_validated:
         old_board = relay.board
         new_board = boards[form.board.data]
         del new_board[relay.index]
