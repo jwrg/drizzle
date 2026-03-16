@@ -42,7 +42,14 @@
     <main id="messages" class="gradient">
       <ul id="messages" class="messages">
         {%- for category, message in messages %}
+          {%- if category != 'append'%}
         <li class="{{ category }}">{{ message }}</li>
+          {%- endif %}
+        {%- endfor %}
+        {%- for category, message in messages %}
+          {%- if category == 'append'%}
+        <li class="{{ category }}">{{ message }}</li>
+          {%- endif %}
         {%- endfor %}
       </ul>
     </main>

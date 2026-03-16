@@ -283,22 +283,28 @@ def edit_relay(relay_id):
                 "Dependency list must not contain duplicate relays."
             )
 
-        def detect_cycle(target, current=None, visited=[]):
+        def detect_cycle(target, current=None, visited=None):
             if target == current:
                 raise ValidationError("Cyclic dependency graph detected")
-            if current is None:
+            if current is None and visited is None:
+                visited = list()
                 for d in [
                     d.relay.data for d in field.entries if d.relay.data != '0'
                 ]:
-                    detect_cycle(target, d, [target])
+                    if d not in visited:
+                        visited.append(d)
+                        visited = detect_cycle(target, d, visited)
             else:
                 for d in relays[current].requires:
                     if d.relay.id not in visited:
-                        visited += d.relay.id
+                        visited.append(d.relay.id)
                         visited = detect_cycle(target, d.relay.id, visited)
             return visited
         if relay_id in relays.keys():
-            detect_cycle(relay_id)
+            dep_graph_order = len(detect_cycle(relay_id))
+            if dep_graph_order > 0:
+                flash("Dependency graph order: " +
+                      str(dep_graph_order), "append")
 
     class EditRelayForm(RelayForm):
         index = SelectField('Index', coerce=int, validators=[validate_index])

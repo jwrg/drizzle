@@ -247,7 +247,8 @@ p.describe {
 }
 
 .append {
-  font-size: 24pt;
+  color: grey;
+  font-size: smaller;
   text-align: center;
 }
 
