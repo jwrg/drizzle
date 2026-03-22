@@ -13,11 +13,13 @@ from flask import (
     request,
     url_for,
 )
+from wtforms import FieldList, FormField
+from wtforms.validators import ValidationError
 
 with current_app.app_context():
     from util.schedule import Schedule, Job, Scheduler
     from util.sequencer import Sequencer
-    from util.form import ScheduleForm
+    from util.form import FixtureForm, ScheduleForm
     from util.redirected import redirected
     schedules = Scheduler()
     sequences = Sequencer()
@@ -119,6 +121,26 @@ def new():
 
 @schedule.route("/edit/<string:schedule_id>/", methods=("GET", "POST"))
 def edit(schedule_id):
+    def validate_concurrency(form, field):
+        if len(
+            [
+                str(d.weekday.data) + str(d.hour.data) + str(d.minute.data)
+                for d in field.entries
+            ]
+        ) > len(
+            {
+                str(d.weekday.data) + str(d.hour.data) + str(d.minute.data)
+                for d in field.entries
+            }
+        ):
+            raise ValidationError(
+                "Schedule must not contain concurrently scheduled jobs."
+            )
+
+    class EditScheduleForm(ScheduleForm):
+        jobs = FieldList(FormField(FixtureForm),
+                         validators=[validate_concurrency])
+
     schedule = schedules[schedule_id] if schedule_id in schedules.keys(
     ) else Schedule(
         **{
@@ -130,9 +152,11 @@ def edit(schedule_id):
         }
     )
     if request.method == "GET":
-        form = ScheduleForm(formdata=None, obj=schedule, meta={'csrf': False})
+        form = EditScheduleForm(
+            formdata=None, obj=schedule, meta={'csrf': False}
+        )
     else:
-        form = ScheduleForm(meta={'csrf': False})
+        form = EditScheduleForm(meta={'csrf': False})
     for entry in form.jobs.entries:
         entry.weekday.choices = [
             (id, weekday) for id, weekday in weekdays.items()
