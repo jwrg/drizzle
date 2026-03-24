@@ -361,9 +361,11 @@ def edit_relay(relay_id):
     elif request.method == "POST" and form_is_validated:
         old_board = relay.board
         new_board = boards[form.board.data]
-        del new_board[relay.index]
-        if relay.index != 0:
-            del old_board[relay.index]
+        new_index = False
+        if old_board != new_board or relay.index != form.index.data:
+            new_index = True
+            if relay.index != 0:
+                del old_board[relay.index]
         while len(form.requires.entries) > len(relay.requires):
             relay.requires += [Dependency(None, 0)]
         form.populate_obj(relay)
@@ -373,7 +375,8 @@ def edit_relay(relay_id):
             if dep.relay != '0':
                 dep.relay = relays[dep.relay]
         relays[relay_id] = relay
-        new_board[relay.index] = relay
+        if new_index:
+            new_board[relay.index] = relay
         flash("Updated relay " + relay.name + " .")
         return redirect(url_for(".index"))
     return render_template(

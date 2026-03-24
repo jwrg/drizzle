@@ -56,7 +56,7 @@ class Board:
     def __len__(self):
         return len(self.get_valid_addresses()) - len(self.get_open_addresses())
 
-    def __setitem__(self, index: int, relay: Relay) -> bool:
+    def __setitem__(self, index: int, relay: Relay):
         if index not in self.get_open_addresses():
             Board.logger.debug(
                 " ".join(
@@ -71,7 +71,7 @@ class Board:
                     ]
                 )
             )
-            return False  # throw?
+            raise ValueError
         self.addresses[index - 1].relay = relay
         Board.logger.debug(
             " ".join(
@@ -85,9 +85,22 @@ class Board:
                 ]
             )
         )
-        return True
 
     def __delitem__(self, index: int) -> None:
+        if index in self.get_open_addresses():
+            Board.logger.debug(
+                " ".join(
+                    [
+                        "Board",
+                        str(self.name),
+                        "did not un-register a relay",
+                        "at address",
+                        str(index) + ";",
+                        "the address is not assigned."
+                    ]
+                )
+            )
+            raise ValueError
         self.addresses[index - 1].relay = None
         Board.logger.debug(
             " ".join(
