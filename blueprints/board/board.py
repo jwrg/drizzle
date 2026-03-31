@@ -18,12 +18,13 @@ with current_app.app_context():
     from util.board import Board, Holder
     from util.form import BoardForm
     from util.redirected import redirected
+    from util.template import filter_pluralize as pluralize
     boards = Holder()
 
 board = Blueprint("board", __name__, url_prefix="/board")
 
 fields = ["name", "description", "type", "index", "active"]
-redirected = redirected(boards, "board", ".index")
+redirected = redirected(boards, current_app.config["BOARD_NAME"], ".index")
 
 
 @board.route("/")
@@ -31,9 +32,9 @@ def index():
     return render_template(
         "list.html",
         allow_create=True,
-        data_headings=["relay", "address"],
+        data_headings=[current_app.config["RELAY_NAME"], "address"],
         data_name="connections",
-        subject="board",
+        subject=current_app.config["BOARD_NAME"],
         items={
             id: {
                 "fields": {
@@ -42,7 +43,7 @@ def index():
                 } | {
                     "connections": {
                         conn.relay.id: {
-                            "relay": conn.relay.name,
+                            current_app.config["RELAY_NAME"]: conn.relay.name,
                             "address": conn.index
                         }
                         for conn in board.addresses
@@ -76,11 +77,12 @@ def index():
                             "args": {"board_id": id},
                             "confirm": ' '.join([
                                 "Are you sure?",
-                                "Deleting board",
+                                "Deleting",
+                                current_app.config["BOARD_NAME"],
                                 board.name,
-                                "will also delete all",
-                                "the relays listed",
-                                "as its connections."
+                                "will also delete all the",
+                                pluralize(current_app.config["RELAY_NAME"]),
+                                "listed as its connections."
                             ]),
                         }
                     },
@@ -110,8 +112,13 @@ def edit(board_id: str):
         **{
             "id": board_id
         } | {
-            "name": "New Relay Board " + ''.join(choices(ascii_uppercase, k=5)),
-            "description": "A relay board on a raspberry pi",
+            "name": ' '.join(
+                [
+                    current_app.config["BOARD_NAME"],
+                    ''.join(choices(ascii_uppercase, k=5)),
+                ]
+            ),
+            "description": "A " + current_app.config["BOARD_NAME"],
             "index": min(
                 [
                     x for x in range(0, 8)
@@ -143,19 +150,28 @@ def edit(board_id: str):
         else:
             form.populate_obj(board)
             boards[board_id] = board
-            flash("Updated board " + board.name, "success")
+            flash(
+                ' '.join(
+                    [
+                        "Updated",
+                        current_app.config["BOARD_NAME"],
+                        board.name,
+                    ]
+                ), "success"
+            )
             return redirect(url_for(".index"))
     return render_template(
         "edit.html",
-        title="edit board configuration",
+        title="edit " + current_app.config["BOARD_NAME"],
         describe=" ".join(
             [
-                "change the settings for board",
+                "Change settings for",
+                current_app.config["BOARD_NAME"],
                 board.name,
                 "in the fields below."
             ]
         ),
-        subject="board",
+        subject=current_app.config["BOARD_NAME"],
         fields=fields,
         form=form,
     )

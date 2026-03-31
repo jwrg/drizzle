@@ -1,22 +1,10 @@
 from functools import wraps
 from flask import flash, redirect, url_for
 from werkzeug.exceptions import NotFound
-
-
-def simple_past(verb: str):
-    if (
-        verb[-1] in ['b', 'd', 'm', 'n', 'p'] and
-        verb[-2] != verb[-1]
-    ) or (
-        verb[-1] == 'g' and
-        verb[-2:-1] != "ng"
-    ):
-        verb += verb[-1] + "ed"
-    elif verb[-1] == 'e':
-        verb += 'd'
-    else:
-        verb += "ed"
-    return verb
+from util.template import (
+    filter_capitalize_all as capitalize,
+    filter_simple_past as simple_past
+)
 
 
 def redirected(collection, item_name, default_route):
@@ -39,7 +27,7 @@ def redirected(collection, item_name, default_route):
                 flash(
                     " ".join(
                         [
-                            item_name.capitalize(),
+                            capitalize(item_name),
                             obj_name,
                             simple_past(func.__name__) + '.',
                         ]

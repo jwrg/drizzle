@@ -22,6 +22,7 @@ with current_app.app_context():
     from util.relay import Baton, Relay, Dependency
     from util.form import RelayForm, DependencyForm
     from util.redirected import redirected
+    from util.template import filter_pluralize as pluralize
     relays = Baton()
     boards = Holder()
 
@@ -33,7 +34,7 @@ fields = [
     "board", "index"
 ]
 mappings = ["requires"]
-redirected = redirected(relays, "relay", ".index")
+redirected = redirected(relays, current_app.config["RELAY_NAME"], ".index")
 
 
 @relay.route("/")
@@ -74,7 +75,8 @@ def disable_relay(relay_id):
         flash(
             " ".join(
                 [
-                    "Relay", relays[relay_id].name,
+                    current_app.config["RELAY_NAME"].capitalize(),
+                    relays[relay_id].name,
                     "was turned off."
                 ]
             ),
@@ -97,22 +99,21 @@ def enable_relay(relay_id):
     """
     API command that activates a relay specified by id for a given number of minutes
     """
-    with current_app.app_context():
-        max_relays = current_app.config["MAX_CONCURRENT"]
+    max_relays = current_app.config["MAX_CONCURRENT"]
     interval = int(request.form["minutes"])
     if interval <= relays[relay_id].max_time:
         if len(relays.state()) >= max_relays:
             flash(
                 " ".join(
                     [
-                        "Relay",
+                        current_app.config["RELAY_NAME"].capitalize(),
                         relays[relay_id].name,
                         "was not turned on for",
                         str(interval),
                         "minute." if interval == 1 else "minutes.",
-                        "Maximum number of active relays (",
-                        str(max_relays),
-                        ") reached."
+                        "Maximum number of active",
+                        pluralize(current_app.config["RELAY_NAME"]),
+                        "(" + str(max_relays) + ") reached."
                     ]
                 ),
                 "error",
@@ -122,7 +123,7 @@ def enable_relay(relay_id):
             flash(
                 " ".join(
                     [
-                        "Relay",
+                        current_app.config["RELAY_NAME"].capitalize(),
                         relays[relay_id].name,
                         "was turned on for",
                         str(interval),
@@ -144,13 +145,14 @@ def enable_relay(relay_id):
         flash(
             " ".join(
                 [
-                    "Relay",
+                    current_app.config["RELAY_NAME"].capitalize(),
                     relays[relay_id].name,
                     "was not turned on for",
                     str(interval),
                     "minute." if interval == 1 else "minutes.",
-                    "This exceeds the max interval set for this relay (",
-                    str(relays[relay_id].max_time),
+                    "This exceeds the max interval set for this",
+                    current_app.config["RELAY_NAME"],
+                    "(" + str(relays[relay_id].max_time),
                     "minute)." if relays[relay_id].max_time == 1 else "minutes)."
                 ]
             ),
@@ -162,26 +164,28 @@ def enable_relay(relay_id):
 @relay.route("/config/")
 def index():
     fields = ["name", "description", "address",
-              "max_time", "default_time", "visible", "requires"]
+              "max_time", "default_time", "visible", "dependencies"]
     return render_template(
         "list.html",
         allow_create=True,
-        data_headings=["relay", "spin_up"],
-        data_name="requires",
-        subject="relay",
+        data_headings=[current_app.config["RELAY_NAME"], "spin_up"],
+        data_name="dependencies",
+        subject=current_app.config["RELAY_NAME"],
         items={
             id: {
                 "fields": {
                     field: relay.__getattribute__(field)
                     for field in fields
-                    if field not in ["requires", "address"]
+                    if field not in ["dependencies", "address"]
                 } | {
-                    "board": relay.board.name,
+                    current_app.config["BOARD_NAME"]: relay.board.name,
                     "address": relay.index
                 } | {
-                    "requires": {
-                        dep.relay.id: {"relay": dep.relay.name,
-                                       "spin_up": dep.spin_up}
+                    "dependencies": {
+                        dep.relay.id: {
+                            current_app.config["RELAY_NAME"]: dep.relay.name,
+                            "spin_up": dep.spin_up
+                        }
                         for dep in relay.requires
                         if relay.requires != []
                     }
@@ -213,10 +217,12 @@ def index():
                             "args": {"relay_id": id},
                             "confirm": ' '.join([
                                 "Are you sure?",
-                                "Deleting relay",
+                                "Deleting",
+                                current_app.config["RELAY_NAME"],
                                 relay.name,
                                 "will delete all",
-                                "information on this relay",
+                                "information on this",
+                                current_app.config["RELAY_NAME"],
                                 "including its list of dependencies."
                             ]),
                         }
@@ -259,9 +265,11 @@ def edit_relay(relay_id):
                     [
                         "Address with index",
                         str(field.data),
-                        "on board",
+                        "on",
+                        current_app.config["BOARD_NAME"],
                         board.name,
-                        "is already assigned to relay",
+                        "is already assigned to",
+                        current_app.config["RELAY_NAME"],
                         board[form.index.data].name,
                     ]
                 )
@@ -280,7 +288,12 @@ def edit_relay(relay_id):
             }
         ):
             raise ValidationError(
-                "Dependency list must not contain duplicate relays."
+                ''.join(
+                    [
+                        "Dependency list must not contain duplicate ",
+                        pluralize(current_app.config["RELAY_NAME"]),
+                    ]
+                )
             )
 
         def detect_cycle(target, current=None, visited=None):
@@ -303,8 +316,9 @@ def edit_relay(relay_id):
         if relay_id in relays.keys():
             dep_graph_order = len(detect_cycle(relay_id))
             if dep_graph_order > 0:
-                flash("Dependency graph order: " +
-                      str(dep_graph_order), "append")
+                flash(
+                    "Dependency graph order: " + str(dep_graph_order), "append"
+                )
 
     class EditRelayForm(RelayForm):
         index = SelectField('Index', coerce=int, validators=[validate_index])
@@ -314,10 +328,13 @@ def edit_relay(relay_id):
     relay = relays[relay_id] if relay_id in relays.keys() else Relay(
         **{
             "id": relay_id,
-        } | {
-
-            "name": "New Relay " + ''.join(choices(ascii_uppercase, k=5)),
-            "description": "A relay",
+            "name": ' '.join(
+                [
+                    current_app.config["RELAY_NAME"].capitalize(),
+                    ''.join(choices(ascii_uppercase, k=5)),
+                ]
+            ),
+            "description": "A " + current_app.config["RELAY_NAME"],
             "active": True,
             "visible": True,
             "default_time": 10,
@@ -377,19 +394,28 @@ def edit_relay(relay_id):
         relays[relay_id] = relay
         if new_index:
             new_board[relay.index] = relay
-        flash("Updated relay " + relay.name + " .")
+        flash(
+            ' '.join(
+                [
+                    "Updated",
+                    current_app.config["RELAY_NAME"],
+                    relay.name + '.',
+                ]
+            ), "success"
+        )
         return redirect(url_for(".index"))
     return render_template(
         "edit.html",
-        title="edit relay configuration",
+        title="edit " + current_app.config["RELAY_NAME"],
         describe=" ".join(
             [
-                "change settings for relay",
+                "Change settings for",
+                current_app.config["RELAY_NAME"],
                 relay.name,
                 "and its dependencies in the fields below."
             ]
         ),
-        subject="relay",
+        subject=current_app.config["RELAY_NAME"],
         fields=[
             "name",
             "description",

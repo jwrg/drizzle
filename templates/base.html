@@ -15,16 +15,16 @@
             <a href="{{ url_for('index') }}">Drizzle</a>
           </li>
           <li{% if subject == 'board' %} class="current"{% endif %}>
-            <a href="{{ url_for('board.index') }}">Boards</a>
+            <a href="{{ url_for('board.index') }}">{{ config.BOARD_NAME|capitalize|pluralize }}</a>
           </li>
           <li{% if subject == 'time' or subject == 'relay' %} class="current"{% endif %}>
-            <a href="{{ url_for('relay.index') }}">Relays</a>
+            <a href="{{ url_for('relay.index') }}">{{ config.RELAY_NAME|capitalize|pluralize }}</a>
           </li>
           <li{% if subject == 'sequence' %} class="current"{% endif %}>
-            <a href="{{ url_for('sequence.index') }}">Sequences</a>
+            <a href="{{ url_for('sequence.index') }}">{{ config.SEQUITUR_NAME|capitalize|pluralize }}</a>
           </li>
           <li{% if subject == 'schedule' %} class="current"{% endif %}>
-            <a href="{{ url_for('schedule.index') }}">Schedules</a>
+            <a href="{{ url_for('schedule.index') }}">{{ config.SCHEDULE_NAME|capitalize|pluralize }}</a>
           </li>
           <li{% if subject == 'config' %} class="current"{% endif %}>
             <a class="icon" href="{{ url_for('relay.index') }}">

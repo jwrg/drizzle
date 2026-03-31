@@ -13,7 +13,7 @@ from flask import (
     request,
     url_for,
 )
-from wtforms import FieldList, FormField
+from wtforms import FieldList, FormField, TimeField
 from wtforms.validators import ValidationError
 
 with current_app.app_context():
@@ -26,7 +26,11 @@ with current_app.app_context():
 schedule = Blueprint("schedule", __name__, url_prefix="/schedule")
 
 fields = ["name", "description", "jobs"]
-redirected = redirected(schedules, "schedule", ".index")
+redirected = redirected(
+    schedules,
+    current_app.config["SCHEDULE_NAME"],
+    ".index"
+)
 
 weekdays = {
     0: "Sunday",
@@ -45,12 +49,12 @@ def index():
         "list.html",
         allow_create=True,
         data_headings=[
-            "sequence",
+            current_app.config["SEQUITUR_NAME"],
             "weekday",
             "time",
         ],
         data_name="jobs",
-        subject="schedule",
+        subject=current_app.config["SCHEDULE_NAME"],
         items={
             id: {
                 "fields": {
@@ -60,7 +64,7 @@ def index():
                 } | {
                     "jobs": {
                         ordinal: {
-                            "sequence": job.sequence.name,
+                            current_app.config["SEQUITUR_NAME"]: job.sequence.name,
                             "weekday": weekdays[job.weekday],
                             "time": str(job.hour) + ":" + str(job.minute)
                         }
@@ -85,7 +89,8 @@ def index():
                             "args": {"schedule_id": id},
                             "confirm": ' '.join([
                                 "Are you sure?",
-                                "Deleting schedule",
+                                "Deleting",
+                                current_app.config["SCHEDULE_NAME"],
                                 schedule.name,
                                 "cannot be undone."
                             ]),
@@ -138,15 +143,22 @@ def edit(schedule_id):
             )
 
     class EditScheduleForm(ScheduleForm):
-        jobs = FieldList(FormField(FixtureForm),
-                         validators=[validate_concurrency])
+        jobs = FieldList(
+            FormField(FixtureForm),
+            validators=[validate_concurrency]
+        )
 
     schedule = schedules[schedule_id] if schedule_id in schedules.keys(
     ) else Schedule(
         **{
             "id": schedule_id,
-            "name": "New Schedule" + ''.join(choices(ascii_uppercase, k=5)),
-            "description": "A new schedule of sequences",
+            "name": ' '.join(
+                [
+                    current_app.config["SCHEDULE_NAME"].capitalize(),
+                    ''.join(choices(ascii_uppercase, k=5)),
+                ]
+            ),
+            "description": "A " + current_app.config["SCHEDULE_NAME"],
             "active": False,
             "jobs": [Job(str(next(iter(sequences.values()))), 0, 0, 0)]
         }
@@ -176,20 +188,29 @@ def edit(schedule_id):
             for job in schedule.jobs:
                 job.sequence = sequences[job.sequence]
             schedules[schedule_id] = schedule
-            flash("Updated schedule " + schedule.name, "success")
+            flash(
+                ' '.join(
+                    [
+                        "Updated",
+                        current_app.config["SCHEDULE_NAME"],
+                        schedule.name + '.',
+                    ]
+                ), "success"
+            )
             return redirect(url_for(".index"))
     return render_template(
         "edit.html",
-        id=str(schedule_id),
-        title="edit schedule configuration",
+        title="edit " + current_app.config["SCHEDULE_NAME"],
         describe=" ".join(
             [
-                "change the settings for schedule",
+                "Change the settings, and",
+                "change, move, add, delete entries for",
+                current_app.config["SCHEDULE_NAME"],
                 schedule.name,
                 "in the fields below."
             ]
         ),
-        subject="schedule",
+        subject=current_app.config["SCHEDULE_NAME"],
         fields=fields,
         form=form,
     )

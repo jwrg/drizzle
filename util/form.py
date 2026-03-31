@@ -1,3 +1,4 @@
+from flask import current_app
 from flask_wtf import FlaskForm
 from wtforms import (
     Form,
@@ -48,13 +49,13 @@ class BoardForm(BasicForm):
 
 
 class DependencyForm(Form):
-    relay = SelectField('Relay')
+    relay = SelectField(current_app.config["RELAY_NAME"].capitalize())
     spin_up = IntegerField('Spin up', validators=[
                            validators.NumberRange(min=0, max=5)])
 
 
 class RelayForm(BasicForm):
-    board = SelectField('Board')
+    board = SelectField(current_app.config["BOARD_NAME"].capitalize())
     index = SelectField('Index', coerce=int)
     max_time = IntegerField('Max time', validators=[
                             validators.NumberRange(min=1, max=60)])
@@ -66,7 +67,7 @@ class RelayForm(BasicForm):
 
 
 class SequorForm(Form):
-    relay = SelectField('Relay')
+    relay = SelectField(current_app.config["RELAY_NAME"].capitalize())
     minutes = IntegerField('Minutes', validators=[
                            validators.NumberRange(min=1, max=60)])
 
@@ -76,7 +77,7 @@ class SequiturForm(BasicForm):
 
 
 class FixtureForm(Form):
-    sequence = SelectField('Sequence')
+    sequence = SelectField(current_app.config["SEQUITUR_NAME"].capitalize())
     weekday = SelectField('Weekday', coerce=int)
     hour = IntegerField('Hour', validators=[
         validators.NumberRange(min=1, max=24)])
