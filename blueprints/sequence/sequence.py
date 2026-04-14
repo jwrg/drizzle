@@ -56,7 +56,7 @@ def index():
                     }
                 },
                 "actions": {
-                    "inactive": {
+                    "stopped": {
                         "start": {
                             "name": "start".capitalize(),
                             "endpoint": ".start",
@@ -79,7 +79,7 @@ def index():
                             ]),
                         }
                     },
-                    "active": {
+                    "running": {
                         "stop": {
                             "name": "stop".capitalize(),
                             "endpoint": ".stop",
@@ -89,7 +89,8 @@ def index():
                     "always": {
                     },
                 },
-                "active": seq.active
+                "running": seq.running,
+                "active": True
             }
             for id, seq in sequences.items()
         }

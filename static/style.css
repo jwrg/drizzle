@@ -68,10 +68,17 @@ li.name::after {
   margin-bottom: 0.25ex;
 }
 
-div.active ul.entry li.name::before {
+div.inactive ul.entry li.name::before {
   display: inline-block;
   margin-right: 0.5ex;
-  content: "(Active) ";
+  content: "(Not Active) ";
+}
+
+
+div.running ul.entry li.name::before {
+  display: inline-block;
+  margin-right: 0.5ex;
+  content: "(Running) ";
 }
 
 a {
@@ -264,7 +271,7 @@ p.describe {
   color: navy;
 }
 
-.activate .run, .success, .green {
+.start, .activate, .run, .success, .green {
   color: green;
 }
 
@@ -273,7 +280,7 @@ p.describe {
 }
 
 .inactive {
-  display: none;
+  color: grey;
 }
 
 /* Inputs */

@@ -205,7 +205,7 @@ def index():
                             "args": {"relay_id": id},
                         },
                     },
-                    "always": {
+                    "stopped": {
                         "edit": {
                             "name": "edit".capitalize(),
                             "endpoint": ".edit_relay",
@@ -227,8 +227,10 @@ def index():
                             ]),
                         }
                     },
+                    "always": {},
                 },
-                "active": relay.active
+                "active": relay.active,
+                "running": relay.timer.is_set(),
             }
             for id, relay in {
                 connection.relay.id: connection.relay

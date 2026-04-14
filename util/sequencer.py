@@ -34,7 +34,7 @@ class Sequitur:
         self.name = name
         self.description = description
         self.sequence = sequence
-        self.active = False
+        self.running = False
         self.current = None
 
     def start(self):
@@ -44,7 +44,7 @@ class Sequitur:
                 self.stop()
                 return
             else:
-                self.active = True
+                self.running = True
                 if self.current is not None:
                     self.current.off()
                 self.current = self.sequence[pos].relay
@@ -57,7 +57,7 @@ class Sequitur:
     def stop(self):
         if self.current is not None:
             self.current.off()
-        self.active = False
+        self.running = False
         self.current = None
 
 
