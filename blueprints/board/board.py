@@ -52,18 +52,18 @@ def index():
                 },
                 "actions": {
                     "inactive": {
-                        "activate": {
-                            "name": "activate".capitalize(),
-                            "endpoint": ".activate",
-                            "args": {"board_id": id},
-                        },
+                        # "activate": {
+                        #     "name": "activate".capitalize(),
+                        #     "endpoint": ".activate",
+                        #     "args": {"board_id": id},
+                        # },
                     },
                     "active": {
-                        "deactivate": {
-                            "name": "deactivate".capitalize(),
-                            "endpoint": ".deactivate",
-                            "args": {"board_id": id},
-                        },
+                        # "deactivate": {
+                        #     "name": "deactivate".capitalize(),
+                        #     "endpoint": ".deactivate",
+                        #     "args": {"board_id": id},
+                        # },
                     },
                     "always": {
                         "edit": {
