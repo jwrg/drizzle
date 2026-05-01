@@ -5,6 +5,7 @@ from wtforms import (
     FieldList,
     FormField,
     SelectField,
+    SelectMultipleField,
     BooleanField,
     IntegerField,
     StringField,
@@ -78,7 +79,7 @@ class SequiturForm(BasicForm):
 
 class FixtureForm(Form):
     sequence = SelectField(current_app.config["SEQUITUR_NAME"].capitalize())
-    weekday = SelectField('Weekday', coerce=int)
+    weekdays = SelectMultipleField('Weekdays', coerce=int)
     hour = IntegerField('Hour', validators=[
         validators.NumberRange(min=1, max=24)])
     minute = IntegerField('Minute', validators=[

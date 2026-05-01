@@ -50,7 +50,7 @@ def index():
         allow_create=True,
         data_headings=[
             current_app.config["SEQUITUR_NAME"],
-            "weekday",
+            "weekdays",
             "time",
         ],
         data_name="jobs",
@@ -65,7 +65,9 @@ def index():
                     "jobs": {
                         ordinal: {
                             current_app.config["SEQUITUR_NAME"]: job.sequence.name,
-                            "weekday": weekdays[job.weekday],
+                            "weekdays": ", ".join(
+                                weekdays[weekday] for weekday in job.weekdays
+                            ),
                             "time": str(job.hour) + ":" + str(job.minute)
                         }
                         for ordinal, job in enumerate(schedule.jobs)
@@ -129,13 +131,13 @@ def edit(schedule_id):
     def validate_concurrency(form, field):
         if len(
             [
-                str(d.weekday.data) + str(d.hour.data) + str(d.minute.data)
-                for d in field.entries
+                str(weekday.data) + str(d.hour.data) + str(d.minute.data)
+                for d in field.entries for weekday in d.weekdays
             ]
         ) > len(
             {
-                str(d.weekday.data) + str(d.hour.data) + str(d.minute.data)
-                for d in field.entries
+                str(weekday.data) + str(d.hour.data) + str(d.minute.data)
+                for d in field.entries for weekday in d.weekdays
             }
         ):
             raise ValidationError(
@@ -170,7 +172,7 @@ def edit(schedule_id):
     else:
         form = EditScheduleForm(meta={'csrf': False})
     for entry in form.jobs.entries:
-        entry.weekday.choices = [
+        entry.weekdays.choices = [
             (id, weekday) for id, weekday in weekdays.items()
         ]
         entry.sequence.choices = [

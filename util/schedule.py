@@ -24,12 +24,12 @@ class Job:
     def __init__(
         self,
         sequence: Sequitur,
-        weekday: int,
+        weekdays: list[int],
         hour: int,
         minute: int
     ) -> None:
         self.sequence = sequence
-        self.weekday = weekday
+        self.weekdays = weekdays
         self.hour = hour
         self.minute = minute
 
@@ -53,17 +53,22 @@ class Job:
 
     def remaining(self) -> timedelta:
         """
-        Return timedelta between now and the next run of this job
+        Return timedelta difference between now and the next run of this job
         """
         return self.upcoming() - datetime.now()
 
+    def today(self) -> datetime:
+        """
+        Return datetime for comparison for the beginning of today
+        """
+        return datetime.combine(date.today(), time())
+
     def upcoming(self) -> datetime:
         """
-        Return datetime when the next time tmessagehis job will run
+        Return datetime for when the next time this job will run
         """
-        today = datetime.combine(date.today(), time())
-        thisweek = today + timedelta(
-            days=self.weekday - (today.isoweekday() % 7),
+        thisweek = self.today() + timedelta(
+            days=self.weekday() - (self.today().isoweekday() % 7),
             hours=self.hour,
             minutes=self.minute,
         )
@@ -71,6 +76,26 @@ class Job:
             thisweek if thisweek > datetime.now()
             else thisweek + timedelta(days=7)
         )
+
+    def weekday(self) -> int:
+        """
+        Return weekday for when the next time this job will run (Sunday = 0)
+        """
+        today = date.today().isoweekday() % 7
+        later = (x for x in self.weekdays if x > today)
+        if today in self.weekdays:
+            index = self.weekdays.index(today)
+            if self.today() + timedelta(
+                hours=self.hour, minutes=self.minute
+            ) > datetime.now():
+                return today
+            else:
+                return self.weekdays[(index + 1) % len(self.weekdays)]
+        else:
+            try:
+                return next(later)
+            except StopIteration:
+                return self.weekdays[0]
 
 
 class Schedule:
@@ -140,9 +165,6 @@ class Schedule:
         )
 
     def next(self) -> None:
-        # """
-        # Run the next job
-        # """
         self.jobs[0].sequence.start()
         Schedule.logger.info(
             " ".join(
@@ -213,7 +235,7 @@ class Scheduler(PersistentMapping):
                 deque(
                     Job(
                         sequences[job["sequence"]],
-                        job["weekday"],
+                        job["weekdays"],
                         job["hour"],
                         job["minute"]
                     )
@@ -233,7 +255,7 @@ class Scheduler(PersistentMapping):
                 "jobs": [
                     {
                         "sequence": job.sequence.id,
-                        "weekday": job.weekday,
+                        "weekdays": job.weekdays,
                         "hour": job.hour,
                         "minute": job.minute
                     }
