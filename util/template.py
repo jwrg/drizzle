@@ -20,7 +20,9 @@ def filter_capitalize_all(phrase: str):
 def filter_pluralize(noun: str):
     if noun[-1] not in ['s', 'x', 'z']:
         return noun + 's'
-    return noun + 'es'
+    elif noun[-1] != 'y':
+        return noun + 'es'
+    return noun[:-1] + "ies"
 
 
 def filter_simple_past(verb: str):
