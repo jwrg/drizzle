@@ -10,6 +10,7 @@ from wtforms import (
     IntegerField,
     StringField,
     SubmitField,
+    TimeField,
     validators
 )
 from wtforms.widgets import html_params
@@ -80,10 +81,7 @@ class SequiturForm(BasicForm):
 class FixtureForm(Form):
     sequence = SelectField(current_app.config["SEQUITUR_NAME"].capitalize())
     weekdays = SelectMultipleField('Weekdays', coerce=int)
-    hour = IntegerField('Hour', validators=[
-        validators.NumberRange(min=1, max=24)])
-    minute = IntegerField('Minute', validators=[
-        validators.NumberRange(min=0, max=59)])
+    time = TimeField('Time')
 
 
 class ScheduleForm(BasicForm):

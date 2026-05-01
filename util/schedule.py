@@ -25,13 +25,11 @@ class Job:
         self,
         sequence: Sequitur,
         weekdays: list[int],
-        hour: int,
-        minute: int
+        time: time
     ) -> None:
         self.sequence = sequence
         self.weekdays = weekdays
-        self.hour = hour
-        self.minute = minute
+        self.time = time
 
     def __eq__(self, obj: Job) -> bool:
         return self.upcoming() == obj.upcoming()
@@ -69,8 +67,8 @@ class Job:
         """
         thisweek = self.today() + timedelta(
             days=self.weekday() - (self.today().isoweekday() % 7),
-            hours=self.hour,
-            minutes=self.minute,
+            hours=self.time.hour,
+            minutes=self.time.minute,
         )
         return (
             thisweek if thisweek > datetime.now()
@@ -86,7 +84,7 @@ class Job:
         if today in self.weekdays:
             index = self.weekdays.index(today)
             if self.today() + timedelta(
-                hours=self.hour, minutes=self.minute
+                hours=self.time.hour, minutes=self.time.minute
             ) > datetime.now():
                 return today
             else:
@@ -236,8 +234,7 @@ class Scheduler(PersistentMapping):
                     Job(
                         sequences[job["sequence"]],
                         job["weekdays"],
-                        job["hour"],
-                        job["minute"]
+                        time(hour=job["hour"], minute=job["minute"])
                     )
                     for job in schedule["jobs"]
                 ),
@@ -256,8 +253,8 @@ class Scheduler(PersistentMapping):
                     {
                         "sequence": job.sequence.id,
                         "weekdays": job.weekdays,
-                        "hour": job.hour,
-                        "minute": job.minute
+                        "hour": job.time.hour,
+                        "minute": job.time.minute
                     }
                     for job in list(schedule.jobs)
                 ]

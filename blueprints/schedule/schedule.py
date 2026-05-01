@@ -68,7 +68,13 @@ def index():
                             "weekdays": ", ".join(
                                 weekdays[weekday] for weekday in job.weekdays
                             ),
-                            "time": str(job.hour) + ":" + str(job.minute)
+                            "time": ':'.join([
+                                str(job.time.hour),
+                                str(job.time.minute),
+                            ]) if job.time.minute > 9 else ":0".join([
+                                str(job.time.hour),
+                                str(job.time.minute),
+                            ])
                         }
                         for ordinal, job in enumerate(schedule.jobs)
                     }
@@ -131,13 +137,15 @@ def edit(schedule_id):
     def validate_concurrency(form, field):
         if len(
             [
-                str(weekday.data) + str(d.hour.data) + str(d.minute.data)
-                for d in field.entries for weekday in d.weekdays
+                str(weekday) + str(d.time.data.hour) +
+                str(d.time.data.minute)
+                for d in field.entries for weekday in d.weekdays.data
             ]
         ) > len(
             {
-                str(weekday.data) + str(d.hour.data) + str(d.minute.data)
-                for d in field.entries for weekday in d.weekdays
+                str(weekday) + str(d.time.data.hour) +
+                str(d.time.data.minute)
+                for d in field.entries for weekday in d.weekdays.data
             }
         ):
             raise ValidationError(
