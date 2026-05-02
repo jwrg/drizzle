@@ -33,7 +33,7 @@ fields = [
     "visible", "default_time", "max_time",
     "board", "index"
 ]
-mappings = ["requires"]
+mappings = ["dependencies"]
 redirected = redirected(relays, current_app.config["RELAY_NAME"], ".index")
 
 
@@ -186,8 +186,8 @@ def index():
                             current_app.config["RELAY_NAME"]: dep.relay.name,
                             "spin_up": dep.spin_up
                         }
-                        for dep in relay.requires
-                        if relay.requires != []
+                        for dep in relay.dependencies
+                        if relay.dependencies != []
                     }
                 },
                 "actions": {
@@ -277,7 +277,7 @@ def edit_relay(relay_id):
                 )
             )
 
-    def validate_requires(form, field):
+    def validate_dependencies(form, field):
         if len(
             [
                 d.relay.data for d in field.entries
@@ -310,7 +310,7 @@ def edit_relay(relay_id):
                         visited.append(d)
                         visited = detect_cycle(target, d, visited)
             else:
-                for d in relays[current].requires:
+                for d in relays[current].dependencies:
                     if d.relay.id not in visited:
                         visited.append(d.relay.id)
                         visited = detect_cycle(target, d.relay.id, visited)
@@ -324,8 +324,8 @@ def edit_relay(relay_id):
 
     class EditRelayForm(RelayForm):
         index = SelectField('Index', coerce=int, validators=[validate_index])
-        requires = FieldList(FormField(DependencyForm),
-                             validators=[validate_requires])
+        dependencies = FieldList(FormField(DependencyForm),
+                                 validators=[validate_dependencies])
 
     relay = relays[relay_id] if relay_id in relays.keys() else Relay(
         **{
@@ -343,19 +343,19 @@ def edit_relay(relay_id):
             "max_time": 60,
             "board": 0,
             "index": 0,
-            "requires": [],
+            "dependencies": [],
         }
     )
 
     if request.method == "GET":
-        if len(relay.requires) == 0:
-            relay.requires += [Dependency(**{"relay": "0", "spin_up": 0})]
+        if len(relay.dependencies) == 0:
+            relay.dependencies += [Dependency(**{"relay": "0", "spin_up": 0})]
         form = EditRelayForm(
             formdata=None,
             obj=relay,
             meta={'csrf': False},
         )
-        relay.requires = [d for d in relay.requires if d.relay != '0']
+        relay.dependencies = [d for d in relay.dependencies if d.relay != '0']
     else:
         form = EditRelayForm(meta={'csrf': False})
     form.board.choices = [
@@ -365,7 +365,7 @@ def edit_relay(relay_id):
     form.index.choices = [
         (index, index) for index in range(1, 8)
     ]
-    for entry in form.requires.entries:
+    for entry in form.dependencies.entries:
         entry.relay.choices = [
             ('0', "Choose a dependency if required...")
         ] + sorted(list(
@@ -385,12 +385,12 @@ def edit_relay(relay_id):
             new_index = True
             if relay.index != 0:
                 del old_board[relay.index]
-        while len(form.requires.entries) > len(relay.requires):
-            relay.requires += [Dependency(None, 0)]
+        while len(form.dependencies.entries) > len(relay.dependencies):
+            relay.dependencies += [Dependency(None, 0)]
         form.populate_obj(relay)
-        relay.requires = [d for d in relay.requires if d.relay != '0']
+        relay.dependencies = [d for d in relay.dependencies if d.relay != '0']
         relay.board = boards[relay.board]
-        for dep in relay.requires:
+        for dep in relay.dependencies:
             if dep.relay != '0':
                 dep.relay = relays[dep.relay]
         relays[relay_id] = relay
@@ -427,7 +427,7 @@ def edit_relay(relay_id):
             "max_time",
             "board",
             "index",
-            "requires"
+            "dependencies"
         ],
         form=form,
         max_rows=len(relays)

@@ -42,7 +42,7 @@ class Relay:
         default_time: int,
         active: bool,
         visible: bool,
-        requires: list[Dependency] = None,
+        dependencies: list[Dependency] = None,
     ) -> None:
         self.id = id
         self.name = name
@@ -53,7 +53,7 @@ class Relay:
         self.default_time = default_time
         self.active = active
         self.visible = visible
-        self.requires = requires
+        self.dependencies = dependencies
         self.timer = Timmy(self.name)
         self.counter = 0
         self.mutex = Lock()
@@ -74,8 +74,8 @@ class Relay:
         """
         self.mutex.acquire()
         if self.counter == 0:
-            if self.requires is not None:
-                for dep in self.requires:
+            if self.dependencies is not None:
+                for dep in self.dependencies:
                     dep.relay.on()
                     sleep(dep.spin_up)
             relayON(self.board.index, self.index)
@@ -96,8 +96,8 @@ class Relay:
         self.mutex.acquire()
         self.counter -= 1
         if self.counter == 0:
-            if self.requires is not None:
-                for dep in self.requires:
+            if self.dependencies is not None:
+                for dep in self.dependencies:
                     dep.relay.off()
             relayOFF(self.board.index, self.index)
             self.timer.clear()
@@ -120,7 +120,7 @@ class Baton(PersistentMapping):
             relay.board[relay.index] = relay
 
     def __delitem__(self, key):
-        for dep in self.collection[key].requires:
+        for dep in self.collection[key].dependencies:
             del dep
         del self.collection[key].board[self.collection[key].index]
         super().__delitem__(key)
@@ -165,12 +165,12 @@ class Baton(PersistentMapping):
                             objects[dep["relay"]],
                             dep["spin_up"]
                         )
-                        for dep in relay["requires"]
+                        for dep in relay["dependencies"]
                     ]
                 )
                 for id, relay in collection.items()
                 if [
-                    dep for dep in relay["requires"]
+                    dep for dep in relay["dependencies"]
                     if dep["relay"] not in objects.keys()
                 ] == []
                 and id not in objects.keys()
@@ -193,12 +193,12 @@ class Baton(PersistentMapping):
                 "default_time": relay.default_time,
                 "active": relay.active,
                 "visible": relay.visible,
-                "requires": [
+                "dependencies": [
                     {
                         "relay": dep.relay.id,
                         "spin_up": dep.spin_up
                     }
-                    for dep in relay.requires
+                    for dep in relay.dependencies
                 ]
             }
             for id, relay in collection.items()

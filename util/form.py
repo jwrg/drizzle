@@ -65,7 +65,7 @@ class RelayForm(BasicForm):
                                 validators.NumberRange(min=1, max=60)])
     active = BooleanField('Active')
     visible = BooleanField('Visible')
-    requires = FieldList(FormField(DependencyForm))
+    dependencies = FieldList(FormField(DependencyForm))
 
 
 class SequorForm(Form):
