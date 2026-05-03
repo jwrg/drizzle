@@ -176,7 +176,7 @@ class Schedule:
                 ]
             )
         )
-        self.jobs.rotate(-1)
+        self.jobs = deque(sorted(self.jobs))
         Schedule.logger.info(
             " ".join(
                 [
