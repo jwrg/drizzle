@@ -64,7 +64,7 @@ def index():
                 } | {
                     "jobs": {
                         ordinal: {
-                            current_app.config["SEQUITUR_NAME"]: job.sequence.name,
+                            current_app.config["SEQUITUR_NAME"]: job.sequitur.name,
                             "weekdays": ", ".join(
                                 weekdays[weekday] for weekday in job.weekdays
                             ),
@@ -183,7 +183,7 @@ def edit(schedule_id):
         entry.weekdays.choices = [
             (id, weekday) for id, weekday in weekdays.items()
         ]
-        entry.sequence.choices = [
+        entry.sequitur.choices = [
             (sequitur.id, sequitur.name)
             for sequitur in sequences.values()
         ]
@@ -196,7 +196,7 @@ def edit(schedule_id):
                 schedule.jobs += [Job(None, 0, 0, 0)]
             form.populate_obj(schedule)
             for job in schedule.jobs:
-                job.sequence = sequences[job.sequence]
+                job.sequitur = sequences[job.sequitur]
             schedules[schedule_id] = schedule
             flash(
                 ' '.join(

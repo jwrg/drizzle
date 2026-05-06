@@ -21,9 +21,9 @@ with current_app.app_context():
     from util.redirected import redirected
     relays = Baton()
     sequences = Sequencer()
-sequence = Blueprint("sequence", __name__, url_prefix="/sequence")
+sequencer = Blueprint("sequencer", __name__, url_prefix="/sequencer")
 
-fields = ["name", "description", "sequence"]
+fields = ["name", "description", "sequencia"]
 redirected = redirected(
     sequences,
     current_app.config["SEQUITUR_NAME"],
@@ -31,28 +31,28 @@ redirected = redirected(
 )
 
 
-@sequence.route("/")
+@sequencer.route("/")
 def index():
     return render_template(
         "list.html",
         allow_create=True,
         data_headings=["index", current_app.config["RELAY_NAME"], "minutes"],
-        data_name="sequence",
+        data_name="sequencia",
         subject=current_app.config["SEQUITUR_NAME"],
         items={
             id: {
                 "fields": {
                     field: seq.__getattribute__(field)
                     for field in fields
-                    if field != "sequence"
+                    if field != "sequencia"
                 } | {
-                    "sequence": {
+                    "sequencia": {
                         ordinal: {
                             "index": int(ordinal) + 1,
                             current_app.config["RELAY_NAME"]: entry.relay.name,
                             "minutes": str(entry.minutes)
                         }
-                        for ordinal, entry in enumerate(seq.sequence)
+                        for ordinal, entry in enumerate(seq.sequencia)
                     }
                 },
                 "actions": {
@@ -97,7 +97,7 @@ def index():
     )
 
 
-@sequence.route("/new/", methods=("GET", "POST"))
+@sequencer.route("/new/", methods=("GET", "POST"))
 def new():
     return redirect(
         url_for(
@@ -108,9 +108,9 @@ def new():
     )
 
 
-@sequence.route("/edit/<string:sequence_id>/", methods=("GET", "POST"))
+@sequencer.route("/edit/<string:sequence_id>/", methods=("GET", "POST"))
 def edit(sequence_id):
-    seq = sequences[sequence_id] if sequence_id in sequences.keys(
+    sequitur = sequences[sequence_id] if sequence_id in sequences.keys(
     ) else Sequitur(
         **{
             "id": sequence_id,
@@ -121,14 +121,14 @@ def edit(sequence_id):
                 ]
             ),
             "description": "A " + current_app.config["SEQUITUR_NAME"],
-            "sequence": [Sequor(str(next(iter(relays.values()))), 1)]
+            "sequencia": [Sequor(str(next(iter(relays.values()))), 1)]
         }
     )
     if request.method == "GET":
-        form = SequiturForm(formdata=None, obj=seq, meta={'csrf': False})
+        form = SequiturForm(formdata=None, obj=sequitur, meta={'csrf': False})
     else:
         form = SequiturForm(meta={'csrf': False})
-    for sequor in form.sequence.entries:
+    for sequor in form.sequencia.entries:
         sequor.relay.choices = sorted(list(
             (r.id, r.name)
             for r in relays.values()
@@ -138,18 +138,18 @@ def edit(sequence_id):
             flash("Form failed to validate")
             flash(form.errors)
         else:
-            while len(form.sequence.entries) > len(seq.sequence):
-                seq.sequence += [Sequor(None, 0)]
-            form.populate_obj(seq)
-            for sequor in seq.sequence:
+            while len(form.sequencia.entries) > len(sequitur.sequencia):
+                sequitur.sequencia += [Sequor(None, 0)]
+            form.populate_obj(sequitur)
+            for sequor in sequitur.sequencia:
                 sequor.relay = relays[sequor.relay]
-            sequences[sequence_id] = seq
+            sequences[sequence_id] = sequitur
             flash(
                 ' '.join(
                     [
                         "Updated",
                         current_app.config["SEQUITUR_NAME"],
-                        seq.name + '.',
+                        sequitur.name + '.',
                     ]
                 ), "success"
             )
@@ -162,7 +162,7 @@ def edit(sequence_id):
                 "Change the settings, and",
                 "change, move, add, delete entries for",
                 current_app.config["SEQUITUR_NAME"],
-                seq.name,
+                sequitur.name,
                 "in the fields below."
             ]
         ),
@@ -172,19 +172,19 @@ def edit(sequence_id):
     )
 
 
-@sequence.route("/delete/<string:sequence_id>/")
+@sequencer.route("/delete/<string:sequence_id>/")
 @redirected()
 def delete(sequence_id):
     del sequences[sequence_id]
 
 
-@sequence.route("/start/<string:sequence_id>/")
+@sequencer.route("/start/<string:sequence_id>/")
 @redirected()
 def start(sequence_id):
     sequences[sequence_id].start()
 
 
-@sequence.route("/stop/<string:sequence_id>/")
+@sequencer.route("/stop/<string:sequence_id>/")
 @redirected()
 def stop(sequence_id: str):
     sequences[sequence_id].stop()

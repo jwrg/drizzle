@@ -36,12 +36,12 @@ def log_request():
 with app.app_context():
     from blueprints.board import board
     from blueprints.relay import relay
-    from blueprints.sequence import sequence
+    from blueprints.sequencer import sequencer
     from blueprints.schedule import schedule
 
 app.register_blueprint(board.board)
 app.register_blueprint(relay.relay)
-app.register_blueprint(sequence.sequence)
+app.register_blueprint(sequencer.sequencer)
 app.register_blueprint(schedule.schedule)
 
 

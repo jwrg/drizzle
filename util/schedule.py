@@ -23,11 +23,11 @@ class Job:
 
     def __init__(
         self,
-        sequence: Sequitur,
+        sequitur: Sequitur,
         weekdays: list[int],
         time: time
     ) -> None:
-        self.sequence = sequence
+        self.sequitur = sequitur
         self.weekdays = weekdays
         self.time = time
 
@@ -163,7 +163,7 @@ class Schedule:
         )
 
     def next(self) -> None:
-        self.jobs[0].sequence.start()
+        self.jobs[0].sequitur.start()
         Schedule.logger.info(
             " ".join(
                 [
@@ -171,8 +171,8 @@ class Schedule:
                     str(self.name),
                     "with id",
                     str(self.id),
-                    "running job, sequence",
-                    str(self.jobs[0].sequence.name),
+                    "running job, sequitur",
+                    str(self.jobs[0].sequitur.name),
                 ]
             )
         )
@@ -180,8 +180,8 @@ class Schedule:
         Schedule.logger.info(
             " ".join(
                 [
-                    "Next job is for sequence",
-                    str(self.jobs[0].sequence.name),
+                    "Next job is",
+                    str(self.jobs[0].sequitur.name),
                     "and runs in",
                     str(self.jobs[0].remaining()),
                 ]
@@ -232,7 +232,7 @@ class Scheduler(PersistentMapping):
                 schedule["active"],
                 deque(
                     Job(
-                        sequences[job["sequence"]],
+                        sequences[job["sequitur"]],
                         job["weekdays"],
                         time(hour=job["hour"], minute=job["minute"])
                     )
@@ -251,7 +251,7 @@ class Scheduler(PersistentMapping):
                 "active": schedule.active,
                 "jobs": [
                     {
-                        "sequence": job.sequence.id,
+                        "sequitur": job.sequitur.id,
                         "weekdays": job.weekdays,
                         "hour": job.time.hour,
                         "minute": job.time.minute

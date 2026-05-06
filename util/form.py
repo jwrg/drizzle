@@ -75,11 +75,11 @@ class SequorForm(Form):
 
 
 class SequiturForm(BasicForm):
-    sequence = FieldList(FormField(SequorForm))
+    sequencia = FieldList(FormField(SequorForm))
 
 
 class FixtureForm(Form):
-    sequence = SelectField(current_app.config["SEQUITUR_NAME"].capitalize())
+    sequitur = SelectField(current_app.config["SEQUITUR_NAME"].capitalize())
     weekdays = SelectMultipleField('Weekdays', coerce=int)
     time = TimeField('Time')
 

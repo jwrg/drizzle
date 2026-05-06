@@ -28,28 +28,28 @@ class Sequitur:
     """
 
     def __init__(
-        self, id: str, name: str, description: str, sequence: list[Sequor]
+        self, id: str, name: str, description: str, sequencia: list[Sequor]
     ) -> None:
         self.id = id
         self.name = name
         self.description = description
-        self.sequence = sequence
+        self.sequencia = sequencia
         self.running = False
         self.current = None
 
     def start(self):
 
         def secutus(pos):
-            if pos == len(self.sequence):
+            if pos == len(self.sequencia):
                 self.stop()
                 return
             else:
                 self.running = True
                 if self.current is not None:
                     self.current.off()
-                self.current = self.sequence[pos].relay
+                self.current = self.sequencia[pos].relay
                 self.current.on(
-                    timedelta(minutes=self.sequence[pos].minutes),
+                    timedelta(minutes=self.sequencia[pos].minutes),
                     secutus, [pos + 1],
                 )
         secutus(0)
@@ -82,7 +82,7 @@ class Sequencer(PersistentMapping):
                 [
                     Sequor(relays[
                         sequor["relay"]], sequor["minutes"])
-                    for sequor in sequitur["sequence"]
+                    for sequor in sequitur["sequencia"]
                 ]
             )
             for id, sequitur in collection.items()
@@ -94,12 +94,12 @@ class Sequencer(PersistentMapping):
                 "description": sequitur.description,
                 "name": sequitur.name,
                 "modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%Z"),
-                "sequence": [
+                "sequencia": [
                     {
                         "relay": sequor.relay.id,
                         "minutes": sequor.minutes,
                     }
-                    for sequor in sequitur.sequence
+                    for sequor in sequitur.sequencia
                 ]
             }
             for id, sequitur in collection.items()
