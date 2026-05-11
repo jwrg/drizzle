@@ -16,7 +16,7 @@
                 <dl>
     {%- from "macro.html" import render_field %}
     {%- for fieldName in fields %}
-      {{ render_field(form[fieldName]) }}
+      {{ render_field(form[fieldName], data_name) }}
     {%- endfor %}
                 </dl>
                 <br /><hr />

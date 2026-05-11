@@ -22,7 +22,10 @@ with current_app.app_context():
     from util.relay import Baton, Relay, Dependency
     from util.form import RelayForm, DependencyForm
     from util.redirected import redirected
-    from util.template import filter_pluralize as pluralize
+    from util.template import (
+        filter_pluralize as pluralize,
+        filter_capitalize_first as capitalize
+    )
     relays = Baton()
     boards = Holder()
 
@@ -33,7 +36,6 @@ fields = [
     "visible", "default_time", "max_time",
     "board", "index"
 ]
-mappings = ["dependencies"]
 redirected = redirected(relays, current_app.config["RELAY_NAME"], ".index")
 
 
@@ -75,7 +77,7 @@ def disable_relay(relay_id):
         flash(
             " ".join(
                 [
-                    current_app.config["RELAY_NAME"].capitalize(),
+                    capitalize(current_app.config["RELAY_NAME"]),
                     relays[relay_id].name,
                     "was turned off."
                 ]
@@ -106,7 +108,7 @@ def enable_relay(relay_id):
             flash(
                 " ".join(
                     [
-                        current_app.config["RELAY_NAME"].capitalize(),
+                        capitalize(current_app.config["RELAY_NAME"]),
                         relays[relay_id].name,
                         "was not turned on for",
                         str(interval),
@@ -123,7 +125,7 @@ def enable_relay(relay_id):
             flash(
                 " ".join(
                     [
-                        current_app.config["RELAY_NAME"].capitalize(),
+                        capitalize(current_app.config["RELAY_NAME"]),
                         relays[relay_id].name,
                         "was turned on for",
                         str(interval),
@@ -145,7 +147,7 @@ def enable_relay(relay_id):
         flash(
             " ".join(
                 [
-                    current_app.config["RELAY_NAME"].capitalize(),
+                    capitalize(current_app.config["RELAY_NAME"]),
                     relays[relay_id].name,
                     "was not turned on for",
                     str(interval),
@@ -169,7 +171,7 @@ def index():
         "list.html",
         allow_create=True,
         data_headings=[current_app.config["RELAY_NAME"], "spin_up"],
-        data_name="dependencies",
+        data_name=pluralize(current_app.config["DEPENDENCY_NAME"]),
         subject=current_app.config["RELAY_NAME"],
         items={
             id: {
@@ -181,7 +183,7 @@ def index():
                     current_app.config["BOARD_NAME"]: relay.board.name,
                     "address": relay.index
                 } | {
-                    "dependencies": {
+                    pluralize(current_app.config["DEPENDENCY_NAME"]): {
                         dep.relay.id: {
                             current_app.config["RELAY_NAME"]: dep.relay.name,
                             "spin_up": dep.spin_up
@@ -193,26 +195,26 @@ def index():
                 "actions": {
                     "inactive": {
                         "activate": {
-                            "name": "activate".capitalize(),
+                            "name": capitalize("activate"),
                             "endpoint": ".activate",
                             "args": {"relay_id": id},
                         },
                     },
                     "active": {
                         "deactivate": {
-                            "name": "deactivate".capitalize(),
+                            "name": capitalize("deactivate"),
                             "endpoint": ".deactivate",
                             "args": {"relay_id": id},
                         },
                     },
                     "stopped": {
                         "edit": {
-                            "name": "edit".capitalize(),
+                            "name": capitalize("edit"),
                             "endpoint": ".edit_relay",
                             "args": {"relay_id": id},
                         },
                         "delete": {
-                            "name": "delete".capitalize(),
+                            "name": capitalize("delete"),
                             "endpoint": ".delete",
                             "args": {"relay_id": id},
                             "confirm": ' '.join([
@@ -223,7 +225,10 @@ def index():
                                 "will delete all",
                                 "information on this",
                                 current_app.config["RELAY_NAME"],
-                                "including its list of dependencies."
+                                "including its list of",
+                                pluralize(
+                                    current_app.config["DEPENDENCY_NAME"]
+                                ) + '.'
                             ]),
                         }
                     },
@@ -290,10 +295,11 @@ def edit_relay(relay_id):
             }
         ):
             raise ValidationError(
-                ''.join(
+                ' '.join(
                     [
-                        "Dependency list must not contain duplicate ",
-                        pluralize(current_app.config["RELAY_NAME"]),
+                        capitalize(current_app.config["DEPENDENCY_NAME"]),
+                        "list must not contain duplicate",
+                        pluralize(current_app.config["RELAY_NAME"]) + '.'
                     ]
                 )
             )
@@ -332,7 +338,7 @@ def edit_relay(relay_id):
             "id": relay_id,
             "name": ' '.join(
                 [
-                    current_app.config["RELAY_NAME"].capitalize(),
+                    capitalize(current_app.config["RELAY_NAME"]),
                     ''.join(choices(ascii_uppercase, k=5)),
                 ]
             ),
@@ -417,6 +423,7 @@ def edit_relay(relay_id):
                 "and its dependencies in the fields below."
             ]
         ),
+        data_name=current_app.config["DEPENDENCY_NAME"],
         subject=current_app.config["RELAY_NAME"],
         fields=[
             "name",

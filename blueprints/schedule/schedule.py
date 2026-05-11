@@ -21,6 +21,10 @@ with current_app.app_context():
     from util.sequencer import Sequencer
     from util.form import FixtureForm, ScheduleForm
     from util.redirected import redirected
+    from util.template import (
+        filter_capitalize_first as capitalize,
+        filter_pluralize as pluralize
+    )
     schedules = Scheduler()
     sequences = Sequencer()
 schedule = Blueprint("schedule", __name__, url_prefix="/schedule")
@@ -53,7 +57,7 @@ def index():
             "weekdays",
             "time",
         ],
-        data_name="jobs",
+        data_name=pluralize(current_app.config["JOB_NAME"]),
         subject=current_app.config["SCHEDULE_NAME"],
         items={
             id: {
@@ -62,7 +66,7 @@ def index():
                     for field in fields
                     if field != "jobs"
                 } | {
-                    "jobs": {
+                    pluralize(current_app.config["JOB_NAME"]): {
                         ordinal: {
                             current_app.config["SEQUITUR_NAME"]: job.sequitur.name,
                             "weekdays": ", ".join(
@@ -82,17 +86,17 @@ def index():
                 "actions": {
                     "inactive": {
                         "activate": {
-                            "name": "activate".capitalize(),
+                            "name": capitalize("activate"),
                             "endpoint": ".activate",
                             "args": {"schedule_id": id},
                         },
                         "edit": {
-                            "name": "edit".capitalize(),
+                            "name": capitalize("edit"),
                             "endpoint": ".edit",
                             "args": {"schedule_id": id},
                         },
                         "delete": {
-                            "name": "delete".capitalize(),
+                            "name": capitalize("delete"),
                             "endpoint": ".delete",
                             "args": {"schedule_id": id},
                             "confirm": ' '.join([
@@ -106,7 +110,7 @@ def index():
                     },
                     "active": {
                         "deactivate": {
-                            "name": "deactivate".capitalize(),
+                            "name": capitalize("deactivate"),
                             "endpoint": ".deactivate",
                             "args": {"schedule_id": id},
                         },
@@ -164,7 +168,7 @@ def edit(schedule_id):
             "id": schedule_id,
             "name": ' '.join(
                 [
-                    current_app.config["SCHEDULE_NAME"].capitalize(),
+                    capitalize(current_app.config["SCHEDULE_NAME"]),
                     ''.join(choices(ascii_uppercase, k=5)),
                 ]
             ),
@@ -220,6 +224,7 @@ def edit(schedule_id):
                 "in the fields below."
             ]
         ),
+        data_name=current_app.config["JOB_NAME"],
         subject=current_app.config["SCHEDULE_NAME"],
         fields=fields,
         form=form,

@@ -18,7 +18,10 @@ with current_app.app_context():
     from util.board import Board, Holder
     from util.form import BoardForm
     from util.redirected import redirected
-    from util.template import filter_pluralize as pluralize
+    from util.template import (
+        filter_capitalize_first as capitalize,
+        filter_pluralize as pluralize
+    )
     boards = Holder()
 
 board = Blueprint("board", __name__, url_prefix="/board")
@@ -33,7 +36,7 @@ def index():
         "list.html",
         allow_create=True,
         data_headings=[current_app.config["RELAY_NAME"], "address"],
-        data_name="connections",
+        data_name=pluralize(current_app.config["CONNECTION_NAME"]),
         subject=current_app.config["BOARD_NAME"],
         items={
             id: {
@@ -41,7 +44,7 @@ def index():
                     field: board.__getattribute__(field)
                     for field in fields
                 } | {
-                    "connections": {
+                    pluralize(current_app.config["CONNECTION_NAME"]): {
                         conn.relay.id: {
                             current_app.config["RELAY_NAME"]: conn.relay.name,
                             "address": conn.index
@@ -53,26 +56,26 @@ def index():
                 "actions": {
                     "inactive": {
                         # "activate": {
-                        #     "name": "activate".capitalize(),
+                        #     "name": capitalize("activate"),
                         #     "endpoint": ".activate",
                         #     "args": {"board_id": id},
                         # },
                     },
                     "active": {
                         # "deactivate": {
-                        #     "name": "deactivate".capitalize(),
+                        #     "name": capitalize("deactivate"),
                         #     "endpoint": ".deactivate",
                         #     "args": {"board_id": id},
                         # },
                     },
                     "always": {
                         "edit": {
-                            "name": "edit".capitalize(),
+                            "name": capitalize("edit"),
                             "endpoint": ".edit",
                             "args": {"board_id": id},
                         },
                         "delete": {
-                            "name": "delete".capitalize(),
+                            "name": capitalize("delete"),
                             "endpoint": ".delete",
                             "args": {"board_id": id},
                             "confirm": ' '.join([
@@ -82,7 +85,10 @@ def index():
                                 board.name,
                                 "will also delete all the",
                                 pluralize(current_app.config["RELAY_NAME"]),
-                                "listed as its connections."
+                                "listed as its",
+                                pluralize(
+                                    current_app.config["CONNECTION_NAME"]
+                                ) + "."
                             ]),
                         }
                     },

@@ -171,7 +171,7 @@ class Schedule:
                     str(self.name),
                     "with id",
                     str(self.id),
-                    "running job, sequitur",
+                    "running job",
                     str(self.jobs[0].sequitur.name),
                 ]
             )
@@ -180,7 +180,7 @@ class Schedule:
         Schedule.logger.info(
             " ".join(
                 [
-                    "Next job is",
+                    "Next job is for",
                     str(self.jobs[0].sequitur.name),
                     "and runs in",
                     str(self.jobs[0].remaining()),

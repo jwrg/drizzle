@@ -1,8 +1,8 @@
-{% macro render_field(field) %}
+{% macro render_field(field, data_name) %}
   {% if field.type == "FieldList" %}
   <br /><hr />
-  <dt class="fieldlist">{{ field.label }}
-  <input class="right" type="button" id="append" name="append" onClick="append_row()" value="Add Field" />
+  <dt class="fieldlist">{{ data_name|pluralize|capitalize }}
+  <input class="right" type="button" id="append" name="append" onClick="append_row()" value="Add {{ data_name }}" />
     {% for subfield in field.entries %}
       <dd>{{ subfield(**kwargs)|safe }}
       <input type="button" id="demote" name="demote" onClick="demote_row(this)" value="Up" />

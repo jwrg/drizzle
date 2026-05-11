@@ -19,6 +19,10 @@ with current_app.app_context():
     from util.form import SequiturForm
     from util.relay import Baton
     from util.redirected import redirected
+    from util.template import (
+        filter_capitalize_first as capitalize,
+        filter_pluralize as pluralize
+    )
     relays = Baton()
     sequences = Sequencer()
 sequencer = Blueprint("sequencer", __name__, url_prefix="/sequencer")
@@ -37,7 +41,7 @@ def index():
         "list.html",
         allow_create=True,
         data_headings=["index", current_app.config["RELAY_NAME"], "minutes"],
-        data_name="sequencia",
+        data_name=current_app.config["SEQUENCIA_NAME"],
         subject=current_app.config["SEQUITUR_NAME"],
         items={
             id: {
@@ -46,7 +50,7 @@ def index():
                     for field in fields
                     if field != "sequencia"
                 } | {
-                    "sequencia": {
+                    current_app.config["SEQUENCIA_NAME"]: {
                         ordinal: {
                             "index": int(ordinal) + 1,
                             current_app.config["RELAY_NAME"]: entry.relay.name,
@@ -81,7 +85,7 @@ def index():
                     },
                     "running": {
                         "stop": {
-                            "name": "stop".capitalize(),
+                            "name": capitalize("stop"),
                             "endpoint": ".stop",
                             "args": {"sequence_id": id},
                         },
@@ -166,6 +170,7 @@ def edit(sequence_id):
                 "in the fields below."
             ]
         ),
+        data_name=current_app.config["SEQUENCIA_NAME"],
         subject=current_app.config["SEQUITUR_NAME"],
         fields=fields,
         form=form,
