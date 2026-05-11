@@ -99,11 +99,24 @@ def disable_relay(relay_id):
 @relay.route("/enable/<string:relay_id>/", methods=(["POST"]))
 def enable_relay(relay_id):
     """
-    API command that activates a relay specified by id for a given number of minutes
+    API command that activates a relay specified by id for a given
+    number of minutes
     """
     max_relays = current_app.config["MAX_CONCURRENT"]
     interval = int(request.form["minutes"])
-    if interval <= relays[relay_id].max_time:
+    if not relays[relay_id].active:
+        flash(
+            " ".join(
+                [
+                    "Relay",
+                    str(relays[relay_id].name),
+                    "is set as inactive",
+                    "and therefore was",
+                    "not turned on.",
+                ]
+            )
+        )
+    elif interval <= relays[relay_id].max_time:
         if len(relays.state()) >= max_relays:
             flash(
                 " ".join(
