@@ -248,7 +248,7 @@ def index():
                     "always": {},
                 },
                 "active": relay.active,
-                "running": relay.timer.is_set(),
+                "running": relay.counter > 0,
             }
             for id, relay in {
                 connection.relay.id: connection.relay
@@ -470,5 +470,11 @@ def activate(relay_id):
 @relay.route("/config/deactivate/<string:relay_id>")
 @redirected()
 def deactivate(relay_id):
-    relays[relay_id].active = False
-    relays.save()
+    if relays[relay_id].counter > 0:
+        flash(
+            "Cannot deactivate a currently running " +
+            current_app.config["RELAY_NAME"]
+        )
+    else:
+        relays[relay_id].active = False
+        relays.save()
