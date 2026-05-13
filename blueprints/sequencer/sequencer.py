@@ -62,17 +62,17 @@ def index():
                 "actions": {
                     "stopped": {
                         "start": {
-                            "name": "start".capitalize(),
+                            "name": capitalize("start"),
                             "endpoint": ".start",
                             "args": {"sequence_id": id},
                         },
                         "edit": {
-                            "name": "edit".capitalize(),
+                            "name": capitalize("edit"),
                             "endpoint": ".edit",
                             "args": {"sequence_id": id},
                         },
                         "delete": {
-                            "name": "delete".capitalize(),
+                            "name": capitalize("delete"),
                             "endpoint": ".delete",
                             "args": {"sequence_id": id},
                             "confirm": ' '.join([
