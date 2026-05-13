@@ -36,6 +36,19 @@ class Sequitur:
         self.sequencia = sequencia
         self.running = False
         self.current = None
+        Sequencer.logger.debug(
+            " ".join(
+                [
+                    "Sequitur",
+                    self.name,
+                    "with id",
+                    self.id,
+                    "initialized listing",
+                    str(len(self.sequencia)),
+                    "sequenced relays.",
+                ]
+            )
+        )
 
     def start(self):
 
