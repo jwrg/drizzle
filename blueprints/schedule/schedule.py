@@ -1,6 +1,7 @@
 """
 Routes for scheduling relays and sequences
 """
+from datetime import time
 from random import choices
 from string import ascii_uppercase, ascii_lowercase, digits
 
@@ -13,7 +14,7 @@ from flask import (
     request,
     url_for,
 )
-from wtforms import FieldList, FormField, TimeField
+from wtforms import FieldList, FormField
 from wtforms.validators import ValidationError
 
 with current_app.app_context():
@@ -174,7 +175,7 @@ def edit(schedule_id):
             ),
             "description": "A " + current_app.config["SCHEDULE_NAME"],
             "active": False,
-            "jobs": [Job(str(next(iter(sequences.values()))), 0, 0, 0)]
+            "jobs": [Job(str(next(iter(sequences.values()))), 0, time())]
         }
     )
     if request.method == "GET":
