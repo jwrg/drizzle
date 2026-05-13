@@ -36,11 +36,13 @@ def log_request():
 
 with app.app_context():
     from util.form import ConfigForm
+    from blueprints.dashboard import dashboard
     from blueprints.board import board
     from blueprints.relay import relay
     from blueprints.sequencer import sequencer
     from blueprints.schedule import schedule
 
+app.register_blueprint(dashboard.dashboard)
 app.register_blueprint(board.board)
 app.register_blueprint(relay.relay)
 app.register_blueprint(sequencer.sequencer)
@@ -52,7 +54,7 @@ def index():
     """
     Redirect to index view
     """
-    return redirect(url_for("relay.select_relay"))
+    return redirect(url_for("dashboard.index"))
 
 
 @app.route("/config", methods=(["GET", "POST"]))
