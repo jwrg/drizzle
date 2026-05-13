@@ -10,7 +10,9 @@
       <input type="button" id="delete" name="delete" onClick="if(window.confirm('Are you sure?')){delete_row(this)}" value="Delete" />
     {% endfor %}
   {% else %}
+    {% if field.widget.input_type != "hidden" %}
   <dt>{{ field.label }}
+    {% endif %}
   <dd>{{ field(**kwargs)|safe }}
   {% endif %}
   {% if field.type == "FieldList" %}

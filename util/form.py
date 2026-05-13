@@ -8,12 +8,13 @@ from wtforms import (
     SelectMultipleField,
     BooleanField,
     IntegerField,
+    HiddenField,
     StringField,
     SubmitField,
     TimeField,
     validators
 )
-from wtforms.widgets import html_params
+from wtforms.widgets import html_params, HiddenInput
 
 
 class ButtonWidget:
@@ -44,6 +45,43 @@ class BasicForm(FlaskForm):
     submit = SubmitField()
 
 
+std_length = validators.Length(max=64)
+
+
+class ConfigForm(FlaskForm):
+    LOG_LEVEL = IntegerField("Log level", widget=HiddenInput(), validators=[
+        validators.NumberRange(min=1, max=10)
+    ])
+    APP_PORT = IntegerField("TCP/IP port", widget=HiddenInput(), validators=[
+        validators.NumberRange(min=1, max=65535)
+    ])
+    SECRET_KEY = HiddenField("Secret key", validators=[])
+    SERVER_NAME = HiddenField("Server name", validators=[])
+    MAX_TIME = IntegerField('Max relay run time', validators=[
+        validators.NumberRange(min=1)
+    ])
+    MAX_CONCURRENT = IntegerField('Max concurrent running relays', validators=[
+        validators.NumberRange(min=1)
+    ])
+    BOARD_NAME = StringField('Board object name', validators=[std_length])
+    CONNECTION_NAME = StringField('Connection list name', validators=[
+        std_length
+    ])
+    RELAY_NAME = StringField('Relay object name', validators=[std_length])
+    DEPENDENCY_NAME = StringField('Dependency list name', validators=[
+        std_length
+    ])
+    SEQUITUR_NAME = StringField('Sequence object name', validators=[
+        std_length
+    ])
+    SEQUENCIA_NAME = StringField('Sequence list name', validators=[std_length])
+    SCHEDULE_NAME = StringField('Schedule object name', validators=[
+        std_length
+    ])
+    JOB_NAME = StringField('Job list name', validators=[std_length])
+    submit = SubmitField()
+
+
 class BoardForm(BasicForm):
     type = SelectField('Type', choices=[('PiPlates', 'PiPlates')])
     index = SelectField('Index', coerce=int)
@@ -53,16 +91,19 @@ class BoardForm(BasicForm):
 class DependencyForm(Form):
     relay = SelectField(current_app.config["RELAY_NAME"].capitalize())
     spin_up = IntegerField('Spin up', validators=[
-                           validators.NumberRange(min=0, max=5)])
+        validators.NumberRange(min=0, max=5)
+    ])
 
 
 class RelayForm(BasicForm):
     board = SelectField(current_app.config["BOARD_NAME"].capitalize())
     index = SelectField('Index', coerce=int)
     max_time = IntegerField('Max time', validators=[
-                            validators.NumberRange(min=1, max=60)])
+        validators.NumberRange(min=1, max=60)]
+    )
     default_time = IntegerField('Default time', validators=[
-                                validators.NumberRange(min=1, max=60)])
+        validators.NumberRange(min=1, max=60)]
+    )
     active = BooleanField('Active')
     visible = BooleanField('Visible')
     dependencies = FieldList(FormField(DependencyForm))
@@ -71,7 +112,8 @@ class RelayForm(BasicForm):
 class SequorForm(Form):
     relay = SelectField(current_app.config["RELAY_NAME"].capitalize())
     minutes = IntegerField('Minutes', validators=[
-                           validators.NumberRange(min=1, max=60)])
+        validators.NumberRange(min=1, max=60)]
+    )
 
 
 class SequiturForm(BasicForm):
