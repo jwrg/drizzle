@@ -30,14 +30,14 @@ function format_seconds(remaining) {
   return hours === '0' ? minutes + ':' + seconds : hours + ':' + minutes + ':' + seconds;
 }
 
-function set_countdown(button, array, index) {
-  button.value = format_seconds(button.value);
+function set_countdown(el) {
+  el.value = format_seconds(el.value);
   return setInterval(function() {
-    seconds = get_seconds(button.value);
-    if (seconds <= 0) {
+    seconds = get_seconds(el.value);
+    if (seconds <= 0 || seconds === NaN) {
       window.location.reload();
     } else {
-      button.value = format_seconds(seconds - 1);
+      el.value = format_seconds(seconds - 1);
     }
   }, 1000);
 }
@@ -45,5 +45,5 @@ function set_countdown(button, array, index) {
 const active_buttons = Array.from(document.getElementsByClassName('active'));
 let handles = [];
 for (let i = 0; i < active_buttons.length; ++i) {
-  handles[i] = set_countdown(active_buttons[i], handles, i);
+  handles[i] = set_countdown(active_buttons[i]);
 }
