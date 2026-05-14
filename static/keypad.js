@@ -42,7 +42,17 @@ function set_countdown(el) {
   }, 1000);
 }
 
+function set_countup(el) {
+  var current = new Date();
+  el.innerHTML = current.toLocaleString();
+  return setInterval(function() {
+    current.setSeconds(current.getSeconds() + 1);
+    el.innerHTML = current.toLocaleString();
+  }, 1000);
+}
+
 const active_buttons = Array.from(document.getElementsByClassName('active'));
+var datetime = set_countup(document.getElementById('datetime'));
 let handles = [];
 for (let i = 0; i < active_buttons.length; ++i) {
   handles[i] = set_countdown(active_buttons[i]);

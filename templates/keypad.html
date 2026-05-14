@@ -1,7 +1,7 @@
 {% extends "base.html" %}
   {% block title %}{{ subject|capitalize }} Menu{% endblock %}
   {% block content %}
-      <h2>{{ datetime }}</h2>
+      <h2 id="datetime" class="datetime">{{ datetime }}</h2>
       <form method="post">
         <div class="time-wrapper" id="time-wrapper">
           <fieldset>
