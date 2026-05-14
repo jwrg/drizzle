@@ -51,9 +51,9 @@ function set_countup(el) {
   }, 1000);
 }
 
-const active_buttons = Array.from(document.getElementsByClassName('active'));
+const running_buttons = Array.from(document.getElementsByClassName('running'));
 var datetime = set_countup(document.getElementById('datetime'));
 let handles = [];
-for (let i = 0; i < active_buttons.length; ++i) {
-  handles[i] = set_countdown(active_buttons[i]);
+for (let i = 0; i < running_buttons.length; ++i) {
+  handles[i] = set_countdown(running_buttons[i]);
 }

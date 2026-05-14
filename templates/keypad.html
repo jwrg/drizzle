@@ -14,14 +14,16 @@
           </fieldset>
         </div>
         <div class="button-wrapper" id="button-wrapper">
-    {%- for label, action, endpoint, arguments, confirm, active, remaining, default, max in actions %}
+    {%- for label, action, endpoint, arguments, confirm, running, visible, remaining in actions %}
+      {%- if visible %}
           <input type="submit" value="
-      {%- if active %}{{ remaining }}{% else %}{{ label }}{% endif -%}
+        {%- if running %}{{ remaining }}{% else %}{{ label }}{% endif -%}
           " class="gradient keypad relay
-      {%- if active %} active{% endif -%}
+        {%- if running %} running{% endif -%}
           " name="{{ label }}" onclick="
       {%- if confirm %}return window.confirm('Really {{ action }} {{ subject }} {{ label }}?'){% endif -%}
           " formaction="{{ url_for(endpoint, **arguments) }}" />
+      {%- endif %}
     {%- endfor -%}
         </div>
       </form>

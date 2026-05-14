@@ -50,9 +50,8 @@ def index():
                 {"relay_id": id},
                 True,
                 id in state.keys(),
+                relay.visible,
                 state[id] if id in state.keys() else None,
-                relay.default_time,
-                relay.max_time,
             )
             for id, relay in relays.items()
         ],
