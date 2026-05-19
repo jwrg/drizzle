@@ -1,7 +1,7 @@
 """
 Routes for activating relay timers
 """
-from datetime import timedelta, datetime
+from datetime import timedelta
 from random import choices
 from string import ascii_uppercase, ascii_lowercase, digits
 
@@ -31,18 +31,13 @@ with current_app.app_context():
 
 relay = Blueprint("relay", __name__, url_prefix="/relay")
 
-fields = [
-    "name", "description", "active",
-    "visible", "default_time", "max_time",
-    "board", "index"
-]
+fields = ["name", "description", "active", "visible", "board", "index"]
 redirected = redirected(relays, current_app.config["RELAY_NAME"], ".index")
 
 
 @relay.route("/")
 def index():
-    fields = ["name", "description", "address",
-              "max_time", "default_time", "visible", "dependencies"]
+    fields = ["name", "description", "address", "visible", "dependencies"]
     return render_template(
         "list.html",
         allow_create=True,
@@ -160,7 +155,16 @@ def on(relay_id):
     """
     max_relays = current_app.config["MAX_CONCURRENT"]
     interval = int(request.form["minutes"])
-    if not relays[relay_id].active:
+    if relay_id not in relays.keys():
+        flash(
+            ' '.join(
+                [
+                    "Id", str(relay_id), "not found."
+                ]
+            ),
+            "caution",
+        )
+    elif not relays[relay_id].active:
         flash(
             ' '.join(
                 [
@@ -172,47 +176,7 @@ def on(relay_id):
                 ]
             )
         )
-    elif interval <= relays[relay_id].max_time:
-        if len(relays.state()) >= max_relays:
-            flash(
-                ' '.join(
-                    [
-                        capitalize(current_app.config["RELAY_NAME"]),
-                        relays[relay_id].name,
-                        "was not turned on for",
-                        str(interval),
-                        "minute." if interval == 1 else "minutes.",
-                        "Maximum number of active",
-                        pluralize(current_app.config["RELAY_NAME"]),
-                        "(" + str(max_relays) + ") reached."
-                    ]
-                ),
-                "error",
-            )
-        elif relay_id in relays.keys():
-            relays[relay_id].on(timedelta(minutes=interval))
-            flash(
-                ' '.join(
-                    [
-                        capitalize(current_app.config["RELAY_NAME"]),
-                        relays[relay_id].name,
-                        "was turned on for",
-                        str(interval),
-                        "minute." if interval == 1 else "minutes.",
-                    ]
-                ),
-                "success",
-            )
-        else:
-            flash(
-                ' '.join(
-                    [
-                        "Id", str(relay_id), "not found."
-                    ]
-                ),
-                "caution",
-            )
-    else:
+    elif len(relays.state()) >= max_relays:
         flash(
             ' '.join(
                 [
@@ -221,13 +185,26 @@ def on(relay_id):
                     "was not turned on for",
                     str(interval),
                     "minute." if interval == 1 else "minutes.",
-                    "This exceeds the max interval set for this",
-                    current_app.config["RELAY_NAME"],
-                    "(" + str(relays[relay_id].max_time),
-                    "minute)." if relays[relay_id].max_time == 1 else "minutes)."
+                    "Maximum number of active",
+                    pluralize(current_app.config["RELAY_NAME"]),
+                    "(" + str(max_relays) + ") reached."
                 ]
             ),
             "error",
+        )
+    else:
+        relays[relay_id].on(timedelta(minutes=interval))
+        flash(
+            ' '.join(
+                [
+                    capitalize(current_app.config["RELAY_NAME"]),
+                    relays[relay_id].name,
+                    "was turned on for",
+                    str(interval),
+                    "minute." if interval == 1 else "minutes.",
+                ]
+            ),
+            "success",
         )
     return redirect(url_for("index"))
 
@@ -330,8 +307,6 @@ def edit(relay_id):
             "description": "A " + current_app.config["RELAY_NAME"],
             "active": True,
             "visible": True,
-            "default_time": 10,
-            "max_time": 60,
             "board": 0,
             "index": 0,
             "dependencies": [],
@@ -415,8 +390,6 @@ def edit(relay_id):
             "description",
             "active",
             "visible",
-            "default_time",
-            "max_time",
             "board",
             "index",
             "dependencies"

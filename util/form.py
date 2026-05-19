@@ -98,12 +98,6 @@ class DependencyForm(Form):
 class RelayForm(BasicForm):
     board = SelectField(current_app.config["BOARD_NAME"].capitalize())
     index = SelectField('Index', coerce=int)
-    max_time = IntegerField('Max time', validators=[
-        validators.NumberRange(min=1, max=60)]
-    )
-    default_time = IntegerField('Default time', validators=[
-        validators.NumberRange(min=1, max=60)]
-    )
     active = BooleanField('Active')
     visible = BooleanField('Visible')
     dependencies = FieldList(FormField(DependencyForm))

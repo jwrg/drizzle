@@ -38,8 +38,6 @@ class Relay:
         description: str,
         board: Any,
         index: int,
-        max_time: int,
-        default_time: int,
         active: bool,
         visible: bool,
         dependencies: list[Dependency] = None,
@@ -49,8 +47,6 @@ class Relay:
         self.description = description
         self.board = board
         self.index = index
-        self.max_time = max_time
-        self.default_time = default_time
         self.active = active
         self.visible = visible
         self.dependencies = dependencies
@@ -138,9 +134,14 @@ class Baton(PersistentMapping):
         Baton.logger.debug(
             " ".join(
                 [
-                    "Returned get_state() with",
-                    "no relays active" if len(active) == 0 else "active relays"
-                ] + [self.collection[relay].name for relay in active]
+                    "Returned state() with",
+                    "no relays running"
+                    if len(active) == 0 else "running relays"
+                ]
+            ) + " " + ", ".join(
+                [
+                    self.collection[relay].name for relay in active
+                ]
             )
         )
         return active
@@ -156,8 +157,6 @@ class Baton(PersistentMapping):
                     relay["description"],
                     boards[relay["board"]],
                     relay["index"],
-                    relay["max_time"],
-                    relay["default_time"],
                     relay["active"],
                     relay["visible"],
                     [
@@ -189,8 +188,6 @@ class Baton(PersistentMapping):
                 "modified": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%Z"),
                 "board": relay.board.id,
                 "index": relay.index,
-                "max_time": relay.max_time,
-                "default_time": relay.default_time,
                 "active": relay.active,
                 "visible": relay.visible,
                 "dependencies": [
