@@ -124,7 +124,7 @@ def off(relay_id):
     API command for turning off a relay, given its id
     """
     if relay_id in relays.keys():
-        relays[relay_id].off()
+        relays[relay_id].off(True)
         flash(
             ' '.join(
                 [

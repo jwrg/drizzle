@@ -80,17 +80,23 @@ class Relay:
             self.counter += 1
         if interval is not None:
             self.timer.set(
-                interval, self.off if callback is None else callback, args)
+                interval,
+                self.off if callback is None else callback,
+                [True] if args is None else args
+            )
         self.mutex.release()
         Relay.logger.info(" ".join(["Relay", str(self.name), "on"]))
 
-    def off(self) -> None:
+    def off(self, clear_timer: bool = False) -> None:
         """
         Decrement the counter
         Turns off the relay if the counter is reduced to zero
+        Turns off the timer if the flag is true
         """
         self.mutex.acquire()
         self.counter -= 1
+        if clear_timer:
+            self.timer.clear()
         if self.counter == 0:
             if self.dependencies is not None:
                 for dep in self.dependencies:

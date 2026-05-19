@@ -59,7 +59,7 @@ class Sequitur:
             else:
                 self.running = True
                 if self.current is not None:
-                    self.current.off()
+                    self.current.off(True)
                 self.current = self.sequencia[pos].relay
                 self.current.on(
                     timedelta(minutes=self.sequencia[pos].minutes),
@@ -69,7 +69,7 @@ class Sequitur:
 
     def stop(self):
         if self.current is not None:
-            self.current.off()
+            self.current.off(True)
         self.running = False
         self.current = None
 
