@@ -31,15 +31,16 @@ function format_seconds(remaining) {
 }
 
 function set_countdown(el) {
-  el.value = format_seconds(el.value);
+  el.innerHTML = format_seconds(el.innerHTML);
   return setInterval(function() {
-    seconds = get_seconds(el.value);
+    seconds = Number(get_seconds(el.innerHTML));
     if (seconds <= 0 || seconds === NaN) {
+      // console.log(seconds);
       window.location.reload();
     } else {
-      el.value = format_seconds(seconds - 1);
+      el.innerHTML = format_seconds(seconds - 1);
     }
-  }, 1000);
+  }, 999);
 }
 
 function set_countup(el) {
@@ -48,10 +49,10 @@ function set_countup(el) {
   return setInterval(function() {
     current.setSeconds(current.getSeconds() + 1);
     el.innerHTML = current.toLocaleString();
-  }, 1000);
+  }, 999);
 }
 
-const running_buttons = Array.from(document.getElementsByClassName('running'));
+const running_buttons = Array.from(document.getElementsByClassName('running-label'));
 var datetime = set_countup(document.getElementById('datetime'));
 let handles = [];
 for (let i = 0; i < running_buttons.length; ++i) {

@@ -18,7 +18,6 @@ with current_app.app_context():
     from util.relay import Baton
     from util.sequencer import Sequencer
     from util.schedule import Scheduler
-    from util.redirected import redirected
     from util.template import (
         filter_capitalize_first as capitalize,
         filter_pluralize as pluralize
@@ -45,7 +44,7 @@ def index():
         actions=[
             (
                 relay.name,
-                "relay.deactivate" if id in state.keys() else "relay.activate",
+                "turn off" if id in state.keys() else "turn on",
                 "relay.off" if id in state.keys() else "relay.on",
                 {"relay_id": id},
                 True,

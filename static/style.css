@@ -334,8 +334,14 @@ form li.boolean input, form li.number input {
 }
 
 .button-wrapper {
-  height: 100%;
+  /* height: 100%; */
   /* width: 100%; */
+}
+
+.button-box label {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
 }
 
 /*input.relay[type="submit"] {
@@ -376,8 +382,8 @@ form li.boolean input, form li.number input {
   box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
 }
 
-.time-wrapper label.time-label:running,
-.button-wrapper input.relay[type="submit"]:running {
+.time-wrapper label.time-label:active,
+.button-wrapper input.relay[type="submit"]:active {
   box-shadow: 0px 3px 0px #24a, 0px 3px 6px rgba(0,0,0,.9);
   position: relative;
   top: 6px;
@@ -441,21 +447,18 @@ input.submit {
   font-size: 24pt;
 }
 
-input:running,
 input:active {
   color: #24a !important;
   background: honeydew;
   border-color: aliceblue !important;
 }
 
-input.cancel:running,
 input.cancel:active {
   color: white !important;
   background: maroon;
   border-color: firebrick !important;
 }
 
-input.submit:running,
 input.submit:active {
   color: white !important;
   background: limegreen;
