@@ -55,8 +55,8 @@ def index():
             for id, relay in relays.items()
         ],
         datetime=datetime.now().strftime("%d/%m/%y %H:%M:%S"),
-        times=sorted({
-            x for x in [1, 2, 5, 10, 20, 30, current_app.config["MAX_TIME"]]
-            if x <= current_app.config["MAX_TIME"]
-        })
+        times=(
+            x["time"] for x in current_app.config["RUNNING_TIMES"]
+            if x["time"] <= current_app.config["MAX_TIME"]
+        ),
     )

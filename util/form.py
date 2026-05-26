@@ -48,6 +48,12 @@ class BasicForm(FlaskForm):
 std_length = validators.Length(max=64)
 
 
+class RunningTimeForm(Form):
+    time = IntegerField("Running time", validators=[
+        validators.NumberRange(min=1, max=current_app.config["MAX_TIME"])
+    ])
+
+
 class ConfigForm(FlaskForm):
     LOG_LEVEL = IntegerField("Log level", widget=HiddenInput(), validators=[
         validators.NumberRange(min=1, max=10)
@@ -64,21 +70,24 @@ class ConfigForm(FlaskForm):
         validators.NumberRange(min=1)
     ])
     BOARD_NAME = StringField('Board object name', validators=[std_length])
-    CONNECTION_NAME = StringField('Connection list name', validators=[
+    CONNECTION_NAME = StringField('Board connection name', validators=[
         std_length
     ])
     RELAY_NAME = StringField('Relay object name', validators=[std_length])
-    DEPENDENCY_NAME = StringField('Dependency list name', validators=[
+    DEPENDENCY_NAME = StringField('Relay dependency name', validators=[
         std_length
     ])
     SEQUITUR_NAME = StringField('Sequence object name', validators=[
         std_length
     ])
-    SEQUENCIA_NAME = StringField('Sequence list name', validators=[std_length])
+    SEQUENCIA_NAME = StringField('Sequence entry name', validators=[
+        std_length
+    ])
     SCHEDULE_NAME = StringField('Schedule object name', validators=[
         std_length
     ])
-    JOB_NAME = StringField('Job list name', validators=[std_length])
+    JOB_NAME = StringField('Scheduled job name', validators=[std_length])
+    RUNNING_TIMES = FieldList(FormField(RunningTimeForm))
     submit = SubmitField()
 
 

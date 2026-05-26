@@ -2,11 +2,12 @@
   {% block title %}{{ subject|capitalize }} Menu{% endblock %}
   {% block content %}
       <h2 id="datetime" class="datetime">{{ datetime }}</h2>
+      <p>Maximum number of concurrently running relays allowed: {{ config.MAX_CONCURRENT }}</p>
       <form method="post">
         <div class="time-wrapper" id="time-wrapper">
           <fieldset>
     {%- for time in times %}
-            <input type="radio" class="hidden" id="minutes-{{ time }}" name="minutes" value="{{ time }}" {% if time == 1 %}checked{% endif -%} />
+            <input type="radio" class="hidden" id="minutes-{{ time }}" name="minutes" value="{{ time }}" {% if loop.index == 1 %}checked{% endif -%} />
             <label for="minutes-{{ time }}" class="time-label">{{ time }}</label>
     {%- endfor %}
           <!-- <input type="range" class="range" id="time" name="time" value=5 min=1 max=100 /> -->

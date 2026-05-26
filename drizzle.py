@@ -71,24 +71,28 @@ def edit_config():
             flash("Form failed to validate", "error")
             flash(form.errors, "error")
         else:
+            app.config["RUNNING_TIMES"] = form["RUNNING_TIMES"].data
             for k in request.form.keys():
-                app.config[k] = form[k].data
+                if k.split('-')[0] != "RUNNING_TIMES":
+                    app.config[k] = form[k].data
             with open(config_path, 'w', encoding="utf8") as f:
                 dump(
                     {
                         k: app.config[k] for k in request.form.keys()
-                        if k != "submit"
-                    }, f
+                        if k.split('-')[0] != "RUNNING_TIMES" and k != "submit"
+                    } | {"RUNNING_TIMES": app.config["RUNNING_TIMES"]}, f
                 )
             return redirect(url_for(".index"))
     return render_template(
         "edit.html",
         title="edit global app configuration",
-        describe="Change global app settings here. If unsure, leave this alone.",
+        describe='. '.join([
+            "Change global app settings here",
+            "If unsure, leave these alone",
+        ]),
         subject="config",
+        data_name="running time",
         fields=[
-            "MAX_TIME",
-            "MAX_CONCURRENT",
             "BOARD_NAME",
             "CONNECTION_NAME",
             "RELAY_NAME",
@@ -101,6 +105,9 @@ def edit_config():
             "APP_PORT",
             "SECRET_KEY",
             "SERVER_NAME",
+            "MAX_TIME",
+            "MAX_CONCURRENT",
+            "RUNNING_TIMES",
         ],
         form=form,
     )

@@ -52,7 +52,9 @@ function append_row() {
   const old_row = document.querySelector('dl dd table').parentElement.parentElement.lastElementChild;
   let new_row = old_row.cloneNode(true);
   change_row_indices(new_row);
-  new_row.querySelector('tr td select').value = new_row.querySelector('tr td select').options[0].value;
+  if (new_row.querySelector('tr td select') !== null){
+    new_row.querySelector('tr td select').value = new_row.querySelector('tr td select').options[0].value;
+  }
   form.insertBefore(new_row, null);
 }
 
