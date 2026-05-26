@@ -50,7 +50,7 @@ std_length = validators.Length(max=64)
 
 class RunningTimeForm(Form):
     time = IntegerField("Running time", validators=[
-        validators.NumberRange(min=1, max=current_app.config["MAX_TIME"])
+        validators.NumberRange(min=1)
     ])
 
 

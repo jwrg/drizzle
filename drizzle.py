@@ -4,6 +4,8 @@ A flask app for controlling relays, with a sprinkler flavour
 from json import load, dump
 
 from flask import Flask, flash, redirect, render_template, request, url_for
+from wtforms import IntegerField, FieldList, FormField
+from wtforms.validators import NumberRange, ValidationError
 from util.template import filter_capitalize_first, filter_pluralize
 
 app = Flask(__name__)
@@ -35,7 +37,7 @@ def log_request():
 
 
 with app.app_context():
-    from util.form import ConfigForm
+    from util.form import ConfigForm, RunningTimeForm
     from blueprints.dashboard import dashboard
     from blueprints.board import board
     from blueprints.relay import relay
@@ -62,10 +64,34 @@ def edit_config():
     """
     Global configuration editor
     """
+    def validate_running_time(form, field):
+        if field.data > app.config["MAX_TIME"]:
+            raise ValidationError(
+                ' '.join(
+                    [
+                        "Running time",
+                        str(field.data),
+                        "is greater than the currently set",
+                        "maximum allowable running time of",
+                        str(app.config["MAX_TIME"]),
+                        "minutes" + '.',
+                    ]
+                )
+            )
+
+    class EditRunningTimeForm(RunningTimeForm):
+        time = IntegerField("Running time", validators=[
+            NumberRange(min=1),
+            validate_running_time,
+        ])
+
+    class EditConfigForm(ConfigForm):
+        RUNNING_TIMES = FieldList(FormField(EditRunningTimeForm))
+
     if request.method == "GET":
-        form = ConfigForm(data=app.config, meta={'csrf': False})
+        form = EditConfigForm(data=app.config, meta={'csrf': False})
     else:
-        form = ConfigForm(meta={'csrf': False})
+        form = EditConfigForm(meta={'csrf': False})
     if request.method == "POST":
         if not form.validate_on_submit():
             flash("Form failed to validate", "error")
