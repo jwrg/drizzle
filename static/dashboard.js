@@ -1,8 +1,3 @@
-// document.getElementById("time").addEventListener("input", () => {
-//   setBubble(document.getElementById("time"),document.getElementById("time").nextElementSibling);
-// });
-// setBubble(document.getElementById("time"),document.getElementById("time").nextElementSibling);
-
 function setBubble(range, bubble) {
   const val = range.value;
   const min = range.min ? range.min : 0;
