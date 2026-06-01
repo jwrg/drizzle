@@ -118,7 +118,7 @@ def index():
     )
 
 
-@relay.route("/disable/<string:relay_id>/", methods=(["POST"]))
+@relay.route("/off/<string:relay_id>/", methods=(["POST"]))
 def off(relay_id):
     """
     API command for turning off a relay, given its id
@@ -147,7 +147,7 @@ def off(relay_id):
     return redirect(url_for("index"))
 
 
-@relay.route("/enable/<string:relay_id>/", methods=(["POST"]))
+@relay.route("/on/<string:relay_id>/", methods=(["POST"]))
 def on(relay_id):
     """
     API command that turns on a relay specified by id for a given

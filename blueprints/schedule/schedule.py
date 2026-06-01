@@ -34,7 +34,7 @@ fields = ["name", "description", "jobs"]
 redirected = redirected(
     schedules,
     current_app.config["SCHEDULE_NAME"],
-    ".index"
+    "index"
 )
 
 weekdays = {

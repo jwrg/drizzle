@@ -31,7 +31,7 @@ fields = ["name", "description", "sequencia"]
 redirected = redirected(
     sequences,
     current_app.config["SEQUITUR_NAME"],
-    ".index"
+    "index"
 )
 
 
