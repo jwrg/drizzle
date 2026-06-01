@@ -63,61 +63,7 @@ class Timmy:
         :param callback: a method to call once the interval has elapsed
         :param args: arguments for callback
         """
-        if interval > self.remaining():
-            if self.timer is not None:
-                Timmy.logger.debug(
-                    " ".join(
-                        [
-                            "Timer",
-                            str(self.name),
-                            "thread",
-                            str(self.timer.native_id),
-                            "has been reset before finishing!",
-                        ]
-                    )
-                )
-                if callback != self.callback or args != self.args:
-                    Timmy.logger.debug(
-                        " ".join(
-                            [
-                                "Timer",
-                                str(self.name),
-                                "thread",
-                                str(self.timer.native_id),
-                                "used to have callback",
-                                str(self.callback),
-                                "with args",
-                                str(self.args),
-                                "but has been changed to callback",
-                                str(callback),
-                                "with args",
-                                str(args),
-                            ]
-                        )
-                    )
-                self.timer.cancel()
-                del self.timer
-                self.timer = None
-            self.interval = interval
-            self.start = datetime.now()
-            self.callback = callback
-            self.args = args
-            self.timer = Timer(interval.total_seconds(), callback, args)
-            self.timer.start()
-            Timmy.logger.info(
-                " ".join(
-                    [
-                        "Timer",
-                        str(self.name),
-                        "thread",
-                        str(self.timer.native_id),
-                        "set for",
-                        str(interval),
-                        "from now"
-                    ]
-                )
-            )
-        else:
+        if self.timer is not None:
             Timmy.logger.debug(
                 " ".join(
                     [
@@ -125,12 +71,51 @@ class Timmy:
                         str(self.name),
                         "thread",
                         str(self.timer.native_id),
-                        "not set! Arg",
-                        str(interval),
-                        "ends before currently set timer",
+                        "has been reset before finishing!",
                     ]
                 )
             )
+            if callback != self.callback or args != self.args:
+                Timmy.logger.debug(
+                    " ".join(
+                        [
+                            "Timer",
+                            str(self.name),
+                            "thread",
+                            str(self.timer.native_id),
+                            "used to have callback",
+                            str(self.callback),
+                            "with args",
+                            str(self.args),
+                            "but has been changed to callback",
+                            str(callback),
+                            "with args",
+                            str(args),
+                        ]
+                    )
+                )
+            self.timer.cancel()
+            del self.timer
+            self.timer = None
+        self.interval = interval
+        self.start = datetime.now()
+        self.callback = callback
+        self.args = args
+        self.timer = Timer(interval.total_seconds(), callback, args)
+        self.timer.start()
+        Timmy.logger.info(
+            " ".join(
+                [
+                    "Timer",
+                    str(self.name),
+                    "thread",
+                    str(self.timer.native_id),
+                    "set for",
+                    str(interval),
+                    "from now"
+                ]
+            )
+        )
 
     def clear(self) -> None:
         """
