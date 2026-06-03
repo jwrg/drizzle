@@ -198,7 +198,7 @@ def edit(schedule_id):
             flash(form.errors, "error")
         else:
             while len(form.jobs.entries) > len(schedule.jobs):
-                schedule.jobs += [Job(None, 0, 0, 0)]
+                schedule.jobs += [Job(None, 0, time())]
             form.populate_obj(schedule)
             for job in schedule.jobs:
                 job.sequitur = sequences[job.sequitur]
