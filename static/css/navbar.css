@@ -1,0 +1,81 @@
+nav {
+  width: 100%;
+}
+
+header {
+  border-top: 3px solid black;
+  border-bottom: 3px solid #eee;
+}
+
+header nav {
+  min-height: 3ex;
+  font-size: 24pt;
+  background-color: #24a;
+  border-top: 4px solid #115;
+  border-bottom: 4px solid lightgrey;
+}
+
+header nav ul {
+  font-size: 0;
+  display: flex;
+}
+
+header nav ul li {
+  flex-grow: 4;
+  text-align: left;
+  font-size: 24pt;
+  font-family: Trebuchet, Tahoma, Arial, sans-serif;
+  min-height: 3ex;
+  padding: 0 1.5ex;
+  margin: 0;
+  border-left: 2px solid #015;
+  border-right: 2px solid #99f;
+}
+
+header nav ul li a {
+  color: white;
+  vertical-align: sub;
+  margin: auto 0;
+}
+
+header nav ul li.corner a, header nav ul li.filler a {
+  color: transparent;
+}
+
+header nav ul li.filler {
+  flex-grow: 1;
+}
+
+header nav ul li.drizzle {
+  background-color: #115;
+}
+
+header nav ul li.current {
+  background-image: linear-gradient(0deg, #222, #115);
+  border-bottom: 4px solid #aaf;
+  font-weight: bold;
+}
+
+header nav li a.icon svg {
+  display: inline-block;
+  width: 28px;
+  text-align: right;
+  vertical-align: middle;
+  fill: white;
+  stroke: black;
+  stroke-width: 0px;
+}
+
+ul nav a {
+  margin-right: 1.5ex;
+}
+
+ul nav a:not(:last-child)::after {
+  content:"|";
+  color: navy;
+  position: relative;
+  right:-1ex;
+  top:0;
+  height:100%;
+}
+

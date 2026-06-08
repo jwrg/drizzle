@@ -1,0 +1,39 @@
+input.selected,
+input.running,
+input.active {
+  color: white;
+  border-color: cornflowerblue;
+  background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
+}
+
+input.cancel {
+  color: white;
+  border-color: indianred;
+  background-image: linear-gradient(48deg, crimson, darkred);
+  font-size: 24pt;
+}
+
+input.submit {
+  color: white;
+  border-color: palegreen;
+  background-image: linear-gradient(48deg, forestgreen, darkgreen);
+  font-size: 24pt;
+}
+
+input:active {
+  color: #24a !important;
+  background: honeydew;
+  border-color: aliceblue !important;
+}
+
+input.cancel:active {
+  color: white !important;
+  background: maroon;
+  border-color: firebrick !important;
+}
+
+input.submit:active {
+  color: white !important;
+  background: limegreen;
+  border-color: chartreuse !important;
+}

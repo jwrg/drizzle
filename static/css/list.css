@@ -1,0 +1,27 @@
+li.name::after {
+  content: "";
+  height: 2px;
+  background: navy;
+  display: block;
+  margin-bottom: 0.25ex;
+}
+
+div.inactive ul.entry li.name::before {
+  display: inline-block;
+  margin-right: 0.5ex;
+  content: "(Not Active) ";
+}
+
+div.running ul.entry li.name::before {
+  display: inline-block;
+  margin-right: 0.5ex;
+  content: "(Running) ";
+}
+
+div.running,
+div.active {
+  color: white;
+  border-width: 2px;
+  border-color: cornflowerblue;
+  background-image: linear-gradient(48deg, floralwhite, skyblue);
+}

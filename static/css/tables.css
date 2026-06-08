@@ -1,0 +1,33 @@
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14pt;
+  margin: 1.5em 0;
+}
+
+table.sequencer,
+table.scheduler {
+  display: inline;
+}
+
+td, th {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+
+tr:nth-child(odd) {
+  background-color: #ddd
+}
+
+tr:nth-child(even) {
+  background-color: #eee
+}
+
+tr:hover {
+  background-color: #fff;
+}
+
+th {
+  background-color:navy;
+  color: #eee;
+}

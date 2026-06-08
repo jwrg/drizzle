@@ -1,0 +1,63 @@
+body {
+  width: 100%;
+  min-height: 100vh;
+  font-family: Geneva, Verdana, sans-serif;
+  text-align: left;
+  background-image: linear-gradient(floralwhite, azure);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+main {
+  width: 90%;
+  margin: 1em auto 0 auto;
+}
+
+main#content {
+  display: block;
+  min-height: 90vh;
+  
+}
+
+div.box {
+  width: 100%;
+  margin: 0em auto;
+}
+
+.hidden {
+  display: none;
+  visibility: hidden;
+}
+
+ul {
+  list-style-type: none;
+}
+
+ul.entry {
+  width: 90%;
+  margin: 1em auto;
+  padding: 1em 0;
+}
+
+td, li, input, label, textarea {
+  margin-top: 0.25ex;
+}
+
+/* Global classes */
+
+.gradient {
+  background-image: linear-gradient(48deg, honeydew, floralwhite);
+}
+
+.rounded {
+  border-radius: 15px;
+  border-width: 1px;
+}
+
+.shadow {
+  -webkit-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+  -moz-box-shadow: 0px 5px 40px -10px rgba(0,0,0,0.57);
+}

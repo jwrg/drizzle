@@ -1,0 +1,13 @@
+main#messages {
+  padding: 1em 0;
+}
+
+ul#messages li {
+  text-align: center;
+}
+
+ul#messages li.append {
+  color: grey;
+  font-size: smaller;
+  text-align: center;
+}
