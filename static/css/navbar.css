@@ -8,7 +8,6 @@ header {
 }
 
 header nav {
-  min-height: 3ex;
   font-size: 24pt;
   background-color: #24a;
   border-top: 4px solid #115;
@@ -21,11 +20,10 @@ header nav ul {
 }
 
 header nav ul li {
-  flex-grow: 4;
+  flex-grow: 6;
   text-align: left;
-  font-size: 24pt;
+  font-size: 2.5vw;
   font-family: Trebuchet, Tahoma, Arial, sans-serif;
-  min-height: 3ex;
   padding: 0 1.5ex;
   margin: 0;
   border-left: 2px solid #015;

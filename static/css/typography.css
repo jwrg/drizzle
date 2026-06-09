@@ -4,17 +4,17 @@ h1, h2, h3, p {
 
 h1 {
   color: midnightblue;
-  font-size: 64pt;
+  font-size: 7vw;
 }
 
 h2 {
   color: black;
-  font-size: 36pt;
+  font-size: 4vw;
 }
 
 h3, p {
   color: navy;
-  font-size: 36pt;
+  font-size: 2.5vw;
 }
 
 h2, h3 {
