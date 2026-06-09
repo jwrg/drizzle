@@ -13,12 +13,11 @@ body {
 
 main {
   width: 90%;
-  margin: 1em auto 0 auto;
+  margin: 2em auto;
 }
 
 main#content {
   display: block;
-  min-height: 90vh;
   
 }
 
