@@ -45,7 +45,7 @@ class BasicForm(FlaskForm):
     submit = SubmitField()
 
 
-std_length = validators.Length(max=64)
+std_length = validators.Length(min=3, max=64)
 
 
 class RunningTimeForm(Form):
