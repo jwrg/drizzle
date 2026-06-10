@@ -10,7 +10,7 @@ header {
 header nav {
   font-size: 24pt;
   background-color: #24a;
-  border-top: 4px solid #115;
+  /* border-top: 4px solid #115; */
   border-bottom: 4px solid lightgrey;
 }
 
@@ -21,8 +21,9 @@ header nav ul {
 
 header nav ul li {
   flex-grow: 6;
+  display: table;
   text-align: left;
-  font-size: 2.5vw;
+  font-size: 2.25vw;
   font-family: Trebuchet, Tahoma, Arial, sans-serif;
   padding: 0 1.5ex;
   margin: 0;
@@ -31,13 +32,19 @@ header nav ul li {
 }
 
 header nav ul li a {
+  display: table-cell;
   color: white;
-  vertical-align: sub;
-  margin: auto 0;
+  vertical-align: bottom;
+  padding-top: 4px;
+  padding-bottom: 8px;
+  min-width: 10vw;
+  max-width: 12.5vw;
+  overflow: clip;
 }
 
 header nav ul li.corner a, header nav ul li.filler a {
   color: transparent;
+  min-width: 1px;
 }
 
 header nav ul li.filler {
@@ -48,15 +55,27 @@ header nav ul li.drizzle {
   background-color: #115;
 }
 
+header nav ul li.drizzle a,
+header nav ul li a.icon {
+  min-width: 1px;
+  text-align: center;
+}
+
 header nav ul li.current {
   background-image: linear-gradient(0deg, #222, #115);
-  border-bottom: 4px solid #aaf;
-  font-weight: bold;
+  border-bottom: 4px solid #88c;
+  padding-bottom: 0;
+  /* font-weight: bold; */
+}
+
+header nav ul li.current a {
+  padding-bottom: 4px;
 }
 
 header nav li a.icon svg {
   display: inline-block;
-  width: 28px;
+  width: 2.5vw;
+  height: 2.5vw;
   text-align: right;
   vertical-align: middle;
   fill: white;

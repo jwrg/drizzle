@@ -22,7 +22,7 @@
       <nav>
         <ul>
           <li class="corner"></li>
-          <li class="drizzle">
+          <li class="drizzle{% if subject == "dashboard" %} current{% endif %}">
             <a href="{{ url_for('index') }}">Drizzle</a>
           </li>
           <li{% if subject == config.BOARD_NAME %} class="current"{% endif %}>
