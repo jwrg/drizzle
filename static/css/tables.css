@@ -2,10 +2,15 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14pt;
-  margin: 1.5em 0;
+  margin: 1em 0;
 }
 
-td, th {
+table caption {
+  text-align: left;
+  margin-bottom: 1ex;
+}
+
+table td, table th {
   border: 1px solid #ccc;
   padding: 8px;
 }
