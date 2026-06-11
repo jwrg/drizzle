@@ -41,7 +41,7 @@ def index():
         "list.html",
         allow_create=True,
         data_headings=["index", current_app.config["RELAY_NAME"], "minutes"],
-        data_name=current_app.config["SEQUENCIA_NAME"],
+        data_name=pluralize(current_app.config["SEQUENCIA_NAME"]),
         subject=current_app.config["SEQUITUR_NAME"],
         items={
             id: {
@@ -50,7 +50,7 @@ def index():
                     for field in fields
                     if field != "sequencia"
                 } | {
-                    current_app.config["SEQUENCIA_NAME"]: {
+                    pluralize(current_app.config["SEQUENCIA_NAME"]): {
                         ordinal: {
                             "index": int(ordinal) + 1,
                             current_app.config["RELAY_NAME"]: entry.relay.name,
