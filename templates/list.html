@@ -33,8 +33,11 @@
             </table>
         {%- elif fieldName != data_name %}
             <li class="{{ fieldName }}">
-            {%- if fieldName not in ["name", "description"] %}{{ fieldName|capitalize|replace("_", " ") }}:&nbsp;{% endif -%}
-            {{ fieldData }}</li>
+          {%- if fieldName not in ["name", "description"] %}{{ fieldName|capitalize|replace("_", " ") }}:&nbsp;{% endif -%}
+          {%- if fieldData is boolean and fieldData == True %}Yes
+          {%- elif fieldData is boolean and fieldData == False %}No
+          {%- else %}{{ fieldData }}
+          {%- endif %}</li>
         {%- endif %}
       {%- endfor %}
             <nav>
