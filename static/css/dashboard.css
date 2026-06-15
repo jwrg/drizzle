@@ -43,20 +43,6 @@ div.button-box label {
   text-align: center;
 }
 
-/*input.relay[type="submit"] {
-  width: 40vw;
-  height: 20vw;
-  margin: 2.0vw;
-  color: navy;
-  font-size: 36pt;
-  border-radius: 5vw;
-  border-width: 1px;
-}*/
-
-div#button-wrapper input.relay[type="submit"]{
-  background: #fff;
-}
-
 div#time-wrapper label.time-label{
   flex: 1 1 1px;
 }
@@ -65,25 +51,15 @@ div#button-wrapper input.relay[type="submit"],
 div#time-wrapper label.time-label{
   padding: 2.5ex 1em;
   margin: 1ex;
-  text-align: center;
-  border-radius: 2vw;
-  border-width: 1px;
-  white-space: normal;
-  -webkit-transition: all .1s ease;
-  -moz-transition: all .1s ease;
-  -ms-transition: all .1s ease;
-  -o-transition: all .1s ease;
-  transition: all .1s ease;
-  -moz-box-shadow: 0px 9px 0px navy, 0px 9px 25px #444545;
-  -webkit-box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
-  box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
+  min-width: 1px;
 }
 
-div#time-wrapper label.time-label:active,
-div#button-wrapper input.relay[type="submit"]:active {
-  box-shadow: 0px 3px 0px #24a, 0px 3px 6px rgba(0,0,0,.9);
-  position: relative;
-  top: 6px;
+div#time-wrapper input[type="radio"]:checked+label,
+div#button-wrapper div.button-box input[type="submit"].running {
+  color: white;
+  text-shadow: 1px 1px navy;
+  border-color: cornflowerblue;
+  background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
 }
 
 div#time-wrapper input[type="radio"]:checked+label{

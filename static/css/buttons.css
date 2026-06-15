@@ -1,39 +1,33 @@
-input.selected,
-input.running,
-input.active {
-  color: white;
-  border-color: cornflowerblue;
-  background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
+label.time-label,
+label.button-label,
+input[type="submit"],
+input[type="button"],
+button {
+  padding: 1ex;
+  margin: 1ex 0;
+  min-width: 5em;
+  text-align: center;
+  text-shadow: 1px 1px lavender;
+  background: white;
+  border-radius: 2vw;
+  border-width: 1px;
+  white-space: normal;
+  -webkit-transition: all .1s ease;
+  -moz-transition: all .1s ease;
+  -ms-transition: all .1s ease;
+  -o-transition: all .1s ease;
+  transition: all .1s ease;
+  -moz-box-shadow: 0px 9px 0px navy, 0px 9px 25px #444545;
+  -webkit-box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
+  box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
 }
 
-input.cancel {
-  color: white;
-  border-color: indianred;
-  background-image: linear-gradient(48deg, crimson, darkred);
-  font-size: 24pt;
-}
-
-input.submit {
-  color: white;
-  border-color: palegreen;
-  background-image: linear-gradient(48deg, forestgreen, darkgreen);
-  font-size: 24pt;
-}
-
-input:active {
-  color: #24a !important;
-  background: honeydew;
-  border-color: aliceblue !important;
-}
-
-input.cancel:active {
-  color: white !important;
-  background: maroon;
-  border-color: firebrick !important;
-}
-
-input.submit:active {
-  color: white !important;
-  background: limegreen;
-  border-color: chartreuse !important;
+label.time-label:active,
+label.button-label:active,
+input[type="submit"]:active,
+input[type="button"]:active,
+button:active {
+  box-shadow: 0px 3px 0px #24a, 0px 3px 6px rgba(0,0,0,.9);
+  position: relative;
+  top: 6px;
 }
