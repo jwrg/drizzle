@@ -1,8 +1,7 @@
 section#dashboard {
   width: 100%;
-  /* height: 100vh; */
-  background: #fff;
-  border: 1px solid #aaa;
+  background: snow;
+  border: 1px solid darkgray;
 }
 
 section#dashboard p {
@@ -28,11 +27,6 @@ div#time-wrapper fieldset{
   border: none;
 }
 
-div#button-wrapper {
-  /* height: 100%; */
-  /* width: 100%; */
-}
-
 div.button-box {
   flex: 1 1 anchor-size;
 }
@@ -49,7 +43,7 @@ div#time-wrapper label.time-label{
 
 div#button-wrapper input.relay[type="submit"],
 div#time-wrapper label.time-label{
-  padding: 2.5ex 1em;
+  padding: 2.5vw 2vw;
   margin: 1ex;
   min-width: 1px;
 }
@@ -62,8 +56,8 @@ div#button-wrapper div.button-box input[type="submit"].running {
   background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
 }
 
-div#time-wrapper input[type="radio"]:checked+label{
-  background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
+div.table-wrapper {
+  margin: 2em;
 }
 
 div#range-wrapper {
@@ -96,13 +90,4 @@ input[type="range"] {
   background: green;
   top: 100%;
   left: 50%;
-}
-
-div.table-wrapper {
-  margin: 2em;
-}
-
-table#sequencer,
-table#scheduler {
-  /* display: inline; */
 }
