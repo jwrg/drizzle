@@ -50,6 +50,9 @@ class Sequitur:
             )
         )
 
+    def __str__(self):
+        return self.id
+
     def start(self):
 
         def secutus(pos):

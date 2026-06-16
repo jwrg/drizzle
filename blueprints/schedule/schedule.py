@@ -37,15 +37,15 @@ redirected = redirected(
     "index"
 )
 
-weekdays = {
-    0: "Sunday",
-    1: "Monday",
-    2: "Tuesday",
-    3: "Wednesday",
-    4: "Thursday",
-    5: "Friday",
-    6: "Saturday",
-}
+weekdays = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+]
 
 
 @schedule.route("/")
@@ -184,14 +184,14 @@ def edit(schedule_id):
         )
     else:
         form = EditScheduleForm(meta={'csrf': False})
-    for entry in form.jobs.entries:
-        entry.weekdays.choices = [
-            (id, weekday) for id, weekday in weekdays.items()
-        ]
-        entry.sequitur.choices = [
+    for job in form.jobs.entries:
+        job.sequitur.choices = sorted(list(
             (sequitur.id, sequitur.name)
             for sequitur in sequences.values()
-        ]
+        ))
+        job.weekdays.choices = list(
+            (id, weekday) for id, weekday in enumerate(weekdays)
+        )
     if request.method == "POST":
         if not form.validate_on_submit():
             flash("Form failed to validate: " + str(form.errors), "error")
