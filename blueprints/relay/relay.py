@@ -142,7 +142,7 @@ def off(relay_id):
                     "Id", str(relay_id), "not found."
                 ]
             ),
-            "caution",
+            "error",
         )
     return redirect(url_for("index"))
 
@@ -162,7 +162,7 @@ def on(relay_id):
                     "Id", str(relay_id), "not found."
                 ]
             ),
-            "caution",
+            "error",
         )
     elif not relays[relay_id].active:
         flash(
@@ -174,7 +174,7 @@ def on(relay_id):
                     "and therefore was",
                     "not turned on.",
                 ]
-            )
+            ), "caution"
         )
     elif len(relays.state()) >= max_relays:
         flash(
@@ -287,7 +287,8 @@ def edit(relay_id):
             dep_graph_order = len(detect_cycle(relay_id))
             if dep_graph_order > 0:
                 flash(
-                    "Dependency graph order: " + str(dep_graph_order), "append"
+                    "Dependency graph order: " + str(dep_graph_order),
+                    "append"
                 )
 
     class EditRelayForm(RelayForm):
@@ -341,8 +342,7 @@ def edit(relay_id):
         ))
     form_is_validated = form.validate_on_submit()
     if request.method == "POST" and not form_is_validated:
-        flash("Form failed to validate")
-        flash(form.errors)
+        flash("Form failed to validate: " + str(form.errors), "error")
     elif request.method == "POST" and form_is_validated:
         old_board = relay.board
         new_board = boards[form.board.data]
@@ -418,7 +418,8 @@ def deactivate(relay_id):
     if relays[relay_id].counter > 0:
         flash(
             "Cannot deactivate a currently running " +
-            current_app.config["RELAY_NAME"]
+            current_app.config["RELAY_NAME"],
+            "caution"
         )
     else:
         relays[relay_id].active = False

@@ -194,8 +194,7 @@ def edit(schedule_id):
         ]
     if request.method == "POST":
         if not form.validate_on_submit():
-            flash("Form failed to validate", "error")
-            flash(form.errors, "error")
+            flash("Form failed to validate: " + str(form.errors), "error")
         else:
             while len(form.jobs.entries) > len(schedule.jobs):
                 schedule.jobs += [Job(None, 0, time())]

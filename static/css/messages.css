@@ -1,13 +1,27 @@
 main#messages {
-  padding: 1em 0;
-}
-
-ul#messages li {
   text-align: center;
 }
 
-ul#messages li.append {
+main#messages ul li {
+  padding: 1em;
+}
+
+main#messages ul li.success {
+  border: 1px solid green;
+  background-image: linear-gradient(48deg, honeydew, floralwhite);
+}
+
+main#messages ul li.caution {
+  border: 1px solid darkOrange;
+  background-image: linear-gradient(48deg, lightgoldenrodyellow, lemonchiffon);
+}
+
+main#messages ul li.error {
+  border: 1px solid red;
+  background-image: linear-gradient(48deg, lavenderblush, mistyrose);
+}
+
+main#messages ul li.append {
   color: grey;
   font-size: smaller;
-  text-align: center;
 }

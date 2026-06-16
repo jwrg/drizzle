@@ -1,8 +1,8 @@
-.stop, .delete, .error, .warning, .red {
+.stop, .delete, .error, .red {
   color: red;
 }
 
-.edit, .caution, .orange {
+.edit, .caution, .warning, .warnings, .orange {
   color: darkOrange;
 }
 

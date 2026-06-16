@@ -151,8 +151,7 @@ def edit(board_id: str):
     }), key=lambda x: x[0])
     if request.method == "POST":
         if not form.validate_on_submit():
-            flash("Form failed to validate", "error")
-            flash(form.errors, "error")
+            flash("Form failed to validate: " + str(form.errors), "error")
         else:
             form.populate_obj(board)
             boards[board_id] = board

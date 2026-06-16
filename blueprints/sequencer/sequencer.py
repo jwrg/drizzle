@@ -139,8 +139,7 @@ def edit(sequence_id):
         ))
     if request.method == "POST":
         if not form.validate_on_submit():
-            flash("Form failed to validate")
-            flash(form.errors)
+            flash("Form failed to validate: " + str(form.errors), "error")
         else:
             while len(form.sequencia.entries) > len(sequitur.sequencia):
                 sequitur.sequencia += [Sequor(None, 0)]

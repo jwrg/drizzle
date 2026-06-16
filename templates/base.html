@@ -50,8 +50,8 @@
     </header>
     {%- with messages = get_flashed_messages(with_categories=true) %}
       {%- if messages %}
-    <main id="messages" class="gradient">
-      <ul id="messages" class="messages">
+    <main id="messages" class="messages">
+      <ul class="messages">
         {%- for category, message in messages %}
           {%- if category != 'append'%}
         <li class="{{ category }}">{{ message }}</li>
