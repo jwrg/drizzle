@@ -2,6 +2,7 @@
 Routes for sequencing relays
 """
 from random import choices
+from operator import itemgetter
 from string import ascii_uppercase, ascii_lowercase, digits
 
 from flask import (
@@ -133,10 +134,13 @@ def edit(sequence_id):
     else:
         form = SequiturForm(meta={'csrf': False})
     for sequor in form.sequencia.entries:
-        sequor.relay.choices = sorted(list(
-            (r.id, r.name)
-            for r in relays.values()
-        ))
+        sequor.relay.choices = sorted(
+            list(
+                (r.id, r.name)
+                for r in relays.values()
+            ),
+            key=itemgetter(1)
+        )
     if request.method == "POST":
         if not form.validate_on_submit():
             flash("Form failed to validate: " + str(form.errors), "error")

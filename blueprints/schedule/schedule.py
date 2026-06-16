@@ -2,6 +2,7 @@
 Routes for scheduling relays and sequences
 """
 from datetime import time
+from operator import itemgetter
 from random import choices
 from string import ascii_uppercase, ascii_lowercase, digits
 
@@ -185,10 +186,13 @@ def edit(schedule_id):
     else:
         form = EditScheduleForm(meta={'csrf': False})
     for job in form.jobs.entries:
-        job.sequitur.choices = sorted(list(
-            (sequitur.id, sequitur.name)
-            for sequitur in sequences.values()
-        ))
+        job.sequitur.choices = sorted(
+            list(
+                (s.id, s.name)
+                for s in sequences.values()
+            ),
+            key=itemgetter(1)
+        )
         job.weekdays.choices = list(
             (id, weekday) for id, weekday in enumerate(weekdays)
         )

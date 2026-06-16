@@ -2,6 +2,7 @@
 Routes for activating relay timers
 """
 from datetime import timedelta
+from operator import itemgetter
 from random import choices
 from string import ascii_uppercase, ascii_lowercase, digits
 
@@ -332,14 +333,17 @@ def edit(relay_id):
     form.index.choices = [
         (index, index) for index in range(1, 8)
     ]
-    for entry in form.dependencies.entries:
-        entry.relay.choices = [
+    for dep in form.dependencies.entries:
+        dep.relay.choices = [
             ('0', "Choose a dependency if required...")
-        ] + sorted(list(
-            (r.id, r.name)
-            for r in relays.values()
-            if r is not relay
-        ))
+        ] + sorted(
+            list(
+                (r.id, r.name)
+                for r in relays.values()
+                if r is not relay
+            ),
+            key=itemgetter(1)
+        )
     form_is_validated = form.validate_on_submit()
     if request.method == "POST" and not form_is_validated:
         flash("Form failed to validate: " + str(form.errors), "error")
