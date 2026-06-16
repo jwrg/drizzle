@@ -228,8 +228,8 @@ def edit(relay_id):
         if (
             relay_id not in relays.keys() or
             form.board.data != relay.board.id or
-            form.index.data != relay.index
-        ) and form.index.data not in board.get_open_addresses():
+            field.data != relay.index
+        ) and field.data not in board.get_open_addresses():
             raise ValidationError(
                 ' '.join(
                     [
@@ -240,7 +240,7 @@ def edit(relay_id):
                         board.name,
                         "is already assigned to",
                         current_app.config["RELAY_NAME"],
-                        board[form.index.data].name,
+                        board[field.data].name + '.',
                     ]
                 )
             )
@@ -284,6 +284,7 @@ def edit(relay_id):
                         visited.append(d.relay.id)
                         visited = detect_cycle(target, d.relay.id, visited)
             return visited
+
         if relay_id in relays.keys():
             dep_graph_order = len(detect_cycle(relay_id))
             if dep_graph_order > 0:

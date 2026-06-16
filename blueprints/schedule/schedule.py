@@ -15,7 +15,7 @@ from flask import (
     request,
     url_for,
 )
-from wtforms import FieldList, FormField
+from wtforms import FieldList, FormField, SelectMultipleField
 from wtforms.validators import ValidationError
 
 with current_app.app_context():
@@ -155,12 +155,32 @@ def edit(schedule_id):
             }
         ):
             raise ValidationError(
-                "Schedule must not contain concurrently scheduled jobs."
+                ' '.join([
+                    pluralize(capitalize(current_app.config["SCHEDULE_NAME"])),
+                    "must not contain concurrent",
+                    pluralize(current_app.config["JOB_NAME"]) + '.',
+                ])
             )
+
+    def validate_weekdays(form, field):
+        if len(field.data) == 0:
+            raise ValidationError(
+                ' '.join([
+                    pluralize(capitalize(current_app.config["JOB_NAME"])),
+                    "must be set for at least one weekday."
+                ])
+            )
+
+    class EditFixtureForm(FixtureForm):
+        weekdays = SelectMultipleField(
+            'Weekdays',
+            coerce=int,
+            validators=[validate_weekdays]
+        )
 
     class EditScheduleForm(ScheduleForm):
         jobs = FieldList(
-            FormField(FixtureForm),
+            FormField(EditFixtureForm),
             validators=[validate_concurrency]
         )
 
