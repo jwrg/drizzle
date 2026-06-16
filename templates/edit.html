@@ -21,7 +21,7 @@
                 </dl>
                 <br /><hr />
     {{ form.submit() }}
-                <input type="button" id="cancel" name="cancel" onClick="javascript:history.back()" value="Cancel" />
+                <input type="button" id="cancel" name="cancel" onClick="window.location.assign({{ url_for ('.index') }})" value="Cancel" />
               </form>
             </ul>
           </div>
