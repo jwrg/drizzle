@@ -60,7 +60,7 @@
           </ul>
         </div></li>
     {%- endfor %}
-    {%- if allow_create %}
+    {%- if allow_create and items != {} %}
         <li><div class="box gradient rounded shadow">
           <ul id="new-entry" class="entry">
             <li><p><a class="success" href="new/">Create a new {{ subject }}</a></p></li>
