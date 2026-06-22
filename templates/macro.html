@@ -16,9 +16,9 @@
     {% endfor %}
   </fieldset>
   {% else %}
-  <li class="{{ field.name }}">
-    {% if field.widget.input_type != "hidden" %}
-    {{ field.label }}
+  <li class="{{ field.name }}
+    {%- if field.widget.input_type == "hidden" %} hidden">
+    {%- else %}">{{ field.label }}
     {% endif %}
     {{ field(**kwargs)|safe }}
   </li>

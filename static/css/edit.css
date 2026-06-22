@@ -3,6 +3,10 @@ p.describe {
   text-align: center;
 }
 
+form {
+  margin-top: 1em;
+}
+
 form ul,
 form ul fieldset {
   display: flex;
@@ -53,6 +57,17 @@ form ul fieldset li {
   width: 100%;
 }
 
+form ul li.BOARD_NAME,
+form ul li.CONNECTION_NAME,
+form ul li.RELAY_NAME,
+form ul li.DEPENDENCY_NAME,
+form ul li.SEQUITUR_NAME,
+form ul li.SEQUENCIA_NAME,
+form ul li.SCHEDULE_NAME,
+form ul li.JOB_NAME {
+  flex-grow: 1;
+}
+
 form ul li table tbody tr td,
 form ul li select,
 form ul li select option {
@@ -86,6 +101,11 @@ form ul li input[type="number"],
 form ul li input[type="time"] {
   font-size: 24pt;
   padding: 0.5ex 0 0.5ex 1ex;
+}
+
+form > ul > li > input[type="number"] {
+  width: 3em;
+  padding-left: 1em;
 }
 
 form ul li input[type="time"] {
