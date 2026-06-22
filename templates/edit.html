@@ -13,13 +13,12 @@
           <div class="box gradient rounded shadow">
             <ul class="entry">
               <form method="post">
-                <dl>
+                <ul>
     {%- from "macro.html" import render_field %}
     {%- for fieldName in fields %}
       {{ render_field(form[fieldName], data_name) }}
     {%- endfor %}
-                </dl>
-                <br /><hr />
+                </ul>
     {{ form.submit() }}
                 <input type="button" id="cancel" name="cancel" onClick="window.location.assign({{ url_for ('.index') }})" value="Cancel" />
               </form>

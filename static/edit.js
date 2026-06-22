@@ -48,8 +48,8 @@ function change_row_indices(row, increment = true) {
 }
 
 function append_row() {
-  const form = document.querySelector('form dl');
-  const old_row = document.querySelector('dl dd table').parentElement.parentElement.lastElementChild;
+  const form = document.querySelector('form ul fieldset');
+  const old_row = document.querySelector('form ul fieldset li table').parentElement.parentElement.lastElementChild;
   let new_row = old_row.cloneNode(true);
   change_row_indices(new_row);
   if (new_row.querySelector('tr td select') !== null){
@@ -61,7 +61,7 @@ function append_row() {
 function delete_row(button) {
   const row = button.parentElement;
   let next_row = row.nextElementSibling;
-  if (row.previousElementSibling.tagName == "DD" || row.nextElementSibling) {
+  if (row.previousElementSibling.tagName == "LI" || row.nextElementSibling) {
     row.remove();
     while (next_row) {
       change_row_indices(next_row, false);
@@ -79,7 +79,7 @@ function swap_row(new_precedent, new_successor) {
 }
 
 function demote_row(button) {
-  if (button.parentElement.previousElementSibling.tagName == "DD") swap_row(button.parentElement, button.parentElement.previousElementSibling);
+  if (button.parentElement.previousElementSibling.tagName == "LI") swap_row(button.parentElement, button.parentElement.previousElementSibling);
 }
 
 function promote_row(button) {

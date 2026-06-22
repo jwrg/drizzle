@@ -1,28 +1,35 @@
 {% macro render_field(field, data_name) %}
   {% if field.type == "FieldList" %}
-  <br /><hr />
-  <dt class="fieldlist">{{ data_name|pluralize|capitalize }}
-  <input class="right" type="button" id="append" name="append" onClick="append_row()" value="Add {{ data_name }}" />
+  </ul><ul>
+  <input type="button" id="append" name="append" onClick="append_row()" value="Add {{ data_name }}" />
+  <fieldset>
+    <legend class="fieldlist">{{ data_name|pluralize|capitalize }}</legend>
     {% for subfield in field.entries %}
-      <dd>{{ subfield(**kwargs)|safe }}
-      <input type="button" id="demote" name="demote" onClick="demote_row(this)" value="Up" />
-      <input type="button" id="promote" name="promote" onClick="promote_row(this)" value="Down" />
-      <input type="button" id="delete" name="delete" onClick="if(window.confirm('Are you sure?')){delete_row(this)}" value="Delete" />
+      <li class="{{ subfield.name.split('-')[0] }}">
+      {% if subfield.type == "SelectMultipleField" -%}
+      {{ subfield(**kwargs)|safe }}
+      {% else -%}{{ subfield(**kwargs)|safe }}{% endif %}
+        <input type="button" id="demote" name="demote" onClick="demote_row(this)" value="Move Up" />
+        <input type="button" id="promote" name="promote" onClick="promote_row(this)" value="Move Down" />
+        <input type="button" id="delete" name="delete" onClick="if(window.confirm('Are you sure?')){delete_row(this)}" value="Delete" />
+        </li>
     {% endfor %}
+  </fieldset>
   {% else %}
+  <li class="{{ field.name }}">
     {% if field.widget.input_type != "hidden" %}
-  <dt>{{ field.label }}
+    {{ field.label }}
     {% endif %}
-  <dd>{{ field(**kwargs)|safe }}
+    {{ field(**kwargs)|safe }}
+  </li>
   {% endif %}
   {% if field.type == "FieldList" %}
   {% endif %}
   {% if field.errors %}
-    <ul class=errors>
+    <ul class="error">
     {% for error in field.errors %}
       <li>{{ error }}</li>
     {% endfor %}
     </ul>
   {% endif %}
-  </dd>
 {% endmacro %}

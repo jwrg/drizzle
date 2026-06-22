@@ -1,7 +1,6 @@
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14pt;
   margin: 1em 0;
 }
 
@@ -11,23 +10,31 @@ table caption {
 }
 
 table td, table th {
-  border: 1px solid #ccc;
-  padding: 8px;
+  border: 1px solid lightgray;
+  padding: 1ex;
 }
 
-tr:nth-child(odd) {
-  background-color: #ddd
+table th[scope="col"] {
+  font-size: 16pt;
+}
+
+table th[scope="row"] {
+  font-size: 14pt;
 }
 
 tr:nth-child(even) {
-  background-color: #eee
+  background-color: floralwhite;
+}
+
+tr:nth-child(odd) {
+  background-color: whitesmoke;
 }
 
 tr:hover {
-  background-color: #fff;
+  background-color: white;
 }
 
 th {
   background-color:navy;
-  color: #eee;
+  color: snow;
 }

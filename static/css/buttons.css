@@ -9,7 +9,7 @@ button {
   text-align: center;
   text-shadow: 1px 1px lavender;
   background: white;
-  border-radius: 2vw;
+  border-radius: 1ex;
   border-width: 1px;
   white-space: normal;
   -webkit-transition: all .1s ease;

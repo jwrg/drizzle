@@ -1,8 +1,129 @@
 p.describe {
-  font-size: large;
-  text-align: left;
+  font-size: 2vw;
+  text-align: center;
 }
 
-.right {
-  float: right;
+form ul,
+form ul fieldset {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: stretch;
+  align-content: stretch;
+  justify-content: flex-start;
+}
+
+form ul li {
+  background: snow;
+  border: 1px solid gray;
+  border-radius: 1ex;
+  margin: 1em 1em 0 0;
+  padding: 1em 1em;
+}
+
+form ul li label {
+  margin: 0 1ex 1ex 0;
+}
+
+form ul li input,
+form ul li select {
+  font-size: 16pt;
+}
+
+form ul li table tbody tr td,
+form ul li select,
+form ul li select option,
+form ul li input[type="text"],
+form ul li textarea,
+form ul fieldset {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  padding: 1ex;
+}
+
+form ul li table tbody tr,
+form ul li select,
+form ul li select option,
+form ul li input[type="text"],
+form ul li textarea,
+form ul li.description,
+form ul li.name,
+form ul fieldset,
+form ul fieldset li {
+  width: 100%;
+}
+
+form ul li table tbody tr td,
+form ul li select,
+form ul li select option {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+form ul li select {
+  margin: 1ex 0;
+}
+
+form ul li select[multiple] {
+  height: 18em;
+  overflow: scroll;
+}
+
+form ul li input[type="checkbox"] {
+  -ms-transform: scale(1.5);
+  -moz-transform: scale(1.5);
+  -webkit-transform: scale(1.5);
+  -o-transform: scale(1.5);
+  transform: scale(1.5);
+  vertical-align: baseline;
+}
+
+form ul li:has(> input[type="checkbox"]) {
+  padding-top: 4.5ex;
+}
+
+form ul li input[type="number"],
+form ul li input[type="time"] {
+  font-size: 24pt;
+  padding: 0.5ex 0 0.5ex 1ex;
+}
+
+form ul li input[type="time"] {
+  padding-right: 1ex;
+}
+
+form ul li label[for="description"],
+form ul li label[for="name"],
+form ul li textarea#description,
+form ul li input#name {
+  display: block;
+}
+
+form ul fieldset {
+  border: none;
+  padding: 0;
+}
+
+form ul input#append {
+  position: sticky;
+  top: 1em;
+  left: 90vw;
+  margin: 3ex 1em -1em 0;
+  padding: 1em;
+}
+
+form ul fieldset li table tbody tr th label {
+  color: white;
+}
+
+form input#submit,
+form input#cancel {
+  font-size: 24pt;
+  margin: 2em 1em 2em 0;
+  min-width: 8em;
+}
+
+form input#cancel {
+  left: 90vw;
+  right: 10vw;
 }

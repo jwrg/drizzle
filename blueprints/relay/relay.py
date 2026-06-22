@@ -393,10 +393,10 @@ def edit(relay_id):
         fields=[
             "name",
             "description",
-            "active",
-            "visible",
             "board",
             "index",
+            "active",
+            "visible",
             "dependencies"
         ],
         form=form,
