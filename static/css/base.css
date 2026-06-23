@@ -1,4 +1,7 @@
 body {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
   width: 100%;
   min-height: 100vh;
   font-family: Geneva, Verdana, sans-serif;
@@ -21,8 +24,12 @@ main#content {
   
 }
 
+nav,
 div.box {
   width: 100%;
+}
+
+div.box {
   margin: 0em auto;
 }
 

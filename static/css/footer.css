@@ -1,0 +1,66 @@
+
+footer {
+  border-top: 16px solid cornflowerblue;
+  border-bottom: 6px solid midnightblue;
+}
+
+footer > nav {
+  background-color: navy;
+  overflow: hidden;
+}
+
+footer > nav > ul {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-evenly;
+}
+
+footer > nav > ul > li {
+  flex-grow: 1;
+  display: flex;
+  flex-flow: column;
+  justify-content: flex-start;
+  margin: 1em 0;
+  text-align: left;
+  border-left: 2px solid black;
+  border-right: 2px solid slateblue;
+}
+
+footer > nav > ul > li:first-of-type {
+  border-left: none;
+}
+
+footer > nav > ul > li:last-of-type {
+  border-right: none;
+}
+
+footer > nav > ul > li p,
+footer > nav > ul > li > h4,
+footer > nav > ul > li > a {
+  color: snow;
+  margin: 0.5ex 10vw;
+  font-size: 16pt;
+  hyphens: auto;
+  overflow: clip;
+}
+
+footer > nav > ul > li a:hover {
+  color: deepskyblue;
+}
+
+footer > nav > ul > li a:active {
+  color: white;
+}
+
+footer > nav > ul > li > a:before {
+  content: "\2023  "
+}
+
+footer > nav > ul > li > p {
+  color: cornflowerblue;
+  text-align: right;
+}
+
+footer > nav > ul > li > p > a {
+  color: snow;
+}
