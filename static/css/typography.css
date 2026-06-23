@@ -26,7 +26,7 @@ a {
   cursor: pointer;
 }
 
-td, li, input, label, textarea, caption {
+td, li, button, input, label, textarea, caption {
   color: navy;
   font-size: 18pt;
 }

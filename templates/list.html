@@ -3,11 +3,7 @@
   {% block content %}
       <ul class="entries">
     {%- if allow_create %}
-        <li><div class="box gradient rounded shadow">
-          <ul id="new-entry" class="entry">
-            <li><p><a class="success" href="new/">Create a new {{ subject }}</a></p></li>
-          </ul>
-        </div></li>
+        <button id="new" name="new" class="sticky" onClick="window.location='{{ url_for('.new') }}';">Create a new {{ subject }}</button>
     {%- endif %}
     {%- for id, entry in items.items()|reverse %}
         <li><div class="box gradient rounded shadow {%- if entry["active"] %} active{%- else %} inactive{%- endif %}{%- if entry["running"] %} running{%- else %} stopped{%- endif %}">
@@ -60,12 +56,5 @@
           </ul>
         </div></li>
     {%- endfor %}
-    {%- if allow_create and items != {} %}
-        <li><div class="box gradient rounded shadow">
-          <ul id="new-entry" class="entry">
-            <li><p><a class="success" href="new/">Create a new {{ subject }}</a></p></li>
-          </ul>
-        </div></li>
-    {%- endif %}
       </ul>
   {%- endblock %}
