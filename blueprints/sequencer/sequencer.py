@@ -176,6 +176,7 @@ def edit(sequence_id):
         data_name=current_app.config["SEQUENCIA_NAME"],
         subject=current_app.config["SEQUITUR_NAME"],
         fields=fields,
+        allow_reorder=True,
         form=form,
     )
 

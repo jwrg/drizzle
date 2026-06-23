@@ -251,6 +251,7 @@ def edit(schedule_id):
         data_name=current_app.config["JOB_NAME"],
         subject=current_app.config["SCHEDULE_NAME"],
         fields=fields,
+        allow_reorder=False,
         form=form,
     )
 

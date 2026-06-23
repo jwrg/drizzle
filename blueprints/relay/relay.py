@@ -400,6 +400,7 @@ def edit(relay_id):
             "dependencies"
         ],
         form=form,
+        allow_reorder=True,
         max_rows=len(relays)
     )
 

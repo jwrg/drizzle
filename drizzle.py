@@ -135,6 +135,7 @@ def edit_config():
             "MAX_CONCURRENT",
             "RUNNING_TIMES",
         ],
+        allow_reorder=True,
         form=form,
     )
 

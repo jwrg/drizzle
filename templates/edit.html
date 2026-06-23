@@ -16,11 +16,11 @@
                 <ul>
     {%- from "macro.html" import render_field %}
     {%- for fieldName in fields %}
-      {{ render_field(form[fieldName], data_name) }}
+      {{ render_field(form[fieldName], data_name, allow_reorder) }}
     {%- endfor %}
                 </ul>
     {{ form.submit() }}
-                <input type="button" id="cancel" name="cancel" onClick="window.location.assign({{ url_for ('.index') }})" value="Cancel" />
+                <input type="button" id="cancel" name="cancel" onClick="window.location.assign({{ url_for('.index') }})" value="Cancel" />
               </form>
             </ul>
           </div>

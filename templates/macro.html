@@ -1,4 +1,4 @@
-{% macro render_field(field, data_name) %}
+{% macro render_field(field, data_name, allow_reorder) %}
   {% if field.type == "FieldList" %}
   </ul><ul>
   <input type="button" id="append" name="append" onClick="append_row()" value="Add {{ data_name }}" />
@@ -9,8 +9,10 @@
       {% if subfield.type == "SelectMultipleField" -%}
       {{ subfield(**kwargs)|safe }}
       {% else -%}{{ subfield(**kwargs)|safe }}{% endif %}
+      {% if allow_reorder -%}
         <input type="button" id="demote" name="demote" onClick="demote_row(this)" value="Move Up" />
         <input type="button" id="promote" name="promote" onClick="promote_row(this)" value="Move Down" />
+      {% endif -%}
         <input type="button" id="delete" name="delete" onClick="if(window.confirm('Are you sure?')){delete_row(this)}" value="Delete" />
         </li>
     {% endfor %}

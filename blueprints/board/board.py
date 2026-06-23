@@ -178,6 +178,7 @@ def edit(board_id: str):
         ),
         subject=current_app.config["BOARD_NAME"],
         fields=fields,
+        allow_reorder=False,
         form=form,
     )
 
