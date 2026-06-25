@@ -79,7 +79,7 @@ def index():
                             "confirm": ' '.join([
                                 "Are you sure?",
                                 "Deleting",
-                                seq.name,
+                                '"' + seq.name + '"',
                                 "cannot be undone.",
                             ]),
                         }
@@ -156,20 +156,27 @@ def edit(sequence_id):
                     [
                         "Updated",
                         current_app.config["SEQUITUR_NAME"],
-                        sequitur.name + '.',
+                        '"' + sequitur.name + '".',
                     ]
                 ), "success"
             )
             return redirect(url_for(".index"))
     return render_template(
         "edit.html",
-        title="edit " + current_app.config["SEQUITUR_NAME"],
-        describe=" ".join(
+        title=' '.join(
+            [
+                "edit",
+                current_app.config["SEQUITUR_NAME"],
+                '"' + sequitur.name + '"'
+
+            ]
+        ),
+        describe=' '.join(
             [
                 "Change the settings, and",
                 "change, move, add, delete entries for",
                 current_app.config["SEQUITUR_NAME"],
-                sequitur.name,
+                '"' + sequitur.name + '"',
                 "in the fields below."
             ]
         ),

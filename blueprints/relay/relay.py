@@ -93,7 +93,7 @@ def index():
                                 "Are you sure?",
                                 "Deleting",
                                 current_app.config["RELAY_NAME"],
-                                relay.name,
+                                '"' + relay.name + '"',
                                 "will delete all",
                                 "information on this",
                                 current_app.config["RELAY_NAME"],
@@ -130,7 +130,7 @@ def off(relay_id):
             ' '.join(
                 [
                     capitalize(current_app.config["RELAY_NAME"]),
-                    relays[relay_id].name,
+                    '"' + relays[relay_id].name + '"',
                     "was turned off."
                 ]
             ),
@@ -170,7 +170,7 @@ def on(relay_id):
             ' '.join(
                 [
                     "Relay",
-                    str(relays[relay_id].name),
+                    '"' + relays[relay_id].name + '"',
                     "is set as inactive",
                     "and therefore was",
                     "not turned on.",
@@ -182,7 +182,7 @@ def on(relay_id):
             ' '.join(
                 [
                     capitalize(current_app.config["RELAY_NAME"]),
-                    relays[relay_id].name,
+                    '"' + relays[relay_id].name + '"',
                     "was not turned on for",
                     str(interval),
                     "minute." if interval == 1 else "minutes.",
@@ -199,7 +199,7 @@ def on(relay_id):
             ' '.join(
                 [
                     capitalize(current_app.config["RELAY_NAME"]),
-                    relays[relay_id].name,
+                    '"' + relays[relay_id].name + '"',
                     "was turned on for",
                     str(interval),
                     "minute." if interval == 1 else "minutes.",
@@ -237,10 +237,10 @@ def edit(relay_id):
                         str(field.data),
                         "on",
                         current_app.config["BOARD_NAME"],
-                        board.name,
+                        '"' + board.name + '"',
                         "is already assigned to",
                         current_app.config["RELAY_NAME"],
-                        board[field.data].name + '.',
+                        '"' + board[field.data].name + '".',
                     ]
                 )
             )
@@ -372,19 +372,25 @@ def edit(relay_id):
                 [
                     "Updated",
                     current_app.config["RELAY_NAME"],
-                    relay.name + '.',
+                    '"' + relay.name + '".',
                 ]
             ), "success"
         )
         return redirect(url_for(".index"))
     return render_template(
         "edit.html",
-        title="edit " + current_app.config["RELAY_NAME"],
-        describe=" ".join(
+        title=' '.join(
+            [
+              "edit",
+              current_app.config["RELAY_NAME"],
+              '"' + relay.name + '"'
+            ]
+        ),
+        describe=' '.join(
             [
                 "Change settings for",
                 current_app.config["RELAY_NAME"],
-                relay.name,
+                '"' + relay.name + '"',
                 "and its dependencies in the fields below."
             ]
         ),

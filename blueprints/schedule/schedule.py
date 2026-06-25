@@ -105,7 +105,7 @@ def index():
                                 "Are you sure?",
                                 "Deleting",
                                 current_app.config["SCHEDULE_NAME"],
-                                schedule.name,
+                                '"' + schedule.name + '"',
                                 "cannot be undone."
                             ]),
                         }
@@ -231,20 +231,26 @@ def edit(schedule_id):
                     [
                         "Updated",
                         current_app.config["SCHEDULE_NAME"],
-                        schedule.name + '.',
+                        '"' + schedule.name + '".',
                     ]
                 ), "success"
             )
             return redirect(url_for(".index"))
     return render_template(
         "edit.html",
-        title="edit " + current_app.config["SCHEDULE_NAME"],
+        title=' '.join(
+            [
+                "edit",
+                current_app.config["SCHEDULE_NAME"],
+                '"' + schedule.name + '"'
+            ]
+        ),
         describe=" ".join(
             [
                 "Change the settings, and",
                 "change, move, add, delete entries for",
                 current_app.config["SCHEDULE_NAME"],
-                schedule.name,
+                '"' + schedule.name + '"',
                 "in the fields below."
             ]
         ),

@@ -82,7 +82,7 @@ def index():
                                 "Are you sure?",
                                 "Deleting",
                                 current_app.config["BOARD_NAME"],
-                                board.name,
+                                '"' + board.name + '"',
                                 "will also delete all the",
                                 pluralize(current_app.config["RELAY_NAME"]),
                                 "listed as its",
@@ -160,19 +160,25 @@ def edit(board_id: str):
                     [
                         "Updated",
                         current_app.config["BOARD_NAME"],
-                        board.name,
+                        '"' + board.name + '"',
                     ]
                 ), "success"
             )
             return redirect(url_for(".index"))
     return render_template(
         "edit.html",
-        title="edit " + current_app.config["BOARD_NAME"],
-        describe=" ".join(
+        title=' '.join(
+            [
+                "edit",
+                current_app.config["BOARD_NAME"],
+                '"' + board.name + '"'
+            ]
+        ),
+        describe=' '.join(
             [
                 "Change settings for",
                 current_app.config["BOARD_NAME"],
-                board.name,
+                '"' + board.name + '"',
                 "in the fields below."
             ]
         ),
