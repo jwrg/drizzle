@@ -1,17 +1,11 @@
-nav {
-  width: 100%;
-}
-
 header {
   border-top: 3px solid black;
-  border-bottom: 3px solid #eee;
+  border-bottom: 8px solid ghostwhite;
 }
 
 header nav {
-  font-size: 24pt;
-  background-color: #24a;
-  /* border-top: 4px solid #115; */
-  border-bottom: 4px solid lightgrey;
+  background-color: navy;
+  border-bottom: 4px solid lightsteelblue;
 }
 
 header nav ul {
@@ -27,8 +21,8 @@ header nav ul li {
   font-family: Trebuchet, Tahoma, Arial, sans-serif;
   padding: 0 1.5ex;
   margin: 0;
-  border-left: 2px solid #015;
-  border-right: 2px solid #99f;
+  border-left: 2px solid midnightblue;
+  border-right: 2px solid slateblue;
 }
 
 header nav ul li a {
@@ -52,7 +46,7 @@ header nav ul li.filler {
 }
 
 header nav ul li.drizzle {
-  background-color: #115;
+  background-color: midnightblue;
 }
 
 header nav ul li.drizzle a,
@@ -62,10 +56,9 @@ header nav ul li a.icon {
 }
 
 header nav ul li.current {
-  background-image: linear-gradient(0deg, #222, #115);
-  border-bottom: 4px solid #88c;
+  background-image: linear-gradient(0deg, black, midnightblue);
+  border-bottom: 4px solid slateblue;
   padding-bottom: 0;
-  /* font-weight: bold; */
 }
 
 header nav ul li.current a {

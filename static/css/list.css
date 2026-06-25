@@ -2,6 +2,11 @@ ul.entries li div {
   margin: 2em 0;
 }
 
+ul.entries li div ul.entry li.name {
+  color: navy;
+  font-size: 32pt;
+}
+
 ul.entries li div ul.entry li.name::after {
   content: "";
   height: 2px;

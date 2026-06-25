@@ -17,7 +17,7 @@ button {
   -ms-transition: all .1s ease;
   -o-transition: all .1s ease;
   transition: all .1s ease;
-  -moz-box-shadow: 0px 9px 0px navy, 0px 9px 25px #444545;
+  -moz-box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
   -webkit-box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
   box-shadow: 0px 9px 0px navy, 0px 9px 25px rgba(0,0,0,.7);
 }
@@ -27,7 +27,7 @@ label.button-label:active,
 input[type="submit"]:active,
 input[type="button"]:active,
 button:active {
-  box-shadow: 0px 3px 0px #24a, 0px 3px 6px rgba(0,0,0,.9);
+  box-shadow: 0px 3px 0px navy, 0px 3px 6px rgba(0,0,0,.9);
   position: relative;
   top: 6px;
 }
