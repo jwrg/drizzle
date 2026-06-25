@@ -131,6 +131,7 @@ def edit_config():
             "APP_PORT",
             "SECRET_KEY",
             "SERVER_NAME",
+            "TESTING",
             "MAX_TIME",
             "MAX_CONCURRENT",
             "RUNNING_TIMES",

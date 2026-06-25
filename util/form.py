@@ -65,6 +65,7 @@ class ConfigForm(FlaskForm):
     APP_PORT = IntegerField("TCP/IP port", widget=HiddenInput(), validators=[
         validators.NumberRange(min=1, max=65535)
     ])
+    TESTING = BooleanField("Testing", widget=HiddenInput(), validators=[])
     SECRET_KEY = HiddenField("Secret key", validators=[])
     SERVER_NAME = HiddenField("Server name", validators=[])
     MAX_TIME = IntegerField("Max relay run time", validators=[

@@ -2,12 +2,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from threading import Lock
 from datetime import datetime, timedelta
-# from test.plates import relayOFF, relayON
-from piplates.RELAYplate import relayOFF, relayON
 from time import sleep
 from typing import Any, Callable
 
 from flask import current_app
+if current_app.config["TESTING"]:
+    from test.plates import relayOFF, relayON
+else:
+    from piplates.RELAYplate import relayOFF, relayON
 
 from util.persist import PersistentMapping
 from util.singleton import singleton
