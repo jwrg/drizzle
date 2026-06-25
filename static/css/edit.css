@@ -132,6 +132,10 @@ form ul input#append {
   padding: 1em;
 }
 
+form ul input#append:active {
+  top: calc(1em + 6px);
+}
+
 form ul fieldset li table tbody tr th label {
   color: white;
 }
