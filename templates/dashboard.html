@@ -5,7 +5,6 @@
         <h2 id="datetime" class="datetime">{{ datetime }}</h2>
 
     {# Relay control component #}
-        <p>Maximum number of concurrently running relays allowed: {{ config.MAX_CONCURRENT }}</p>
         <form method="post">
           <div class="time-wrapper" id="time-wrapper">
             <fieldset>
@@ -39,6 +38,7 @@
     {%- endfor -%}
           </div>
         </form>
+        <p>Maximum number of concurrently running relays allowed: {{ config.MAX_CONCURRENT }}</p>
 
         <div class="table-wrapper">
     {# Sequence control component #}
