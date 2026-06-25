@@ -36,13 +36,14 @@ input[type="submit"].sticky,
 input[type="button"].sticky,
 button.sticky {
   position: sticky;
-  top: 3ex;
+  top: 1ex;
   left: 90vw;
+  margin: -1ex 0;
   font-size: calc(14pt + 1vw);
 }
 
 input[type="submit"].sticky:active,
 input[type="button"].sticky:active,
 button.sticky:active {
-  top: calc(3ex + 6px);
+  top: calc(1ex + 6px);
 }
