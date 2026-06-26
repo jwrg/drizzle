@@ -1,13 +1,13 @@
-ul.entries li div {
+ul.entries > li > div {
   margin: 2em 0;
 }
 
-ul.entries li div ul.entry li.name {
+ul.entries > li > div > ul.entry > li.name {
   color: navy;
   font-size: 32pt;
 }
 
-ul.entries li div ul.entry li.name::after {
+ul.entries > li > div > ul.entry > li.name::after {
   content: "";
   height: 2px;
   background: navy;
@@ -15,33 +15,49 @@ ul.entries li div ul.entry li.name::after {
   margin-bottom: 0.25ex;
 }
 
-ul.entries li div.inactive ul.entry li.name::before {
+ul.entries > li > div.inactive > ul.entry > li.name::before,
+ul.entries > li > div.running > ul.entry > li.name::before {
   display: inline-block;
   margin-right: 0.5ex;
+}
+
+ul.entries > li > div.inactive > ul.entry > li.name::before {
   content: "(Not Active) ";
 }
 
-ul.entries li div.running ul.entry li.name::before {
-  display: inline-block;
-  margin-right: 0.5ex;
+ul.entries > li > div.running > ul.entry > li.name::before {
   content: "(Running) ";
 }
 
-ul.entries li div ul.entry li.description {
+ul.entries > li > div > ul.entry > li.description {
   margin-bottom: 1em;
 }
 
-ul.entries li div ul.entry nav {
+ul.entries > li > div > ul.entry > nav {
   margin: 2em 0 0 0;
 }
 
-ul.entries li div.running,
-ul.entries li div.active {
+ul.entries > li > div.running,
+ul.entries > li > div.active {
   border: 1px solid lightcyan;
   background-image: linear-gradient(48deg, floralwhite, lightcyan);
 }
 
-ul.entries li div.inactive {
+ul.entries > li > div.inactive {
   border: 1px solid lightgray;
   background-image: linear-gradient(48deg, floralwhite, lightgray);
 }
+
+ul.entries > li > div > ul > nav > a {
+  margin-right: 1.5ex;
+}
+
+ul.entries > li > div > ul > nav > a:not(:last-child)::after {
+  content:"|";
+  color: navy;
+  position: relative;
+  right:-1ex;
+  top:0;
+  height:100%;
+}
+

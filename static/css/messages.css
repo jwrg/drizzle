@@ -2,26 +2,26 @@ main#messages {
   text-align: center;
 }
 
-main#messages ul li {
+main#messages > ul > li {
   padding: 1em;
 }
 
-main#messages ul li.success {
+main#messages > ul > li.success {
   border: 1px solid green;
   background-image: linear-gradient(48deg, honeydew, floralwhite);
 }
 
-main#messages ul li.caution {
+main#messages > ul > li.caution {
   border: 1px solid darkOrange;
   background-image: linear-gradient(48deg, lightgoldenrodyellow, lemonchiffon);
 }
 
-main#messages ul li.error {
+main#messages > ul > li.error {
   border: 1px solid red;
   background-image: linear-gradient(48deg, lavenderblush, mistyrose);
 }
 
-main#messages ul li.append {
+main#messages > ul > li.append {
   color: grey;
   font-size: smaller;
 }

@@ -4,20 +4,20 @@ section#dashboard {
   border: 1px solid darkgray;
 }
 
-section#dashboard p {
+section#dashboard > p {
   font-size: calc(12pt + 1vw);
 }
 
-section#dashboard h2#datetime {
+section#dashboard > h2#datetime {
   margin: 1ex;
 }
 
-section#dashboard form {
+section#dashboard > form {
   margin: 3ex;
 }
 
-div#button-wrapper,
-div#time-wrapper fieldset{
+section#dashboard > form > div#time-wrapper > fieldset,
+section#dashboard > form > div#button-wrapper {
   display: flex;
   flex-flow: row wrap;
   align-items: stretch;
@@ -27,40 +27,40 @@ div#time-wrapper fieldset{
   border: none;
 }
 
-div.button-box {
+section#dashboard > form > div#button-wrapper > div.button-box {
   flex: 1 1 anchor-size;
 }
 
-div.button-box label {
+section#dashboard > form > div#button-wrapper > div.button-box > label {
   display: inline-block;
   width: 100%;
   text-align: center;
 }
 
-div#time-wrapper label.time-label{
+section#dashboard > form > div#time-wrapper > fieldset > label.time-label {
   flex: 1 1 1px;
 }
 
-div#button-wrapper input.relay[type="submit"],
-div#time-wrapper label.time-label{
+section#dashboard > form > div#time-wrapper > fieldset > label.time-label,
+section#dashboard > form > div#button-wrapper > div.button-box > input.relay[type="submit"] {
   padding: 2.5vw 2vw;
   margin: 1ex;
   min-width: 1px;
 }
 
-div#time-wrapper input[type="radio"]:checked+label,
-div#button-wrapper div.button-box input[type="submit"].running {
+section#dashboard > form > div#time-wrapper fieldset > input[type="radio"]:checked+label,
+section#dashboard > form > div#button-wrapper > div.button-box > input.relay[type="submit"].running {
   color: white;
   text-shadow: 1px 1px navy;
   border-color: cornflowerblue;
   background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
 }
 
-div.table-wrapper {
+section#dashboard > div.table-wrapper {
   margin: 2em;
 }
 
-div#range-wrapper {
+section#dashboard > div#range-wrapper {
   position: relative;
   width: 80%;
   margin: 0 auto;

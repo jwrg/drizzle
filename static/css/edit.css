@@ -7,8 +7,8 @@ form {
   margin-top: 1em;
 }
 
-form ul,
-form ul fieldset {
+form > ul,
+form > ul > fieldset {
   display: flex;
   flex-flow: row wrap;
   align-items: stretch;
@@ -38,7 +38,7 @@ form ul li select,
 form ul li select option,
 form ul li input[type="text"],
 form ul li textarea,
-form ul fieldset {
+form > ul > fieldset {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
@@ -52,7 +52,7 @@ form ul li input[type="text"],
 form ul li textarea,
 form ul li.description,
 form ul li.name,
-form ul fieldset,
+form > ul > fieldset,
 form ul fieldset li {
   width: 100%;
 }
@@ -103,7 +103,7 @@ form ul li input[type="time"] {
   padding: 0.5ex 0 0.5ex 1ex;
 }
 
-form > ul > li > input[type="number"] {
+form ul li input[type="number"] {
   width: 3em;
   padding-left: 1em;
 }
@@ -112,19 +112,19 @@ form ul li input[type="time"] {
   padding-right: 1ex;
 }
 
-form ul li label[for="description"],
-form ul li label[for="name"],
-form ul li textarea#description,
-form ul li input#name {
+form > ul > li > label[for="description"],
+form > ul > li > label[for="name"],
+form > ul > li > textarea#description,
+form > ul > li > input#name {
   display: block;
 }
 
-form ul fieldset {
+form > ul > fieldset {
   border: none;
   padding: 0;
 }
 
-form ul input#append {
+form > ul > input#append {
   position: sticky;
   top: 1em;
   left: 90vw;
@@ -132,11 +132,11 @@ form ul input#append {
   padding: 1em;
 }
 
-form ul input#append:active {
+form > ul > input#append:active {
   top: calc(1em + 6px);
 }
 
-form ul fieldset li table tbody tr th label {
+form > ul > fieldset > li > table > tbody > tr > th > label {
   color: white;
 }
 
