@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-  {% block title %}Edit {{ subject|capitalize }}
-    {%- if form["name"] is defined %} "{{ form["name"].data|capitalize }}"{% endif %}
+  {% block title %}Edit {{ subject | capitalize }}
+    {%- if form["name"] is defined %} "{{ form["name"].data | capitalize }}"{% endif %}
   {%- endblock title %}
   {% block content %}
       <script src="{{ url_for('static', filename='edit.js') }}"></script>
     {%- if title is defined %}
-      <h2>{{ title|capitalize }}</h2>
+      <h2>{{ title | capitalize }}</h2>
     {%- endif %}
     {%- if describe is defined %}
       <p class="describe">{{ describe }}</p>
@@ -22,7 +22,7 @@
     {%- endfor %}
                 </ul>
     {{ form.submit() }}
-                <input type="button" id="cancel" name="cancel" onClick="window.location.assign({{ url_for('.index') }})" value="Cancel" />
+                <input type="button" id="cancel" name="cancel" onClick="window.location.assign({{ url_for(".index") }})" value="Cancel" />
               </form>
             </ul>
           </div>
