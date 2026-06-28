@@ -18,20 +18,23 @@ class Jsonny:
         """
         Returns a dict from a JSON file with implicit extension in base directory
         """
-        with open(
-            "/".join(
-                [
-                    Jsonny.prefix,
-                    ".".join(
-                        [
-                            file,
-                            Jsonny.extension
-                        ]
-                    )
-                ]
-            ), "r", encoding=Jsonny.encoding
-        ) as f:
-            return load(f)
+        try:
+            with open(
+                "/".join(
+                    [
+                        Jsonny.prefix,
+                        ".".join(
+                            [
+                                file,
+                                Jsonny.extension
+                            ]
+                        )
+                    ]
+                ), "r", encoding=Jsonny.encoding
+            ) as f:
+                return load(f)
+        except FileNotFoundError:
+            return {}
 
     @staticmethod
     def put(file, data, sort=False):
