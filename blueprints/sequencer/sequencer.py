@@ -16,9 +16,9 @@ from flask import (
 )
 
 with current_app.app_context():
-    from util.sequencer import Sequor, Sequitur, Sequencer
+    from lib.relay import Baton
+    from lib.sequencer import Sequor, Sequitur, Sequencer
     from util.form import SequiturForm
-    from util.relay import Baton
     from util.redirected import redirected
     from util.template import (
         filter_capitalize_first as capitalize,

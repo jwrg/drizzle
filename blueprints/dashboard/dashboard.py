@@ -14,10 +14,10 @@ from flask import (
 )
 
 with current_app.app_context():
-    from util.board import Holder
-    from util.relay import Baton
-    from util.sequencer import Sequencer
-    from util.schedule import Scheduler
+    from lib.board import Holder
+    from lib.relay import Baton
+    from lib.sequencer import Sequencer
+    from lib.schedule import Scheduler
     from util.template import (
         filter_capitalize_first as capitalize,
         filter_pluralize as pluralize

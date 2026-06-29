@@ -8,7 +8,8 @@ from flask import current_app
 
 from util.persist import PersistentMapping
 from util.singleton import singleton
-from util.relay import Relay, Baton
+
+from lib.relay import Relay, Baton
 
 relays = Baton()
 

@@ -19,8 +19,8 @@ from wtforms import SelectField, FieldList, FormField
 from wtforms.validators import ValidationError
 
 with current_app.app_context():
-    from util.board import Holder
-    from util.relay import Baton, Relay, Dependency
+    from lib.board import Holder
+    from lib.relay import Baton, Relay, Dependency
     from util.form import RelayForm, DependencyForm
     from util.redirected import redirected
     from util.template import (

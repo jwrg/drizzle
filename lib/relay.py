@@ -155,7 +155,7 @@ class Baton(PersistentMapping):
         return active
 
     def to_obj(self, collection: dict[str, dict]) -> dict[str, Relay]:
-        from util.board import Holder
+        from lib.board import Holder
         boards = Holder()
         objects = {}
         while len(objects.keys()) < len(collection.keys()):

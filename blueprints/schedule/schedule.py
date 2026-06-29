@@ -19,8 +19,8 @@ from wtforms import FieldList, FormField, SelectMultipleField
 from wtforms.validators import ValidationError
 
 with current_app.app_context():
-    from util.schedule import Schedule, Job, Scheduler
-    from util.sequencer import Sequencer
+    from lib.sequencer import Sequencer
+    from lib.schedule import Schedule, Job, Scheduler
     from util.form import FixtureForm, ScheduleForm
     from util.redirected import redirected
     from util.template import (

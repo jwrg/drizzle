@@ -15,7 +15,7 @@ from flask import (
 )
 
 with current_app.app_context():
-    from util.board import Board, Holder
+    from lib.board import Board, Holder
     from util.form import BoardForm
     from util.redirected import redirected
     from util.template import (

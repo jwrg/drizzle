@@ -6,7 +6,8 @@ from flask import current_app
 
 from util.persist import PersistentMapping
 from util.singleton import singleton
-from util.relay import Relay
+
+from lib.relay import Relay
 
 
 @dataclass
@@ -138,7 +139,7 @@ class Holder(PersistentMapping):
         super().__init__(filename)
 
     def __delitem__(self, key):
-        from util.relay import Baton
+        from lib.relay import Baton
         relays = Baton()
         for conn in self.collection[key].addresses:
             if conn.relay is not None:

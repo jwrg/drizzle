@@ -8,10 +8,11 @@ from datetime import date, datetime, time, timedelta
 
 from flask import current_app
 
-from util.sequencer import Sequencer, Sequitur
 from util.singleton import singleton
 from util.persist import PersistentMapping
 from util.timmy import Timmy
+
+from lib.sequencer import Sequencer, Sequitur
 
 sequences = Sequencer()
 
