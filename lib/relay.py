@@ -7,7 +7,7 @@ from typing import Any, Callable
 
 from flask import current_app
 if current_app.config["TESTING"]:
-    from test.plates import relayOFF, relayON
+    from util.plates import relayOFF, relayON
 else:
     from piplates.RELAYplate import relayOFF, relayON
 

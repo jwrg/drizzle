@@ -2,5 +2,7 @@ pi-plates
 spidev
 RPi.GPIO
 bjoern
+Flask-WTF
+behave
 #gevent
 #gunicorn
