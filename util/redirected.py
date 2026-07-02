@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import flash, redirect, url_for
 from werkzeug.exceptions import NotFound
-from util.template import (
+from util.filters import (
     filter_capitalize_all as capitalize,
     filter_simple_past as simple_past
 )
