@@ -23,7 +23,7 @@ with current_app.app_context():
     from lib.relay import Baton, Relay, Dependency
     from util.form import RelayForm, DependencyForm
     from util.redirected import redirected
-    from util.template import (
+    from util.filters import (
         filter_pluralize as pluralize,
         filter_capitalize_first as capitalize
     )

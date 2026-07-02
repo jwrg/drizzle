@@ -23,7 +23,7 @@ with current_app.app_context():
     from lib.schedule import Schedule, Job, Scheduler
     from util.form import FixtureForm, ScheduleForm
     from util.redirected import redirected
-    from util.template import (
+    from util.filters import (
         filter_capitalize_first as capitalize,
         filter_pluralize as pluralize
     )

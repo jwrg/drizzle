@@ -22,20 +22,20 @@ def filter_pluralize(noun: str):
         if noun[-1] == 'y' and noun[-2] not in ['a', 'e', 'i', 'o', 'u']:
             return noun[:-1] + "ies"
         return noun + 's'
-    return noun + 'es'
+    if noun[-1] in ['s', 'z'] and noun[-2] != noun[-1]:
+        return noun + noun[-1] + "es"
+    return noun + "es"
 
 
 def filter_simple_past(verb: str):
     if (
-        verb[-1] in ['b', 'd', 'm', 'n', 'p'] and
+        verb[-1] in ['b', 'd', 'l', 'm', 'n', 'p', 'z'] and
         verb[-2] != verb[-1]
     ) or (
         verb[-1] == 'g' and
-        verb[-2:-1] != "ng"
+        verb[-2:] != "ng"
     ):
-        verb += verb[-1] + "ed"
-    elif verb[-1] == 'e':
-        verb += 'd'
-    else:
-        verb += "ed"
-    return verb
+        return verb + verb[-1] + "ed"
+    if verb[-1] == 'e':
+        return verb + 'd'
+    return verb + "ed"

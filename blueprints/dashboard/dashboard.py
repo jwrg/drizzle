@@ -18,7 +18,7 @@ with current_app.app_context():
     from lib.relay import Baton
     from lib.sequencer import Sequencer
     from lib.schedule import Scheduler
-    from util.template import (
+    from util.filters import (
         filter_capitalize_first as capitalize,
         filter_pluralize as pluralize
     )

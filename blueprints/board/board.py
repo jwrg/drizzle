@@ -18,7 +18,7 @@ with current_app.app_context():
     from lib.board import Board, Holder
     from util.form import BoardForm
     from util.redirected import redirected
-    from util.template import (
+    from util.filters import (
         filter_capitalize_first as capitalize,
         filter_pluralize as pluralize
     )

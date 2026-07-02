@@ -6,7 +6,7 @@ from json import load, dump
 from flask import Flask, flash, redirect, render_template, request, url_for
 from wtforms import IntegerField, FieldList, FormField
 from wtforms.validators import NumberRange, ValidationError
-from util.template import filter_capitalize_first, filter_pluralize
+from util.filters import filter_capitalize_first, filter_pluralize
 
 app = Flask(__name__)
 config_path = "config/config.json"

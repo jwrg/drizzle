@@ -20,7 +20,7 @@ with current_app.app_context():
     from lib.sequencer import Sequor, Sequitur, Sequencer
     from util.form import SequiturForm
     from util.redirected import redirected
-    from util.template import (
+    from util.filters import (
         filter_capitalize_first as capitalize,
         filter_pluralize as pluralize
     )
