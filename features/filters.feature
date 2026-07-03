@@ -13,6 +13,7 @@ Feature: custom template filters
 
     Examples: nouns
       | input | output |
+      | a | A |
       | barry | Barry |
       | siphon | Siphon |
       | WORD-SALAD | WORD-SALAD |
@@ -30,6 +31,7 @@ Feature: custom template filters
 
     Examples: nouns
       | input | output |
+      | a | A |
       | barry | Barry |
       | siphon | Siphon |
       | WORD-SALAD | WORD-SALAD |
@@ -39,6 +41,16 @@ Feature: custom template filters
       | barry lyndon | Barry Lyndon |
       | siphon some gas, Trevor | Siphon Some Gas, Trevor |
       | american WORD-SALAD | American WORD-SALAD |
+
+  Scenario: capitalization of an empty string,
+     Given an empty string,
+      when fed into the capitalize_first filter
+      then it should come out an empty string.
+
+  Scenario: capitalization of an empty string,
+     Given an empty string,
+      when fed into the capitalize_all filter
+      then it should come out an empty string.
 
   Scenario Outline: noun pluralization
      Given a regular noun <input> singular in grammatical number,

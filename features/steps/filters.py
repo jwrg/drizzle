@@ -16,6 +16,12 @@ def step_impl(context, input):
     assert type(context.input) is str
 
 
+@given("an empty string,")
+def step_impl(context):
+    context.input = ''
+    assert type(context.input) is str
+
+
 @when("fed into the capitalize_first filter")
 def step_impl(context):
     context.output = capitalize_first(context.input)
@@ -42,4 +48,11 @@ def step_impl(context):
 @then("it should come out in the simple past tense, as {output}.")
 def step_impl(context, output):
     assert type(output) is str
+    assert type(context.output) is str
     assert context.output == output
+
+
+@then("it should come out an empty string.")
+def step_impl(context):
+    assert type(context.output) is str
+    assert context.output == ''
