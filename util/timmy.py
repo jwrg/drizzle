@@ -30,7 +30,7 @@ class Timmy:
         return (
             self.start + self.interval
             if self.timer is not None
-            else datetime()
+            else datetime.min
         )
 
     def remaining(self) -> timedelta:
@@ -75,7 +75,10 @@ class Timmy:
                     ]
                 )
             )
-            if callback != self.callback or args != self.args:
+            if callback != self.callback or (
+                callback == self.callback and args != self.args
+            ):
+                self.callback(*self.args)
                 Timmy.logger.debug(
                     " ".join(
                         [
