@@ -1,22 +1,62 @@
-platestate = 0
+from flask import current_app
+
+platestate = [0 for zero in range(0, 7)]
 
 
-def relaySTATE(arg):
-    global platestate
-    return platestate
+def relaySTATE(board_index):
+    return platestate[board_index]
 
 
-def relayON(arg, arg2):
-    global platestate
-    platestate = platestate | 1 << arg2 - 1
-    print("__!! ON !!__".join(["BOARD", str(arg), "RELAY", str(arg2), "ON--ON--ON"]))
-    print("--!STATE!--".join((["NEWSTATE:", str(platestate)])))
+def relayON(board_index, relay_index):
+    platestate[board_index] = platestate[board_index] | 1 << relay_index - 1
+    current_app.logger.debug(
+        ' '.join(
+            [
+                "Board with index",
+                str(board_index),
+                "relay with index",
+                str(relay_index),
+                "is now turned on"
+            ]
+        )
+    )
+    print(platestate)
+    current_app.logger.debug(
+        ' '.join(
+            [
+                "New state for board with index",
+                str(board_index),
+                "is",
+                str(platestate[board_index]),
+                "[ {0:0>7b} ]".format(platestate[board_index]),
+            ]
+        )
+    )
     return 0
 
 
-def relayOFF(arg, arg2):
-    global platestate
-    platestate = platestate & ~(1 << arg2 - 1)
-    print("__! OFF !__".join(["BOARD", str(arg), "RELAY", str(arg2), "OFF--OFF--OFF"]))
-    print("--!STATE!--".join((["NEWSTATE:", str(platestate)])))
+def relayOFF(board_index, relay_index):
+    platestate[board_index] = platestate[board_index] & ~(1 << relay_index - 1)
+    current_app.logger.debug(
+        ' '.join(
+            [
+                "Board with index",
+                str(board_index),
+                "relay with index",
+                str(relay_index),
+                "is now turned off"
+            ]
+        )
+    )
+    current_app.logger.debug(
+        ' '.join(
+            [
+                "New state for board with index",
+                str(board_index),
+                "is",
+                str(platestate[board_index]),
+                "[ {0:0>7b} ]".format(platestate[board_index]),
+            ]
+        )
+    )
     return 0
