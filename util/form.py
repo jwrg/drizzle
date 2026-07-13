@@ -9,6 +9,7 @@ from wtforms import (
     BooleanField,
     IntegerField,
     HiddenField,
+    RadioField,
     StringField,
     SubmitField,
     TextAreaField,
@@ -74,6 +75,13 @@ class ConfigForm(FlaskForm):
     MAX_CONCURRENT = IntegerField("Max concurrent running relays", validators=[
         validators.NumberRange(min=1)
     ])
+    TIME_SELECTOR = RadioField(
+        "Dashboard time selector",
+        choices=[
+            ("buttons", "Time buttons"),
+            ("slider", "Time slider"),
+        ],
+    )
     BOARD_NAME = StringField("Board object name", validators=[std_length])
     CONNECTION_NAME = StringField("Board connection name", validators=[
         std_length

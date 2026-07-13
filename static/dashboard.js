@@ -4,7 +4,7 @@ function setBubble(range, bubble) {
   const max = range.max ? range.max : 100;
   const newVal = Number(((val - min) * 100) / (max - min));
   bubble.innerHTML = val == 1 ? val + '&nbsp;minute' : val + '&nbsp;minutes';
-  bubble.style.left = `calc(${newVal}% + (${8 - newVal * 0.15}px))`;
+  bubble.style.left = `calc(${newVal}% + (${20 - newVal * 0.35}px))`;
 }
 
 function get_seconds(time_string) {
@@ -47,9 +47,19 @@ function set_countup(el) {
   }, 999);
 }
 
-const running_buttons = Array.from(document.getElementsByClassName('running-label'));
 var datetime = set_countup(document.getElementById('datetime'));
+
+const running_buttons = Array.from(document.getElementsByClassName('running-label'));
 let handles = [];
 for (let i = 0; i < running_buttons.length; ++i) {
   handles[i] = set_countdown(running_buttons[i]);
+}
+
+const range = document.getElementById("minutes-slider");
+const bubble = document.getElementById("range-bubble");
+if (range && bubble) {
+  range.addEventListener("input", () => {
+    setBubble(range,bubble);
+  });
+  setBubble(range,bubble);
 }

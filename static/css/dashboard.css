@@ -56,33 +56,51 @@ section#dashboard > form > div#button-wrapper > div.button-box > input.relay[typ
   background-image: linear-gradient(48deg, deepskyblue, dodgerblue);
 }
 
-section#dashboard > div.table-wrapper {
+section#dashboard > form > div.table-wrapper {
   margin: 2em;
 }
 
-section#dashboard > div#range-wrapper {
+section#dashboard > form > div#range-wrapper {
   position: relative;
   width: 80%;
   margin: 0 auto;
 }
 
-input[type="range"] {
+section#dashboard > form > div#range-wrapper > input[type="range"] {
+  -webkit-appearance: none;
   width: 100%;
-  margin-top: 5ex;
+  margin-top: 5.5ex;
+  background: transparent;
 }
 
-.range-bubble {
+section#dashboard > form > div#range-wrapper > input[type="range"]::-webkit-slider-runnable-track,
+section#dashboard > form > div#range-wrapper > input[type="range"]::-moz-range-track {
+  height: 1em;
+  background: navy;
+  border-radius: 16px;
+}
+
+section#dashboard > form > div#range-wrapper > input[type="range"]::-webkit-slider-thumb,
+section#dashboard > form > div#range-wrapper > input[type="range"]::-moz-range-thumb {
+  -webkit-appearance: none;
+  height: 2em;
+  width: 2ex;
+  border-radius: 16px;
+}
+
+section#dashboard > form > div#range-wrapper > output.range-bubble {
   background: green;
   color: white;
   font-size: 24pt;
   padding: 8px 18px;
   position: absolute;
-  border-radius: 1rem;
+  border: 1px solid darkgreen;
+  border-radius: 16px;
   left: 50%;
   transform: translateX(-50%);
  }
  
- .range-bubble::after {
+section#dashboard > form > div#range-wrapper > output.range-bubble::after {
   content: "";
   position: absolute;
   width: 0px;
