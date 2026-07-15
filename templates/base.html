@@ -3,7 +3,7 @@
   <head>
 {%- block head %}
     <title>{% block title %}{% endblock title %} - Drizzle</title>
-{% set styles = [
+{%- set styles = [
     'base',
     'buttons',
     'footer',
@@ -12,11 +12,11 @@
     'status',
     'tables',
     'typography',
-] %}
-{% for style in styles %}
+] -%}
+{%- for style in styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/' +
     style + '.css') }}">
-{% endfor %}
+{%- endfor %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/' +
     self._TemplateReference__context.name.split('.')[0] +
     '.css') }}">
@@ -25,7 +25,7 @@
   </head>
   <body>
 {% include "navbar.html" %}
-{% include "messages.html" %}
+{%- include "messages.html" %}
     <main id="content">
       {%- block content %}{% endblock content %}
     </main> 
