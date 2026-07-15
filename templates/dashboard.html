@@ -4,7 +4,7 @@
       <section id="dashboard" class="rounded">
         <h2 id="datetime" class="datetime">{{ datetime }}</h2>
 
-    {# Relay control component #}
+    {#- Relay control component #}
         <form method="post">
     {%- if config["TIME_SELECTOR"] == "buttons" %}
           <div class="time-wrapper" id="time-wrapper">
@@ -39,13 +39,13 @@
               " formaction="{{ url_for(endpoint, **arguments) }}" /><br />
             </div>
       {%- endif %}
-    {%- endfor -%}
+    {%- endfor %}
           </div>
         </form>
         <p>Maximum number of concurrently running relays allowed: {{ config.MAX_CONCURRENT }}</p>
-
         <div class="table-wrapper">
-    {# Sequence control component #}
+
+    {#- Sequence control component #}
           <table id="sequencer" class="shadow">
             <thead>
               <tr>
@@ -69,11 +69,11 @@
     {%- endif %}window.open('{{ url_for(endpoint, **arguments) }}','_parent')
     {%- if confirm %}{{ '}' }}"{% endif %}>{{ action }}</a></td>
               </tr>
-    {%- endfor -%}
+    {%- endfor %}
             </tbody>
           </table>
 
-    {# Schedule control component #}
+    {#- Schedule control component #}
           <table id="scheduler" class="shadow">
             <thead>
               <tr>
@@ -96,10 +96,10 @@
     {%- endif %}window.open('{{ url_for(endpoint, **arguments) }}','_parent')
     {%- if confirm %}{{ '}' }}"{% endif %}>{{ action }}</a></td>
               </tr>
-    {%- endfor -%}
+    {%- endfor %}
             </tbody>
           </table>
         </div>
       </section>
       <script src="{{ url_for('static', filename='dashboard.js') }}"></script>
-  {% endblock %}
+  {%- endblock %}
