@@ -20,7 +20,6 @@ def relayON(board_index, relay_index):
             ]
         )
     )
-    print(platestate)
     current_app.logger.debug(
         ' '.join(
             [
