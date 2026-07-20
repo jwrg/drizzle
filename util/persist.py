@@ -4,13 +4,16 @@
 from collections.abc import MutableMapping
 from typing import Any
 
+from flask import current_app
+
 from util.jsonny import Jsonny
 
 
 class PersistentMapping(MutableMapping):
     def __init__(self, filename: str) -> None:
         self.filename = filename
-        self.jsonny = Jsonny(self.filename)
+        self.prefix = "test/" if current_app.testing else "config/"
+        self.jsonny = Jsonny(self.filename, self.prefix)
         self.collection = self.to_obj(self.jsonny.json)
 
     def __getitem__(self, key: str):

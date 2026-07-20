@@ -75,7 +75,7 @@ def index():
             with open(
                 path.join(
                     config_path,
-                    "config.json"
+                    "app.json"
                 ),
                 'w',
                 encoding="utf8"
@@ -106,10 +106,6 @@ def index():
             "SEQUENCIA_NAME",
             "SCHEDULE_NAME",
             "JOB_NAME",
-            "LOG_LEVEL",
-            "APP_PORT",
-            "SECRET_KEY",
-            "SERVER_NAME",
             "MAX_TIME",
             "MAX_CONCURRENT",
             "TIME_SELECTOR",

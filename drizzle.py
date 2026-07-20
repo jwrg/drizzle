@@ -2,14 +2,18 @@
 A flask app for controlling relays, with a sprinkler flavour
 """
 from json import load
+from os import path
 
 from flask import Flask, redirect, request, url_for
 
 from util.filters import filter_capitalize_first, filter_pluralize
 
 app = Flask(__name__)
-config_path = "config/config.json"
-app.config.from_file(config_path, load=load)
+config_path = "config"
+config_files = ["app.json", "flask.json"]
+for file in config_files:
+    app.config.from_file(path.join(config_path, file), load=load)
+app.config.from_envvar("DRIZZLE_TEST_CONFIG", True)
 app.logger.setLevel(app.config["LOG_LEVEL"])
 app.add_template_filter(filter_capitalize_first, 'capitalize')
 app.add_template_filter(filter_pluralize, 'pluralize')
