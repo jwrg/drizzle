@@ -9,60 +9,65 @@ class Jsonny:
     Class for manipulating JSON configuration data
     """
 
-    encoding = "utf8"
-    extension = "json"
-    prefix = "config/"
+    def __init__(
+        self,
+        filename: str,
+        prefix: str,
+        extension: str = "json",
+        encoding: str = "utf8"
+    ):
+        self.filename = filename
+        self.prefix = prefix
+        self.extension = extension
+        self.encoding = encoding
+        self.json = self.load()
 
-    @staticmethod
-    def get(file):
+    def get(self, filename):
         """
-        Returns a dict from a JSON file with implicit extension in base directory
+        Returns a dict from a JSON file with explicit
+        path and extension relative to base directory
         """
         try:
             with open(
                 "/".join(
                     [
-                        Jsonny.prefix,
+                        self.prefix,
                         ".".join(
                             [
-                                file,
-                                Jsonny.extension
+                                filename,
+                                self.extension
                             ]
                         )
                     ]
-                ), "r", encoding=Jsonny.encoding
+                ), "r", encoding=self.encoding
             ) as f:
                 return load(f)
         except FileNotFoundError:
             return {}
 
-    @staticmethod
-    def put(file, data, sort=False):
+    def put(self, filename, data, sort=False):
         """
-        Persists some JSON data to disk with implicit extension in base directory
+        Persists some JSON data to disk with explicit
+        path and extension relative to base directory
         """
         with open(
             "/".join(
                 [
-                    Jsonny.prefix,
+                    self.prefix,
                     ".".join(
                         [
-                            file,
-                            Jsonny.extension
+                            filename,
+                            self.extension
                         ]
                     )
                 ]
-            ), "w", encoding=Jsonny.encoding
+            ), "w", encoding=self.encoding
         ) as f:
             return dump(data, f, sort_keys=sort)
 
-    def __init__(self, filename: str):
-        self.filename = filename
-        self.json = self.load()
-
     def load(self):
-        return Jsonny.get(self.filename)
+        return self.get(self.filename)
 
     def save(self, json):
         self.json = json
-        return Jsonny.put(self.filename, self.json)
+        return self.put(self.filename, self.json)
