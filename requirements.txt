@@ -4,5 +4,7 @@ RPi.GPIO
 bjoern
 Flask-WTF
 behave
+splinter[selenium]
+PyHamcrest
 #gevent
 #gunicorn
