@@ -78,8 +78,15 @@ def subdata_element(context, obj, index, name):
         )
     ).first
 
+@when("purge extant subdata")
+def step_impl(context):
+    for button in reversed(context.browser.find_by_name("delete")):
+        button.click()
+        context.browser.get_alert().accept()
+
 @when("give it dependencies {subdata}")
 def step_impl(context, subdata):
+    context.execute_steps("When purge extant subdata")
     for index, datum in enumerate(loads(subdata)):
         if index > 0:
             context.browser.find_by_name("append").first.click()
@@ -106,6 +113,7 @@ def step_impl(context, subdata):
 
 @when("give it entries {subdata}")
 def step_impl(context, subdata):
+    context.execute_steps("When purge extant subdata")
     for index, datum in enumerate(loads(subdata)):
         if index > 0:
             context.browser.find_by_name("append").first.click()
@@ -132,6 +140,7 @@ def step_impl(context, subdata):
 
 @when("give it jobs {subdata}")
 def step_impl(context, subdata):
+    context.execute_steps("When purge extant subdata")
     for index, datum in enumerate(loads(subdata)):
         if index > 0:
             context.browser.find_by_name("append").first.click()
@@ -172,6 +181,12 @@ def step_impl(context, subdata):
 def step_impl(context, obj):
     context.browser.find_by_name("submit").first.click()
 
+@when("click the edit link for the {obj} named {name}")
+def step_impl(context, obj, name):
+    context.browser.find_by_xpath(
+        "//li[starts-with(text(), '" + name + "')]/.."
+    ).first.find_by_text("Edit").first.click()
+
 @when("click the delete link for the {obj} named {name}")
 def step_impl(context, obj, name):
     context.browser.find_by_xpath(
@@ -185,6 +200,20 @@ def step_impl(context):
 @then("we should see the {obj} list page")
 def step_impl(context, obj):
     assert_that(context.browser.is_text_present("Create a new " + obj))
+    # assert_that(context.browser.find_by_css(".current").first.text, equal_to(capitalize(pluralize(obj))))
+    # assert_that(context.browser.title, equal_to(capitalize(obj) + " List - Drizzle"))
+
+@then("we should see the {obj} edit page")
+def step_impl(context, obj):
+    assert_that(context.browser.is_text_present("Edit " + obj))
+
+@then("an error message about cyclic dependency graphs")
+def step_impl(context):
+    assert_that(context.browser.is_text_present("Cyclic dependency graph"))
+
+@then("an error message about concurrently scheduled jobs")
+def step_impl(context):
+    assert_that(context.browser.is_text_present("concurrent scheduled jobs"))
 
 @then("we shouldn't see the {obj} named {name}")
 def step_impl(context, obj, name):
@@ -193,7 +222,7 @@ def step_impl(context, obj, name):
         "//li[contains(@class,'name')][contains(text(),'" + name + "')]"
     ))
 
-@then("the new {obj} called {name}")
+@then("the {obj} called {name}")
 def step_impl(context, obj, name):
     assert_that(context.browser.is_text_present("Updated"))
     assert_that(context.browser.is_element_present_by_xpath(

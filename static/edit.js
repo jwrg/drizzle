@@ -68,7 +68,18 @@ function delete_row(button) {
       next_row = next_row.nextElementSibling;
     };
   } else {
-    row.querySelector('tr td select').value = row.querySelector('tr td select').options[0].value;
+    if (row.querySelector('tr td select') != null) {
+      row.querySelector('tr td select').value = row.querySelector('tr td select').options[0].value;
+    }
+    if (row.querySelector('tr td input[type=number]') != null) {
+      row.querySelector('tr td input[type=number]').value = 0;
+    }
+    if (row.querySelector('tr td input[type=time]') != null) {
+      row.querySelector('tr td input[type=time]').value = "00:00";
+    }
+    if (row.querySelector('tr td select[multiple]') != null) {
+      row.querySelector('tr td select[multiple]').selectedIndex = -1
+    }
   }
 }
 
