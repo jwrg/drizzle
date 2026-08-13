@@ -211,9 +211,17 @@ def step_impl(context, obj):
 def step_impl(context):
     assert_that(context.browser.is_text_present("Cyclic dependency graph"))
 
+@then("an error message about the index already being assigned")
+def step_impl(context):
+    assert_that(context.browser.is_text_present("already assigned to relay"))
+
 @then("an error message about concurrently scheduled jobs")
 def step_impl(context):
     assert_that(context.browser.is_text_present("concurrent scheduled jobs"))
+
+@then("an error message about a lack of associated weekdays")
+def step_impl(context):
+    assert_that(context.browser.is_text_present("at least one weekday"))
 
 @then("we shouldn't see the {obj} named {name}")
 def step_impl(context, obj, name):

@@ -4,7 +4,7 @@ Feature: CRUDding data model objects
   model types
 
   Background:
-      Given we are looking at the dashboard
+    Given we are looking at the dashboard
 
   Scenario Outline: Creating a board
      When we click the link to the <obj> list page
@@ -136,6 +136,18 @@ Feature: CRUDding data model objects
      | obj | name | subdata |
      | relay | Relay1 | [{"relay":"Relay2","spin_up":4}] |
 
+  Scenario Outline: Trying to assign a board index twice
+     When we click the link to the <obj> list page
+      And click the edit link for the <obj> named <name>
+      And assign it to index <index>
+      And save the <obj>
+     Then we should see the <obj> edit page
+      And an error message about the index already being assigned
+
+    Examples: Relays
+     | obj | name | index |
+     | relay | Relay1 | 6 |
+
   Scenario Outline: Updating all data for a sequence
      When we click the link to the <obj> list page
       And click the edit link for the <obj> named <name>
@@ -180,6 +192,19 @@ Feature: CRUDding data model objects
     Examples: Schedules
      | obj | name | subdata |
      | schedule | Schedule2 | [{"sequitur":"Sequence2","time":"14:00","weekdays":["Tuesday", "Wednesday", "Thursday"]},{"sequitur":"Sequence1","time":"14:00","weekdays":["Wednesday","Saturday","Sunday"]}] |
+
+  Scenario Outline: Trying to make a schedule with no weekdays
+     When we click the link to the <obj> list page
+      And click the edit link for the <obj> named <name>
+      And give it the description <desc>
+      And give it jobs <subdata>
+      And save the <obj>
+     Then we should see the <obj> edit page
+      And an error message about a lack of associated weekdays
+
+    Examples: Schedules
+     | obj | name | subdata |
+     | schedule | Schedule2 | [{"sequitur":"Sequence2","time":"14:00","weekdays":[]}] |
 
   Scenario Outline: Deleting a data model object
     When we click the link to the <obj> list page
